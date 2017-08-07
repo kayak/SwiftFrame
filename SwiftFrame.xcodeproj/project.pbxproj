@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A8396F031F387DE50060AF00 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A51F30A12A0038146B /* NSColorExtension.swift */; };
+		A8396F041F387DE50060AF00 /* NSErrorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */; };
+		A8396F051F387DE50060AF00 /* NSFontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A71F30A12A0038146B /* NSFontExtension.swift */; };
+		A8396F061F387DE50060AF00 /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8731D281F387A600033ADD1 /* Background.swift */; };
+		A8396F071F387DE50060AF00 /* CommandLineOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359541F262E7B008B479F /* CommandLineOptions.swift */; };
+		A8396F081F387DE50060AF00 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359701F263A2E008B479F /* Config.swift */; };
+		A8396F091F387DE50060AF00 /* FontRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359551F262E7B008B479F /* FontRegistry.swift */; };
+		A8396F0A1F387DE50060AF00 /* Frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359721F274556008B479F /* Frame.swift */; };
+		A8396F0B1F387DE50060AF00 /* ImageComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359561F262E7B008B479F /* ImageComposer.swift */; };
+		A8396F0C1F387DE50060AF00 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359571F262E7B008B479F /* ImageLoader.swift */; };
+		A8396F0D1F387DE50060AF00 /* ImageWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359581F262E7B008B479F /* ImageWriter.swift */; };
+		A8396F0E1F387DE50060AF00 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3595E1F262E7B008B479F /* StringExtension.swift */; };
+		A8396F0F1F387DE50060AF00 /* StringReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3595F1F262E7B008B479F /* StringReader.swift */; };
+		A8396F101F387DE50060AF00 /* TextRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359601F262E7B008B479F /* TextRenderer.swift */; };
+		A8731D291F387A600033ADD1 /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8731D281F387A600033ADD1 /* Background.swift */; };
+		A8731D311F387B540033ADD1 /* BackgroundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8731D301F387B540033ADD1 /* BackgroundTests.swift */; };
+		A87939AE1F3883090048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
+		A87939AF1F38830D0048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
 		A8CF15A81F30A12A0038146B /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A51F30A12A0038146B /* NSColorExtension.swift */; };
 		A8CF15A91F30A12A0038146B /* NSErrorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */; };
 		A8CF15AA1F30A12A0038146B /* NSFontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A71F30A12A0038146B /* NSFontExtension.swift */; };
@@ -37,6 +55,13 @@
 
 /* Begin PBXFileReference section */
 		A837CE9F1F2259D2004FEAD7 /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		A8731D281F387A600033ADD1 /* Background.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
+		A8731D2E1F387B540033ADD1 /* SwiftFrameTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftFrameTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8731D301F387B540033ADD1 /* BackgroundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTests.swift; sourceTree = "<group>"; };
+		A8731D321F387B540033ADD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A87939AD1F3883090048807B /* NSTextCheckingResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSTextCheckingResult.swift; sourceTree = "<group>"; };
+		A87939B01F3897F40048807B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A87939B11F3897F40048807B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A8CD4B4E1F1E03DB00A6E92C /* SwiftFrame */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SwiftFrame; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8CF15A51F30A12A0038146B /* NSColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSErrorExtension.swift; sourceTree = "<group>"; };
@@ -56,6 +81,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A8731D2B1F387B540033ADD1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A8CD4B4B1F1E03DB00A6E92C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -66,13 +98,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A8731D2F1F387B540033ADD1 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				A8731D301F387B540033ADD1 /* BackgroundTests.swift */,
+				A8731D321F387B540033ADD1 /* Info.plist */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		A8CD4B451F1E03DB00A6E92C = {
 			isa = PBXGroup;
 			children = (
 				A837CE9F1F2259D2004FEAD7 /* build.sh */,
 				A8F3596F1F262F69008B479F /* Example */,
+				A87939B01F3897F40048807B /* LICENSE */,
 				A8CD4B4F1F1E03DB00A6E92C /* Products */,
+				A87939B11F3897F40048807B /* README.md */,
 				A8CD4B501F1E03DB00A6E92C /* Sources */,
+				A8731D2F1F387B540033ADD1 /* Tests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -80,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				A8CD4B4E1F1E03DB00A6E92C /* SwiftFrame */,
+				A8731D2E1F387B540033ADD1 /* SwiftFrameTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -88,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				A8CF15A41F30A12A0038146B /* Extensions */,
+				A8731D281F387A600033ADD1 /* Background.swift */,
 				A8F359541F262E7B008B479F /* CommandLineOptions.swift */,
 				A8F359701F263A2E008B479F /* Config.swift */,
 				A8F359551F262E7B008B479F /* FontRegistry.swift */,
@@ -109,6 +155,7 @@
 				A8CF15A51F30A12A0038146B /* NSColorExtension.swift */,
 				A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */,
 				A8CF15A71F30A12A0038146B /* NSFontExtension.swift */,
+				A87939AD1F3883090048807B /* NSTextCheckingResult.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -116,6 +163,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A8731D2D1F387B540033ADD1 /* SwiftFrameTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A8731D331F387B540033ADD1 /* Build configuration list for PBXNativeTarget "SwiftFrameTests" */;
+			buildPhases = (
+				A8731D2A1F387B540033ADD1 /* Sources */,
+				A8731D2B1F387B540033ADD1 /* Frameworks */,
+				A8731D2C1F387B540033ADD1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftFrameTests;
+			productName = SwiftFrameTests;
+			productReference = A8731D2E1F387B540033ADD1 /* SwiftFrameTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A8CD4B4D1F1E03DB00A6E92C /* SwiftFrame */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A8CD4B551F1E03DB00A6E92C /* Build configuration list for PBXNativeTarget "SwiftFrame" */;
@@ -143,6 +207,11 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = KAYAK;
 				TargetAttributes = {
+					A8731D2D1F387B540033ADD1 = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = 8YE23NZS57;
+						ProvisioningStyle = Automatic;
+					};
 					A8CD4B4D1F1E03DB00A6E92C = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = 8YE23NZS57;
@@ -164,11 +233,45 @@
 			projectRoot = "";
 			targets = (
 				A8CD4B4D1F1E03DB00A6E92C /* SwiftFrame */,
+				A8731D2D1F387B540033ADD1 /* SwiftFrameTests */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A8731D2C1F387B540033ADD1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		A8731D2A1F387B540033ADD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A8396F0A1F387DE50060AF00 /* Frame.swift in Sources */,
+				A8396F031F387DE50060AF00 /* NSColorExtension.swift in Sources */,
+				A8396F051F387DE50060AF00 /* NSFontExtension.swift in Sources */,
+				A8731D311F387B540033ADD1 /* BackgroundTests.swift in Sources */,
+				A8396F0D1F387DE50060AF00 /* ImageWriter.swift in Sources */,
+				A8396F081F387DE50060AF00 /* Config.swift in Sources */,
+				A87939AF1F38830D0048807B /* NSTextCheckingResult.swift in Sources */,
+				A8396F0C1F387DE50060AF00 /* ImageLoader.swift in Sources */,
+				A8396F0F1F387DE50060AF00 /* StringReader.swift in Sources */,
+				A8396F101F387DE50060AF00 /* TextRenderer.swift in Sources */,
+				A8396F041F387DE50060AF00 /* NSErrorExtension.swift in Sources */,
+				A8396F091F387DE50060AF00 /* FontRegistry.swift in Sources */,
+				A8396F0B1F387DE50060AF00 /* ImageComposer.swift in Sources */,
+				A8396F071F387DE50060AF00 /* CommandLineOptions.swift in Sources */,
+				A8396F0E1F387DE50060AF00 /* StringExtension.swift in Sources */,
+				A8396F061F387DE50060AF00 /* Background.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A8CD4B4A1F1E03DB00A6E92C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -179,6 +282,7 @@
 				A8CF15A81F30A12A0038146B /* NSColorExtension.swift in Sources */,
 				A8F359611F262E7B008B479F /* CommandLineOptions.swift in Sources */,
 				A8F359661F262E7B008B479F /* main.swift in Sources */,
+				A87939AE1F3883090048807B /* NSTextCheckingResult.swift in Sources */,
 				A8F359641F262E7B008B479F /* ImageLoader.swift in Sources */,
 				A8F359731F274556008B479F /* Frame.swift in Sources */,
 				A8F359621F262E7B008B479F /* FontRegistry.swift in Sources */,
@@ -187,12 +291,41 @@
 				A8CF15AA1F30A12A0038146B /* NSFontExtension.swift in Sources */,
 				A8F3596C1F262E7B008B479F /* StringReader.swift in Sources */,
 				A8F3596D1F262E7B008B479F /* TextRenderer.swift in Sources */,
+				A8731D291F387A600033ADD1 /* Background.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		A8731D341F387B540033ADD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 8YE23NZS57;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kayak.SwiftFrameTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		A8731D351F387B540033ADD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 8YE23NZS57;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kayak.SwiftFrameTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		A8CD4B531F1E03DB00A6E92C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -307,6 +440,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A8731D331F387B540033ADD1 /* Build configuration list for PBXNativeTarget "SwiftFrameTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8731D341F387B540033ADD1 /* Debug */,
+				A8731D351F387B540033ADD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A8CD4B491F1E03DB00A6E92C /* Build configuration list for PBXProject "SwiftFrame" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

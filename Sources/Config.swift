@@ -10,7 +10,7 @@ final class Config {
     let verbose: Bool
     let downsamplingAllowed: Bool
 
-    let backgroundColor: NSColor
+    let background: Background
 
     let titleTexts: [String]
     let titleColor: NSColor
@@ -29,10 +29,10 @@ final class Config {
         verbose = options.verbose.isSpecified
         downsamplingAllowed = (configJSON["allowDownsampling"] as? Bool) ?? options.downsampling.isSpecified
 
-        guard let backgroundColor = try parseBackgroundColor(configJSON: configJSON, options: options) else {
-            throw NSError(description: "Missing or invalid background color specification")
+        guard let background = try parseBackground(configJSON: configJSON, options: options) else {
+            throw NSError(description: "Missing or invalid background specification")
         }
-        self.backgroundColor = backgroundColor
+        self.background = background
 
         titleTexts = try parseTitleTexts(options: options)
         guard !titleTexts.isEmpty else {
@@ -83,7 +83,7 @@ final class Config {
 
     func printSummary() {
         print("### Config Summary Begin")
-        print("Background Color: \(backgroundColor.hexString)")
+        print("Background: \(background)")
         for (index, text) in titleTexts.enumerated() {
             print("Title Text #\(index + 1): \"\(text)\"")
         }
@@ -124,20 +124,20 @@ private func pathRelativeToFile(_ path: String, fragment: String) -> String {
     return NSString.path(withComponents: components) as String
 }
 
-// MARK: - Background Color Parsing
+// MARK: - Background Parsing
 
-private func parseBackgroundColorString(configJSON: [String: Any], options: CommandLineOptions) -> String? {
-    guard let colorString = configJSON["backgroundColor"] as? String else {
-        return options.backgroundColor.arguments.first
+private func parseBackgroundSpecification(configJSON: [String: Any], options: CommandLineOptions) -> String? {
+    guard let specification = configJSON["background"] as? String else {
+        return options.background.arguments.first
     }
-    return colorString
+    return specification
 }
 
-private func parseBackgroundColor(configJSON: [String: Any], options: CommandLineOptions) throws -> NSColor? {
-    guard let colorString = parseBackgroundColorString(configJSON: configJSON, options: options) else {
+private func parseBackground(configJSON: [String: Any], options: CommandLineOptions) throws -> Background? {
+    guard let specification = parseBackgroundSpecification(configJSON: configJSON, options: options) else {
         return nil
     }
-    return try NSColor(hexString: colorString)
+    return try Background(specification: specification)
 }
 
 // MARK: - Title Text Parsing

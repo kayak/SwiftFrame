@@ -55,7 +55,7 @@ do {
             }
 
             let image = try composer.compose(
-                backgroundColor: config.backgroundColor,
+                background: config.background,
                 frame: frameImage,
                 framePadding: frame.padding,
                 viewport: frame.viewport,
