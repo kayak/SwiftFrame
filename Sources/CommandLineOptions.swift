@@ -67,9 +67,10 @@ final class CommandLineOptions {
         numArgsRequired: 1,
         isRepeatable: false)
 
-    let backgroundColor = CommandLineOption(
-        flags: ["-b", "--background-color"],
-        usageText: "The color used to fill the background. CSS-shorthand notation is supported. Leading pound is optional.",
+    let background = CommandLineOption(
+        flags: ["-b", "--background"],
+        usageText: "Specification for how to fill the background. Can either be a solid color in hex form (CSS-shorthand notation supported) " +
+            "or a linear gradient in CSS notation (diagonals and non-hex color notation not supported).",
         argumentPlaceholder: "HEX_STRING",
         numArgsRequired: 1,
         isRepeatable: false)
@@ -175,7 +176,7 @@ final class CommandLineOptions {
         isRepeatable: false)
 
     private var all: [CommandLineOption] {
-        return [help, configPath, backgroundColor, framePath, frameViewport, framePadding, screenshotPath, screenshotDirectory,
+        return [help, configPath, background, framePath, frameViewport, framePadding, screenshotPath, screenshotDirectory,
             downsampling, titleText, titleTexts, titleFontPath, titleColor, titlePadding, outputPath, outputSuffix, verbose]
     }
 
