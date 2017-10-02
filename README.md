@@ -17,7 +17,7 @@ Configuration is mostly possible through command-line arguments (see `swiftframe
   - `padding` – Padding in pixels used to surround the title. Components separated by space in the order `"TOP LEFT BOTTOM RIGHT"`, e.g. `"5 10 5 10"`.
 - `frames` – Object detailing the frames to be used. For every frame a key and an associated object are expected. The key is an escaped regular expression used for matching screenshot filenames, e.g. `".*iPhone5s\\.png"`. The object features the following optiojns:
   - `path` – (absolute or relative) path to the frame image file
-  - `viewport` – The viewport coordinates in the frame's coordinate system given by the x and y components of the bottom left and top right corners, e.g. `"60 180 700 1316"`.
+  - `viewport` – Optional. The viewport coordinates in the frame's coordinate system given by the x and y components of the bottom left and top right corners, e.g. `"60 180 700 1316"`. If omitted, the viewport is determined programmatically by analyzing the frame image.
   - `padding` – Horizontal padding in pixels used to surround the frame
 - `allowDownsampling` – Boolean indicating whether or not screenshots are allowed to be scaled down (retaining the aspect ratio) to fit the frame's viewport
 - `outputSuffix` – Suffix appended when writing framed screenshots to the file system
