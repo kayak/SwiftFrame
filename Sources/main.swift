@@ -35,20 +35,10 @@ do {
         }
 
         for i in 0 ..< screenshots.count {
-            let screenshot = try imageLoader.loadImage(atPath: screenshots[i])
-
-            if config.downsamplingAllowed {
-                let scale = frame.viewport.size.width / screenshot.size.width
-                guard scale <= 1, screenshot.size.applying(CGAffineTransform(scaleX: scale, y: scale)).equalTo(frame.viewport.size) else {
-                    throw NSError(description: "Dimensions of screenshot \(screenshots[i]) – \(screenshot.size) – "
-                        + "cannot be scaled down into viewport – \(frame.viewport.size)")
-                }
-            } else {
-                guard screenshot.size.equalTo(frame.viewport.size) else {
-                    throw NSError(description: "Dimensions of screenshot \(screenshots[i]) – \(screenshot.size) – "
-                        + "don't match viewport – \(frame.viewport.size)")
-                }
-            }
+            let screenshot = try imageLoader.loadImage(
+                atPath: screenshots[i],
+                forSize: frame.viewport.size,
+                allowDownsampling: config.downsamplingAllowed)
 
             if config.verbose {
                 print("Framing \(screenshots[i])...")
