@@ -25,6 +25,7 @@
 		A8731D311F387B540033ADD1 /* BackgroundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8731D301F387B540033ADD1 /* BackgroundTests.swift */; };
 		A87939AE1F3883090048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
 		A87939AF1F38830D0048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
+		A8C1D05E1F825CC7004692DB /* ImageLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */; };
 		A8CF15A81F30A12A0038146B /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A51F30A12A0038146B /* NSColorExtension.swift */; };
 		A8CF15A91F30A12A0038146B /* NSErrorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */; };
 		A8CF15AA1F30A12A0038146B /* NSFontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CF15A71F30A12A0038146B /* NSFontExtension.swift */; };
@@ -62,6 +63,7 @@
 		A87939AD1F3883090048807B /* NSTextCheckingResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSTextCheckingResult.swift; sourceTree = "<group>"; };
 		A87939B01F3897F40048807B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A87939B11F3897F40048807B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoaderTests.swift; sourceTree = "<group>"; };
 		A8CD4B4E1F1E03DB00A6E92C /* SwiftFrame */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SwiftFrame; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8CF15A51F30A12A0038146B /* NSColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		A8CF15A61F30A12A0038146B /* NSErrorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSErrorExtension.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				A8731D301F387B540033ADD1 /* BackgroundTests.swift */,
+				A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */,
 				A8731D321F387B540033ADD1 /* Info.plist */,
 			);
 			path = Tests;
@@ -253,6 +256,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8C1D05E1F825CC7004692DB /* ImageLoaderTests.swift in Sources */,
 				A8396F0A1F387DE50060AF00 /* Frame.swift in Sources */,
 				A8396F031F387DE50060AF00 /* NSColorExtension.swift in Sources */,
 				A8396F051F387DE50060AF00 /* NSFontExtension.swift in Sources */,
