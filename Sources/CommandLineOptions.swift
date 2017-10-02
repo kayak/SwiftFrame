@@ -84,9 +84,10 @@ final class CommandLineOptions {
 
     let frameViewport = CommandLineOption(
         flags: ["-dv", "--device-viewport"],
-        usageText: "The coordinates of the device frame's viewport with respect to its own coordinate system."
+        usageText: "Optional. The coordinates of the device frame's viewport with respect to its own coordinate system."
             + " (X1,Y1) and (X2,Y2) are the coordinates of the top left and bottom right corner, respectively."
-            + " Values should be supplied as integers.",
+            + " Values should be supplied as integers. If omitted, the viewport is determined programmatically by"
+            + " analyzing the frame image.",
         argumentPlaceholder: "\"X1 Y1 X2 Y2\"",
         numArgsRequired: 1,
         isRepeatable: false)

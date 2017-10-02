@@ -1,19 +1,26 @@
+import AppKit
 import Foundation
 
-struct Frame: Equatable, Hashable {
+class Frame: Equatable, Hashable {
 
     let path: String
-    let viewport: NSRect
     let padding: Int
     let nameRegex: NSRegularExpression
+    let viewport: NSRect
+    let image: NSImage
 
     // MARK: - Object Lifecycle
 
-    init(path: String, viewport: NSRect, padding: Int, namePattern: String) throws {
+    init(path: String, padding: Int, namePattern: String, viewport: NSRect? = nil, viewportComputer: ViewportComputerProtocol? = nil) throws {
         self.path = path
-        self.viewport = viewport
         self.padding = padding
         self.nameRegex = try NSRegularExpression(pattern: namePattern, options: [])
+        let image = try ImageLoader().loadImage(atPath: path)
+        guard let viewport = viewport ?? (viewportComputer ?? ViewportComputer()).compute(from: image) else {
+            throw NSError(description: "Failed to auto-compute viewport for device frame at \(path)")
+        }
+        self.viewport = viewport
+        self.image = image
     }
 
     // MARK: - File Name Matching

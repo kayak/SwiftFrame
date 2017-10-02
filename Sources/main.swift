@@ -19,8 +19,6 @@ do {
 
     for (frame, screenshots) in config.screenshotPathsByFrame {
         let imageLoader = ImageLoader()
-        let frameImage = try imageLoader.loadImage(atPath: frame.path)
-
         let composer = ImageComposer()
         let writer = ImageWriter()
 
@@ -46,7 +44,7 @@ do {
 
             let image = try composer.compose(
                 background: config.background,
-                frame: frameImage,
+                frame: frame.image,
                 framePadding: frame.padding,
                 viewport: frame.viewport,
                 screenshot: screenshot,

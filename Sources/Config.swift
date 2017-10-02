@@ -219,13 +219,18 @@ private func parseFrames(configPath: String?, configJSON: [String: Any], options
     guard let framesObject = configJSON["frames"] as? [String: Any] else {
         guard
             let path = options.framePath.arguments.first,
-            let viewportString = options.frameViewport.arguments.first,
             let paddingString = options.framePadding.arguments.first,
             let padding = Int(paddingString)
         else {
             return []
         }
-        return [try Frame(path: path, viewport: try numericComponentsParser.rect(from: viewportString), padding: padding, namePattern: ".*")]
+        let viewport: NSRect?
+        if let viewportString = options.frameViewport.arguments.first {
+            viewport = try numericComponentsParser.rect(from: viewportString)
+        } else {
+            viewport = nil
+        }
+        return [try Frame(path: path, padding: padding, namePattern: ".*", viewport: viewport)]
     }
     var frames: [Frame] = []
     for (key, value) in framesObject {
@@ -233,16 +238,17 @@ private func parseFrames(configPath: String?, configJSON: [String: Any], options
             let configPath = configPath,
             let frameObject = value as? [String: Any],
             let path = frameObject["path"] as? String,
-            let viewportString = frameObject["viewport"] as? String,
             let padding = frameObject["padding"] as? Int
         else {
             continue
         }
-        let frame = try Frame(
-            path: pathRelativeToFile(configPath, fragment: path),
-            viewport: try numericComponentsParser.rect(from: viewportString),
-            padding: padding,
-            namePattern: key)
+        let viewport: NSRect?
+        if let viewportString = frameObject["viewport"] as? String {
+            viewport = try numericComponentsParser.rect(from: viewportString)
+        } else {
+            viewport = nil
+        }
+        let frame = try Frame(path: pathRelativeToFile(configPath, fragment: path), padding: padding, namePattern: key, viewport: viewport)
         frames.append(frame)
     }
     return frames
