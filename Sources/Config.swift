@@ -274,7 +274,7 @@ private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) 
     var result: [Frame: [String]] = [:]
     for path in screenshotPaths {
         guard let frame = frames.first(where: { $0.matches(path: path) }) else {
-            print(CommandLineFormatter().formatWarning("No matching frame for screenshot"))
+            print(CommandLineFormatter().formatWarning("No matching frame for screenshot \(path)"))
             continue
         }
         var paths = result[frame] ?? []
