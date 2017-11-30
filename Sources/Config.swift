@@ -66,7 +66,7 @@ final class Config {
             throw NSError(description: "No screenshots specified")
         }
 
-        screenshotPathsByFrame = try groupScreenshotPaths(screenshotPaths, frames: frames)
+        screenshotPathsByFrame = groupScreenshotPaths(screenshotPaths, frames: frames)
         for paths in screenshotPathsByFrame.values {
             guard paths.count == titleTexts.count else {
                 throw NSError(description: "Unbalanced number of screenshots and title texts")
@@ -270,11 +270,12 @@ private func parseScreenshotPaths(options: CommandLineOptions, outputSuffix: Str
         .map { (path as NSString).appendingPathComponent($0) }
 }
 
-private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) throws -> [Frame: [String]] {
+private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) -> [Frame: [String]] {
     var result: [Frame: [String]] = [:]
     for path in screenshotPaths {
         guard let frame = frames.first(where: { $0.matches(path: path) }) else {
-            throw NSError(description: "No matching frame for screenshot \(path)")
+            print(CommandLineFormatter().formatWarning("No matching frame for screenshot"))
+            continue
         }
         var paths = result[frame] ?? []
         paths.append(path)

@@ -25,6 +25,7 @@
 		A8731D311F387B540033ADD1 /* BackgroundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8731D301F387B540033ADD1 /* BackgroundTests.swift */; };
 		A87939AE1F3883090048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
 		A87939AF1F38830D0048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
+		A87A5FBB1FD0377F00D444CE /* CommandLineFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */; };
 		A8C1D05E1F825CC7004692DB /* ImageLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */; };
 		A8C1D0601F8267BF004692DB /* FrameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C1D05F1F8267BF004692DB /* FrameTests.swift */; };
 		A8C1D0631F8268BC004692DB /* iPhone6s.png in Resources */ = {isa = PBXBuildFile; fileRef = A8C1D0621F8268BC004692DB /* iPhone6s.png */; };
@@ -68,6 +69,7 @@
 		A87939AD1F3883090048807B /* NSTextCheckingResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSTextCheckingResult.swift; sourceTree = "<group>"; };
 		A87939B01F3897F40048807B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A87939B11F3897F40048807B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandLineFormatter.swift; sourceTree = "<group>"; };
 		A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoaderTests.swift; sourceTree = "<group>"; };
 		A8C1D05F1F8267BF004692DB /* FrameTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameTests.swift; sourceTree = "<group>"; };
 		A8C1D0621F8268BC004692DB /* iPhone6s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone6s.png; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 			children = (
 				A8CF15A41F30A12A0038146B /* Extensions */,
 				A8731D281F387A600033ADD1 /* Background.swift */,
+				A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */,
 				A8F359541F262E7B008B479F /* CommandLineOptions.swift */,
 				A8F359701F263A2E008B479F /* Config.swift */,
 				A8F359551F262E7B008B479F /* FontRegistry.swift */,
@@ -312,6 +315,7 @@
 				A8F359651F262E7B008B479F /* ImageWriter.swift in Sources */,
 				A8CF15AA1F30A12A0038146B /* NSFontExtension.swift in Sources */,
 				A8F3596C1F262E7B008B479F /* StringReader.swift in Sources */,
+				A87A5FBB1FD0377F00D444CE /* CommandLineFormatter.swift in Sources */,
 				A8F3596D1F262E7B008B479F /* TextRenderer.swift in Sources */,
 				A8731D291F387A600033ADD1 /* Background.swift in Sources */,
 			);

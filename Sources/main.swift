@@ -67,6 +67,6 @@ do {
 } catch {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.
     // Interestingly, the same does not happen when building with Xcode directly. 
-    print("Error: \((error as NSError).localizedDescription)")
+    print(CommandLineFormatter().formatError("\((error as NSError).localizedDescription)"))
     exit(1)
 }
