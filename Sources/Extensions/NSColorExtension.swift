@@ -43,10 +43,10 @@ private func normalizeHexString(_ string: String) -> String? {
     guard CharacterSet(charactersIn: potentialHexString).isSubset(of: CharacterSet(charactersIn: "0123456789abcdefABCDEF")) else {
         return nil
     }
-    switch potentialHexString.characters.count {
+    switch potentialHexString.count {
     case 3:
         var result = ""
-        for character in potentialHexString.characters {
+        for character in potentialHexString {
             result += "\(character)\(character)"
         }
         return result

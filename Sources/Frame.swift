@@ -27,7 +27,7 @@ class Frame: Equatable, Hashable {
 
     func matches(path: String) -> Bool {
         let filename = (path as NSString).lastPathComponent as String
-        return nameRegex.firstMatch(in: filename, options: [], range: NSRange(location: 0, length: filename.characters.count)) != nil
+        return nameRegex.firstMatch(in: filename, options: [], range: NSRange(location: 0, length: filename.count)) != nil
     }
 
     // MARK: - Equatable

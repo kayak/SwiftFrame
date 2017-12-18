@@ -9,7 +9,7 @@ extension String {
         var lines = [String]()
         while !buffer.isEmpty {
             let breakingIndex: String.Index
-            if buffer.characters.count < lineLength {
+            if buffer.count < lineLength {
                 breakingIndex = buffer.endIndex
             } else {
                 let lineRange = Range(uncheckedBounds: (buffer.startIndex, buffer.index(buffer.startIndex, offsetBy: lineLength)))
@@ -24,7 +24,7 @@ extension String {
             if breakingIndex == buffer.endIndex {
                 buffer = ""
             } else {
-                buffer = buffer.substring(from: buffer.index(breakingIndex, offsetBy: delimiter.characters.count))
+                buffer = buffer.substring(from: buffer.index(breakingIndex, offsetBy: delimiter.count))
             }
         }
         return lines

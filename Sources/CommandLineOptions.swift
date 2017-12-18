@@ -215,7 +215,7 @@ final class CommandLineOptions {
     func summarizeUsage() -> String {
         var lines = [String]()
         let flags = all.map({ $0.flags.joined(separator: ", ") + "\($0.argumentPlaceholder != nil ? " \($0.argumentPlaceholder!)" : "")"})
-        let maxFlagLength = flags.map({ $0.characters.count }).max()!
+        let maxFlagLength = flags.map({ $0.count }).max()!
         let usageTexts = all.map({ $0.usageText.toFuzzyLines(ofLength: 50, breakingOn: " ") })
         for (flag, usageText) in zip(flags, usageTexts) {
             lines.append("\(flag.toWidth(maxFlagLength))  \(usageText.first!)")
