@@ -8,6 +8,12 @@ protocol ViewportComputerProtocol {
 class ViewportComputer: ViewportComputerProtocol {
 
     func compute(from image: NSImage) -> NSRect? {
+        return computeLLOViewport(from: image)
+    }
+
+    /// Computes the viewport of the supplied frame image. The viewport is returned as an `NSRect` in a coordinate system with
+    /// the origin in the upper left corner (AppKit's default).
+    private func computeULOViewport(from image: NSImage) -> NSRect? {
         let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)!
         let representation = NSBitmapImageRep(cgImage: cgImage)
         let center = Point(x: Int(image.size.width / 2), y: Int(image.size.height / 2))
@@ -17,6 +23,19 @@ class ViewportComputer: ViewportComputerProtocol {
         let y1 = find(.start, of: centerColor, along: .y, startingAt: center, in: representation)
         let y2 = find(.end, of: centerColor, along: .y, startingAt: center, in: representation)
         return x1 == x2 || y1 == y2 ? nil : NSRect(x: x1, y: y1, width: x2 - x1 + 1, height: y2 - y1 + 1)
+    }
+
+    /// Computes the viewport of the supplied frame image. The viewport is returned as an `NSRect` in a coordinate system with
+    /// the origin in the lower left corner (Core Graphic's default).
+    private func computeLLOViewport(from image: NSImage) -> NSRect? {
+        guard let uloViewport = computeULOViewport(from: image) else {
+            return nil
+        }
+        return NSRect(
+            x: uloViewport.origin.x,
+            y: image.size.height - uloViewport.origin.y - uloViewport.size.height,
+            width: uloViewport.size.width,
+            height: uloViewport.size.height)
     }
 
 }

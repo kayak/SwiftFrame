@@ -27,10 +27,16 @@ class ViewportComputerTests: XCTestCase {
         XCTAssertEqual(viewport, NSRect(x: 2, y: 2, width: 96, height: 96))
     }
 
-    func testComputesViewportForFrameAsset() {
+    func testComputesViewportFor6SFrameAsset() {
         let frame = NSImage(contentsOfFile: Bundle(for: self.classForCoder).path(forResource: "iPhone6s", ofType: "png")!)!
         let viewport = ViewportComputer().compute(from: frame)
         XCTAssertEqual(viewport, NSRect(x: 63, y: 183, width: 750, height: 1334))
+    }
+
+    func testComputesViewportForAsymmetric8PlusFrameAsset() {
+        let frame = NSImage(contentsOfFile: Bundle(for: self.classForCoder).path(forResource: "iPhone8Plus", ofType: "png")!)!
+        let viewport = ViewportComputer().compute(from: frame)
+        XCTAssertEqual(viewport, NSRect(x: 63, y: 83, width: 1305 - 63, height: 2291 - 83))
     }
 
 }

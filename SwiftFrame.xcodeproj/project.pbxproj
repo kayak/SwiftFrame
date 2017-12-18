@@ -26,6 +26,8 @@
 		A87939AE1F3883090048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
 		A87939AF1F38830D0048807B /* NSTextCheckingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87939AD1F3883090048807B /* NSTextCheckingResult.swift */; };
 		A87A5FBB1FD0377F00D444CE /* CommandLineFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */; };
+		A8BF7D531FE4221200B0150A /* CommandLineFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */; };
+		A8BF7D541FE4222D00B0150A /* iPhone8Plus.png in Resources */ = {isa = PBXBuildFile; fileRef = A8BF7D511FE421A400B0150A /* iPhone8Plus.png */; };
 		A8C1D05E1F825CC7004692DB /* ImageLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */; };
 		A8C1D0601F8267BF004692DB /* FrameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C1D05F1F8267BF004692DB /* FrameTests.swift */; };
 		A8C1D0631F8268BC004692DB /* iPhone6s.png in Resources */ = {isa = PBXBuildFile; fileRef = A8C1D0621F8268BC004692DB /* iPhone6s.png */; };
@@ -70,6 +72,7 @@
 		A87939B01F3897F40048807B /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A87939B11F3897F40048807B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A87A5FBA1FD0377F00D444CE /* CommandLineFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandLineFormatter.swift; sourceTree = "<group>"; };
+		A8BF7D511FE421A400B0150A /* iPhone8Plus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone8Plus.png; sourceTree = "<group>"; };
 		A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoaderTests.swift; sourceTree = "<group>"; };
 		A8C1D05F1F8267BF004692DB /* FrameTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameTests.swift; sourceTree = "<group>"; };
 		A8C1D0621F8268BC004692DB /* iPhone6s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhone6s.png; sourceTree = "<group>"; };
@@ -114,14 +117,23 @@
 		A8731D2F1F387B540033ADD1 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				A8BF7D521FE421AA00B0150A /* Resources */,
 				A8731D301F387B540033ADD1 /* BackgroundTests.swift */,
 				A8C1D05F1F8267BF004692DB /* FrameTests.swift */,
 				A8C1D05C1F825CBE004692DB /* ImageLoaderTests.swift */,
-				A8731D321F387B540033ADD1 /* Info.plist */,
-				A8C1D0621F8268BC004692DB /* iPhone6s.png */,
 				A8E3D1391F8500DD00F936AD /* ViewportComputerTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		A8BF7D521FE421AA00B0150A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A8731D321F387B540033ADD1 /* Info.plist */,
+				A8C1D0621F8268BC004692DB /* iPhone6s.png */,
+				A8BF7D511FE421A400B0150A /* iPhone8Plus.png */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		A8CD4B451F1E03DB00A6E92C = {
@@ -263,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A8C1D0631F8268BC004692DB /* iPhone6s.png in Resources */,
+				A8BF7D541FE4222D00B0150A /* iPhone8Plus.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A8C1D05E1F825CC7004692DB /* ImageLoaderTests.swift in Sources */,
+				A8BF7D531FE4221200B0150A /* CommandLineFormatter.swift in Sources */,
 				A8396F0A1F387DE50060AF00 /* Frame.swift in Sources */,
 				A8396F031F387DE50060AF00 /* NSColorExtension.swift in Sources */,
 				A8396F051F387DE50060AF00 /* NSFontExtension.swift in Sources */,
@@ -329,7 +343,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 8YE23NZS57;
-				INFOPLIST_FILE = Tests/Info.plist;
+				INFOPLIST_FILE = Tests/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kayak.SwiftFrameTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -343,7 +357,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 8YE23NZS57;
-				INFOPLIST_FILE = Tests/Info.plist;
+				INFOPLIST_FILE = Tests/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kayak.SwiftFrameTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
