@@ -39,7 +39,7 @@ private func stringToHex(_ string: String) throws -> Int {
 }
 
 private func normalizeHexString(_ string: String) -> String? {
-    let potentialHexString = string.hasPrefix("#") ? string.substring(from: string.index(after: string.startIndex)) : string
+    let potentialHexString = string.hasPrefix("#") ? String(string[string.index(after: string.startIndex)...]) : string
     guard CharacterSet(charactersIn: potentialHexString).isSubset(of: CharacterSet(charactersIn: "0123456789abcdefABCDEF")) else {
         return nil
     }

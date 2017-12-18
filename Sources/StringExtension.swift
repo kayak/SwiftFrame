@@ -20,11 +20,11 @@ extension String {
                 }
                 breakingIndex = delimiterRange?.lowerBound ?? buffer.endIndex
             }
-            lines.append(buffer.substring(to: breakingIndex))
+            lines.append(String(buffer[..<breakingIndex]))
             if breakingIndex == buffer.endIndex {
                 buffer = ""
             } else {
-                buffer = buffer.substring(from: buffer.index(breakingIndex, offsetBy: delimiter.count))
+                buffer = String(buffer[buffer.index(breakingIndex, offsetBy: delimiter.count)...])
             }
         }
         return lines

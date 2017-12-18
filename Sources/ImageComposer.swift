@@ -11,7 +11,7 @@ final class ImageComposer {
     // MARK: - Preparation
 
     /// Adapts the specified font to fit all of the supplied titles at the same size taking padding and canvas width into account
-    func adapt(titleFont: NSFont, toFitTitleTexts titleTexts: [String], titlePadding: EdgeInsets, width: CGFloat) throws -> NSFont {
+    func adapt(titleFont: NSFont, toFitTitleTexts titleTexts: [String], titlePadding: NSEdgeInsets, width: CGFloat) throws -> NSFont {
         let size = try textRenderer.maximumFontSizeThatFits(
             texts: titleTexts,
             font: titleFont,
@@ -32,7 +32,7 @@ final class ImageComposer {
         titleText: String,
         titleFont: NSFont,
         titleColor: NSColor,
-        titlePadding: EdgeInsets) throws -> CGImage
+        titlePadding: NSEdgeInsets) throws -> CGImage
     {
         let context = try createContext(size: screenshot.size)
 
@@ -89,7 +89,7 @@ final class ImageComposer {
     }
 
     // Returns the rect used for rendering the title
-    private func add(title: String, font: NSFont, color: NSColor, padding: EdgeInsets, context: CGContext) throws -> NSRect {
+    private func add(title: String, font: NSFont, color: NSColor, padding: NSEdgeInsets, context: CGContext) throws -> NSRect {
         let width = try textRenderer.minimumWidthThatFits(
             text: title,
             font: font,

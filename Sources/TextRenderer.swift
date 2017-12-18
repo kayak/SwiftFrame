@@ -119,15 +119,15 @@ final class TextRenderer {
 
     // MARK: - Misc
 
-    private func makeAttributes(font: NSFont, color: NSColor? = nil, alignment: NSTextAlignment? = nil) -> [String: Any] {
-        var attributes: [String: Any] = [NSFontAttributeName: font]
+    private func makeAttributes(font: NSFont, color: NSColor? = nil, alignment: NSTextAlignment? = nil) -> [NSAttributedStringKey: Any] {
+        var attributes: [NSAttributedStringKey: Any] = [.font: font]
         if let color = color {
-            attributes[NSForegroundColorAttributeName] = color
+            attributes[.foregroundColor] = color
         }
         if let alignment = alignment {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = alignment
-            attributes[NSParagraphStyleAttributeName] = paragraphStyle
+            attributes[.paragraphStyle] = paragraphStyle
         }
         return attributes
     }

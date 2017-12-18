@@ -15,7 +15,7 @@ final class Config {
     let titleTexts: [String]
     let titleColor: NSColor
     let titleFont: NSFont
-    let titlePadding: EdgeInsets
+    let titlePadding: NSEdgeInsets
 
     let screenshotPathsByFrame: [Frame: [String]]
     let outputPathsByScreenshotPath: [String: String]
@@ -205,7 +205,7 @@ private func parseTitlePaddingString(configJSON: [String: Any], options: Command
     return paddingString
 }
 
-private func parseTitlePadding(configJSON: [String: Any], options: CommandLineOptions) throws -> EdgeInsets? {
+private func parseTitlePadding(configJSON: [String: Any], options: CommandLineOptions) throws -> NSEdgeInsets? {
     guard let paddingString = parseTitlePaddingString(configJSON: configJSON, options: options) else {
         return nil
     }
@@ -317,9 +317,9 @@ private class NumericComponentsParser {
         return NSRect(x: components[0], y: components[1], width: components[2] - components[0], height: components[3] - components[1])
     }
 
-    func edgeInsets(from string: String) throws -> EdgeInsets {
+    func edgeInsets(from string: String) throws -> NSEdgeInsets {
         let components = try intComponents(from: string, count: 4)
-        return EdgeInsets(top: CGFloat(components[0]), left: CGFloat(components[1]), bottom: CGFloat(components[2]), right: CGFloat(components[3]))
+        return NSEdgeInsets(top: CGFloat(components[0]), left: CGFloat(components[1]), bottom: CGFloat(components[2]), right: CGFloat(components[3]))
     }
 
     private func intComponents(from string: String, count: Int) throws -> [Int] {
