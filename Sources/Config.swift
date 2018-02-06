@@ -268,6 +268,7 @@ private func parseScreenshotPaths(options: CommandLineOptions, outputSuffix: Str
             return kScreenshotExtensions.contains((path as NSString).pathExtension.lowercased())
         }
         .map { (path as NSString).appendingPathComponent($0) }
+        .sorted()
 }
 
 private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) -> [Frame: [String]] {
