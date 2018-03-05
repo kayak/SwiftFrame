@@ -19,6 +19,7 @@ Configuration is mostly possible through command-line arguments (see `swiftframe
   - `path` – (absolute or relative) path to the frame image file
   - `viewport` – Optional. The viewport coordinates in the frame's coordinate system given by the x and y components of the bottom left and top right corners, e.g. `"60 180 700 1316"`. If omitted, the viewport is determined programmatically by analyzing the frame image.
   - `padding` – Horizontal padding in pixels used to surround the frame
+  - `hasNotch` – Whether or not the frame image has a notch and needs to be treated differently
 - `allowDownsampling` – Boolean indicating whether or not screenshots are allowed to be scaled down (retaining the aspect ratio) to fit the frame's viewport
 - `outputSuffix` – Suffix appended when writing framed screenshots to the file system
 

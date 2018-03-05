@@ -47,6 +47,7 @@ do {
                 frame: frame.image,
                 framePadding: frame.padding,
                 viewport: frame.viewport,
+                viewportMask: frame.viewportMask,
                 screenshot: screenshot,
                 titleText: config.titleTexts[i],
                 titleFont: adaptedTitleFont,

@@ -48,6 +48,7 @@
 		A8F3596D1F262E7B008B479F /* TextRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359601F262E7B008B479F /* TextRenderer.swift */; };
 		A8F359711F263A2E008B479F /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359701F263A2E008B479F /* Config.swift */; };
 		A8F359731F274556008B479F /* Frame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F359721F274556008B479F /* Frame.swift */; };
+		A8F76E9820499AED004C6F20 /* iPhoneX.png in Resources */ = {isa = PBXBuildFile; fileRef = A8F76E9720499A62004C6F20 /* iPhoneX.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -94,6 +95,7 @@
 		A8F3596F1F262F69008B479F /* Example */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Example; sourceTree = "<group>"; };
 		A8F359701F263A2E008B479F /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		A8F359721F274556008B479F /* Frame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Frame.swift; sourceTree = "<group>"; };
+		A8F76E9720499A62004C6F20 /* iPhoneX.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iPhoneX.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 				A8731D321F387B540033ADD1 /* Info.plist */,
 				A8C1D0621F8268BC004692DB /* iPhone6s.png */,
 				A8BF7D511FE421A400B0150A /* iPhone8Plus.png */,
+				A8F76E9720499A62004C6F20 /* iPhoneX.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8F76E9820499AED004C6F20 /* iPhoneX.png in Resources */,
 				A8C1D0631F8268BC004692DB /* iPhone6s.png in Resources */,
 				A8BF7D541FE4222D00B0150A /* iPhone8Plus.png in Resources */,
 			);

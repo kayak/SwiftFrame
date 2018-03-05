@@ -230,7 +230,12 @@ private func parseFrames(configPath: String?, configJSON: [String: Any], options
         } else {
             viewport = nil
         }
-        return [try Frame(path: path, padding: padding, namePattern: ".*", viewport: viewport)]
+        return [try Frame(
+            path: path,
+            padding: padding,
+            hasNotch: options.frameHasNotch.isSpecified,
+            namePattern: ".*",
+            viewport: viewport)]
     }
     var frames: [Frame] = []
     for (key, value) in framesObject {
@@ -248,7 +253,12 @@ private func parseFrames(configPath: String?, configJSON: [String: Any], options
         } else {
             viewport = nil
         }
-        let frame = try Frame(path: pathRelativeToFile(configPath, fragment: path), padding: padding, namePattern: key, viewport: viewport)
+        let frame = try Frame(
+            path: pathRelativeToFile(configPath, fragment: path),
+            padding: padding,
+            hasNotch: (frameObject["hasNotch"] as? Bool) ?? false,
+            namePattern: key,
+            viewport: viewport)
         frames.append(frame)
     }
     return frames

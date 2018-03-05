@@ -5,21 +5,26 @@ class Frame: Equatable, Hashable {
 
     let path: String
     let padding: Int
+    let hasNotch: Bool
     let nameRegex: NSRegularExpression
     let viewport: NSRect
+    let viewportMask: NSImage?
     let image: NSImage
 
     // MARK: - Object Lifecycle
 
-    init(path: String, padding: Int, namePattern: String, viewport: NSRect? = nil, viewportComputer: ViewportComputerProtocol? = nil) throws {
+    init(path: String, padding: Int, hasNotch: Bool, namePattern: String, viewport: NSRect? = nil, viewportComputer: ViewportComputerProtocol? = nil) throws {
         self.path = path
         self.padding = padding
+        self.hasNotch = hasNotch
         self.nameRegex = try NSRegularExpression(pattern: namePattern, options: [])
         let image = try ImageLoader().loadImage(atPath: path)
-        guard let viewport = viewport ?? (viewportComputer ?? ViewportComputer()).compute(from: image) else {
+        let computer = viewportComputer ?? ViewportComputer()
+        guard let viewport = viewport ?? computer.computeViewportRect(from: image, hasNotch: hasNotch) else {
             throw NSError(description: "Failed to auto-compute viewport for device frame at \(path)")
         }
         self.viewport = viewport
+        self.viewportMask = try computer.computeViewportMask(from: image, with: viewport)
         self.image = image
     }
 

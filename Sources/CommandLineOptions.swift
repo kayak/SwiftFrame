@@ -99,6 +99,13 @@ final class CommandLineOptions {
         numArgsRequired: 1,
         isRepeatable: false)
 
+    let frameHasNotch = CommandLineOption(
+        flags: ["-dn", "--device-frame-has-notch"],
+        usageText: "If specified, the frame has a notch and will be treated accordingly",
+        argumentPlaceholder: nil,
+        numArgsRequired: 0,
+        isRepeatable: false)
+
     let screenshotPath = CommandLineOption(
         flags: ["-s", "--screenshot"],
         usageText: "The screenshot image. Can be supplied multiple times.",
@@ -177,7 +184,7 @@ final class CommandLineOptions {
         isRepeatable: false)
 
     private var all: [CommandLineOption] {
-        return [help, configPath, background, framePath, frameViewport, framePadding, screenshotPath, screenshotDirectory,
+        return [help, configPath, background, framePath, frameViewport, framePadding, frameHasNotch, screenshotPath, screenshotDirectory,
             downsampling, titleText, titleTexts, titleFontPath, titleColor, titlePadding, outputPath, outputSuffix, verbose]
     }
 

@@ -28,6 +28,7 @@ final class ImageComposer {
         frame: NSImage,
         framePadding: Int,
         viewport: NSRect,
+        viewportMask: NSImage?,
         screenshot: NSImage,
         titleText: String,
         titleFont: NSFont,
@@ -42,8 +43,9 @@ final class ImageComposer {
 
         let frameScale = CGFloat(context.width - 2 * framePadding) / frame.size.width
         let frameYOffset = CGFloat(context.height) / frameScale - frame.size.height - (titlePadding.top + titleRect.height + titlePadding.bottom) / frameScale
+
         add(frame: frame, scale: frameScale, yOffset: frameYOffset, context: context)
-        add(screenshot: screenshot, viewport: viewport, scale: frameScale, yOffset: frameYOffset, context: context)
+        add(screenshot: screenshot, frame: frame, viewport: viewport, viewportMask: viewportMask, scale: frameScale, yOffset: frameYOffset, context: context)
 
         guard let image = context.makeImage() else {
             throw NSError(description: "Failed to retrieve image from graphics context")
@@ -110,11 +112,14 @@ final class ImageComposer {
         context.restoreGState()
     }
 
-    private func add(screenshot: NSImage, viewport: NSRect, scale: CGFloat, yOffset: CGFloat, context: CGContext) {
+    private func add(screenshot: NSImage, frame: NSImage, viewport: NSRect, viewportMask: NSImage?, scale: CGFloat, yOffset: CGFloat, context: CGContext) {
         context.saveGState()
         context.scaleBy(x: scale, y: scale)
         context.translateBy(x: (CGFloat(context.width) / scale - viewport.size.width) / 2.0 - viewport.origin.x, y: yOffset)
         var rect = viewport
+        if let mask = viewportMask?.cgImage(forProposedRect: &rect, context: nil, hints: nil) {
+            context.clip(to: viewport, mask: mask)
+        }
         context.draw(screenshot.cgImage(forProposedRect: &rect, context: nil, hints: nil)!, in: rect)
         context.restoreGState()
     }

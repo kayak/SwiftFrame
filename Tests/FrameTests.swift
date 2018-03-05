@@ -7,6 +7,7 @@ class FrameTests: XCTestCase {
         guard let frame = try? Frame(
             path: Bundle(for: self.classForCoder).path(forResource: "iPhone6s", ofType: "png")!,
             padding: 0,
+            hasNotch: false,
             namePattern: ".*",
             viewport: NSRect(x: 0, y: 0, width: 100, height: 100),
             viewportComputer: ViewportComputerMock())
@@ -21,6 +22,7 @@ class FrameTests: XCTestCase {
         guard let frame = try? Frame(
             path: Bundle(for: self.classForCoder).path(forResource: "iPhone6s", ofType: "png")!,
             padding: 0,
+            hasNotch: false,
             namePattern: ".*",
             viewportComputer: ViewportComputerMock())
         else {
@@ -34,8 +36,12 @@ class FrameTests: XCTestCase {
 
 private struct ViewportComputerMock: ViewportComputerProtocol {
 
-    func compute(from image: NSImage) -> NSRect? {
+    func computeViewportRect(from frame: NSImage, hasNotch: Bool) -> NSRect? {
         return NSRect(x: 1, y: 2, width: 3, height: 4)
+    }
+
+    func computeViewportMask(from frame: NSImage, with viewport: NSRect) throws -> NSImage? {
+        return nil
     }
 
 }
