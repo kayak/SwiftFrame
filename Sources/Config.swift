@@ -69,7 +69,7 @@ final class Config {
         screenshotPathsByFrame = groupScreenshotPaths(screenshotPaths, frames: frames)
         for paths in screenshotPathsByFrame.values {
             guard paths.count == titleTexts.count else {
-                throw NSError(description: "Unbalanced number of screenshots and title texts")
+                throw NSError(description: "Unbalanced number of screenshots and title texts.\nScreenshots: \(paths)\nTitles: \(titleTexts)")
             }
         }
 
