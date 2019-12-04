@@ -14,3 +14,12 @@ public struct Debug {
     }
 
 }
+
+public struct ConfigFile: Codable {
+    let deviceData: [String: DeviceData]
+    let textFilesPath: URL
+}
+
+public struct DeviceData: Codable {
+    
+}

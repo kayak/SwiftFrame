@@ -8,16 +8,13 @@ let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 final class Config {
 
     let verbose: Bool
-    let downsamplingAllowed: Bool
-
-    let background: Background
 
     let titleTexts: [String]
     let titleColor: NSColor
     let titleFont: NSFont
-    let titlePadding: NSEdgeInsets
 
     let screenshotPathsByFrame: [Frame: [String]]
+    let templatePathsByFrame: [Frame: URL]
     let outputPathsByScreenshotPath: [String: String]
 
     // MARK: - Object Lifecycle
@@ -27,7 +24,6 @@ final class Config {
         let configJSON = try loadConfigJSON(path: configPath)
 
         verbose = options.verbose.isSpecified
-        downsamplingAllowed = (configJSON["allowDownsampling"] as? Bool) ?? options.downsampling.isSpecified
 
         guard let background = try parseBackground(configJSON: configJSON, options: options) else {
             throw NSError(description: "Missing or invalid background specification")
@@ -48,11 +44,6 @@ final class Config {
             throw NSError(description: "Missing or invalid title font specification")
         }
         self.titleFont = titleFont
-
-        guard let titlePadding = try parseTitlePadding(configJSON: configJSON, options: options) else {
-            throw NSError(description: "Missing or invalid frame specification")
-        }
-        self.titlePadding = titlePadding
 
         let frames = try parseFrames(configPath: configPath, configJSON: configJSON, options: options)
         guard !frames.isEmpty else {
@@ -83,13 +74,13 @@ final class Config {
 
     func printSummary() {
         print("### Config Summary Begin")
-        print("Background: \(background)")
+        //print("Background: \(background)")
         for (index, text) in titleTexts.enumerated() {
             print("Title Text #\(index + 1): \"\(text)\"")
         }
         print("Title Color: \(titleColor.hexString)")
         print("Title Font: \(titleFont.fontName)")
-        print("Title Padding: \(titlePadding)")
+        //print("Title Padding: \(titlePadding)")
         for (index, element) in screenshotPathsByFrame.enumerated() {
             print("Frame #\(index + 1) Path: \(element.key.path)")
             print("Frame #\(index + 1) Viewport: \(element.key.viewport)")
@@ -122,22 +113,6 @@ private func pathRelativeToFile(_ path: String, fragment: String) -> String {
     components.removeLast()
     components.append(contentsOf: (fragment as NSString).pathComponents)
     return NSString.path(withComponents: components) as String
-}
-
-// MARK: - Background Parsing
-
-private func parseBackgroundSpecification(configJSON: [String: Any], options: CommandLineOptions) -> String? {
-    guard let specification = configJSON["background"] as? String else {
-        return options.background.arguments.first
-    }
-    return specification
-}
-
-private func parseBackground(configJSON: [String: Any], options: CommandLineOptions) throws -> Background? {
-    guard let specification = parseBackgroundSpecification(configJSON: configJSON, options: options) else {
-        return nil
-    }
-    return try Background(specification: specification)
 }
 
 // MARK: - Title Text Parsing

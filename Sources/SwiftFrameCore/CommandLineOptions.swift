@@ -67,114 +67,12 @@ final class CommandLineOptions {
         numArgsRequired: 1,
         isRepeatable: false)
 
-    let background = CommandLineOption(
-        flags: ["-b", "--background"],
-        usageText: "Specification for how to fill the background. Can either be a solid color in hex form (CSS-shorthand notation supported) " +
-            "or a linear gradient in CSS notation (diagonals and non-hex color notation not supported).",
-        argumentPlaceholder: "HEX_STRING",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let framePath = CommandLineOption(
-        flags: ["-d", "--device-frame"],
-        usageText: "The device frame image",
-        argumentPlaceholder: "PATH",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let frameViewport = CommandLineOption(
-        flags: ["-dv", "--device-viewport"],
-        usageText: "Optional. The coordinates of the device frame's viewport with respect to its own coordinate system."
-            + " (X1,Y1) and (X2,Y2) are the coordinates of the top left and bottom right corner, respectively."
-            + " Values should be supplied as integers. If omitted, the viewport is determined programmatically by"
-            + " analyzing the frame image.",
-        argumentPlaceholder: "\"X1 Y1 X2 Y2\"",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let framePadding = CommandLineOption(
-        flags: ["-dp", "--device-padding"],
-        usageText: "The horizontal padding used to surround the device frame",
-        argumentPlaceholder: "INT",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let frameHasNotch = CommandLineOption(
-        flags: ["-dn", "--device-frame-has-notch"],
-        usageText: "If specified, the frame has a notch and will be treated accordingly",
-        argumentPlaceholder: nil,
-        numArgsRequired: 0,
-        isRepeatable: false)
-
-    let screenshotPath = CommandLineOption(
-        flags: ["-s", "--screenshot"],
-        usageText: "The screenshot image. Can be supplied multiple times.",
-        argumentPlaceholder: "PATH",
-        numArgsRequired: 1,
-        isRepeatable: true)
-
-    let screenshotDirectory = CommandLineOption(
-        flags: ["-sd", "--screenshot-directory"],
-        usageText: "The directory containing the screenshots",
-        argumentPlaceholder: "PATH",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let downsampling = CommandLineOption(
-        flags: ["-ad", "--allow-downsampling"],
-        usageText: "If specified, screenshots are scaled down to match the device's viewport when required",
-        argumentPlaceholder: nil,
-        numArgsRequired: 0,
-        isRepeatable: false)
-
-    let titleText = CommandLineOption(
-        flags: ["-t", "--title-text"],
-        usageText: "The title text. Can be supplied multiple times.",
-        argumentPlaceholder: "STRING",
-        numArgsRequired: 1,
-        isRepeatable: true)
-
-    let titleTexts = CommandLineOption(
-        flags: ["-tt", "--title-texts"],
-        usageText: "File containing the title texts. One line is expected for each screenshot supplied. The file should be UTF-8 encoded.",
-        argumentPlaceholder: "STRING",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let titleFontPath = CommandLineOption(
-        flags: ["-tf", "--title-font"],
-        usageText: "The font file to be used for rendering the title",
-        argumentPlaceholder: "PATH",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let titleColor = CommandLineOption(
-        flags: ["-tc", "--title-color"],
-        usageText: "The title text color",
-        argumentPlaceholder: "HEX_STRING",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
-    let titlePadding = CommandLineOption(
-        flags: ["-tp", "--title-padding"],
-        usageText: "The padding used to surround the title text. Values should be supplied as integers.",
-        argumentPlaceholder: "\"TOP LEFT BOTTOM RIGHT\"",
-        numArgsRequired: 1,
-        isRepeatable: false)
-
     let outputPath = CommandLineOption(
         flags: ["-o", "--output"],
         usageText: "The path under which to store the resulting PNG. Can be supplied multiple times.",
         argumentPlaceholder: "PATH",
         numArgsRequired: 1,
         isRepeatable: true)
-
-    let outputSuffix = CommandLineOption(
-        flags: ["-os", "--output-suffix"],
-        usageText: "The suffix to append to screenshot names when writing the framed output.",
-        argumentPlaceholder: "STRING",
-        numArgsRequired: 1,
-        isRepeatable: false)
 
     let verbose = CommandLineOption(
         flags: ["-v", "--verbose"],
@@ -184,8 +82,7 @@ final class CommandLineOptions {
         isRepeatable: false)
 
     private var all: [CommandLineOption] {
-        return [help, configPath, background, framePath, frameViewport, framePadding, frameHasNotch, screenshotPath, screenshotDirectory,
-            downsampling, titleText, titleTexts, titleFontPath, titleColor, titlePadding, outputPath, outputSuffix, verbose]
+        return [help, configPath, outputPath, verbose]
     }
 
     // MARK: - Parsing & Validation
