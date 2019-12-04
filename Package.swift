@@ -18,6 +18,6 @@ let package = Package(
         .target(name: "SwiftFrameCore"),
         .testTarget(
             name: "SwiftFrameTests",
-            dependencies: ["SwiftFrame"]),
+            dependencies: ["SwiftFrameCore"]),
     ]
 )

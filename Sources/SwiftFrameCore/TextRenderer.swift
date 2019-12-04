@@ -119,8 +119,8 @@ final class TextRenderer {
 
     // MARK: - Misc
 
-    private func makeAttributes(font: NSFont, color: NSColor? = nil, alignment: NSTextAlignment? = nil) -> [NSAttributedStringKey: Any] {
-        var attributes: [NSAttributedStringKey: Any] = [.font: font]
+    private func makeAttributes(font: NSFont, color: NSColor? = nil, alignment: NSTextAlignment? = nil) -> [NSAttributedString.Key: Any] {
+        var attributes: [NSAttributedString.Key: Any] = [.font: font]
         if let color = color {
             attributes[.foregroundColor] = color
         }
