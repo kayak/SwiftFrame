@@ -35,16 +35,6 @@ final class Config {
             throw NSError(description: "Missing or invalid title text specification")
         }
 
-        guard let titleColor = try parseTitleColor(configJSON: configJSON, options: options) else {
-            throw NSError(description: "Missing or invalid title color specification")
-        }
-        self.titleColor = titleColor
-
-        guard let titleFont = try parseTitleFont(configPath: configPath, configJSON: configJSON, options: options) else {
-            throw NSError(description: "Missing or invalid title font specification")
-        }
-        self.titleFont = titleFont
-
         let frames = try parseFrames(configPath: configPath, configJSON: configJSON, options: options)
         guard !frames.isEmpty else {
             throw NSError(description: "Missing or invalid frame specification")
@@ -115,35 +105,6 @@ private func pathRelativeToFile(_ path: String, fragment: String) -> String {
     return NSString.path(withComponents: components) as String
 }
 
-// MARK: - Title Text Parsing
-
-private func parseTitleTexts(options: CommandLineOptions) throws -> [String] {
-    var result = options.titleText.arguments
-    if let path = options.titleTexts.arguments.first {
-        result.append(contentsOf: try StringReader().read(from: path))
-    }
-    return result
-}
-
-// MARK: - Title Color Parsing
-
-private func parseTitleColorString(configJSON: [String: Any], options: CommandLineOptions) -> String? {
-    guard
-        let titlesObject = configJSON["titles"] as? [String: Any],
-        let colorString = titlesObject["color"] as? String
-    else {
-        return options.titleColor.arguments.first
-    }
-    return colorString
-}
-
-private func parseTitleColor(configJSON: [String: Any], options: CommandLineOptions) throws -> NSColor? {
-    guard let colorString = parseTitleColorString(configJSON: configJSON, options: options) else {
-        return nil
-    }
-    return try NSColor(hexString: colorString)
-}
-
 // MARK: - Title Font Parsing
 
 private func parseTitleFontPath(configPath: String?, configJSON: [String: Any], options: CommandLineOptions) -> String? {
@@ -168,91 +129,17 @@ private func parseTitleFont(configPath: String?, configJSON: [String: Any], opti
     return font
 }
 
-// MARK: - Title Padding Parsing
-
-private func parseTitlePaddingString(configJSON: [String: Any], options: CommandLineOptions) -> String? {
-    guard
-        let titlesObject = configJSON["titles"] as? [String: Any],
-        let paddingString = titlesObject["padding"] as? String
-    else {
-        return options.titlePadding.arguments.first
-    }
-    return paddingString
-}
-
-private func parseTitlePadding(configJSON: [String: Any], options: CommandLineOptions) throws -> NSEdgeInsets? {
-    guard let paddingString = parseTitlePaddingString(configJSON: configJSON, options: options) else {
-        return nil
-    }
-    return try NumericComponentsParser().edgeInsets(from: paddingString)
-}
-
-// MARK: - Frame Parsing
-
-private func parseFrames(configPath: String?, configJSON: [String: Any], options: CommandLineOptions) throws -> [Frame] {
-    let numericComponentsParser = NumericComponentsParser()
-    guard let framesObject = configJSON["frames"] as? [String: Any] else {
-        guard
-            let path = options.framePath.arguments.first,
-            let paddingString = options.framePadding.arguments.first,
-            let padding = Int(paddingString)
-        else {
-            return []
-        }
-        let viewport: NSRect?
-        if let viewportString = options.frameViewport.arguments.first {
-            viewport = try numericComponentsParser.rect(from: viewportString)
-        } else {
-            viewport = nil
-        }
-        return [try Frame(
-            path: path,
-            padding: padding,
-            hasNotch: options.frameHasNotch.isSpecified,
-            namePattern: ".*",
-            viewport: viewport)]
-    }
-    var frames: [Frame] = []
-    for (key, value) in framesObject {
-        guard
-            let configPath = configPath,
-            let frameObject = value as? [String: Any],
-            let path = frameObject["path"] as? String,
-            let padding = frameObject["padding"] as? Int
-        else {
-            continue
-        }
-        let viewport: NSRect?
-        if let viewportString = frameObject["viewport"] as? String {
-            viewport = try numericComponentsParser.rect(from: viewportString)
-        } else {
-            viewport = nil
-        }
-        let frame = try Frame(
-            path: pathRelativeToFile(configPath, fragment: path),
-            padding: padding,
-            hasNotch: (frameObject["hasNotch"] as? Bool) ?? false,
-            namePattern: key,
-            viewport: viewport)
-        frames.append(frame)
-    }
-    return frames
-}
-
 // MARK: - Screenshot Path Parsing
 
-private func parseScreenshotPaths(options: CommandLineOptions, outputSuffix: String?) throws -> [String] {
-    guard let path = options.screenshotDirectory.arguments.first else {
-        return options.screenshotPath.arguments
-    }
-    return (try FileManager.default.contentsOfDirectory(atPath: path))
+private func parseScreenshotPaths(folderPath: String, outputSuffix: String?) throws -> [String] {
+    return (try FileManager.default.contentsOfDirectory(atPath: folderPath))
         .filter { path in
             if let suffix = outputSuffix, (path as NSString).deletingPathExtension.hasSuffix(suffix) {
                 return false
             }
             return kScreenshotExtensions.contains((path as NSString).pathExtension.lowercased())
         }
-        .map { (path as NSString).appendingPathComponent($0) }
+        .map { (folderPath as NSString).appendingPathComponent($0) }
         .sorted()
 }
 
@@ -266,30 +153,6 @@ private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) 
         var paths = result[frame] ?? []
         paths.append(path)
         result[frame] = paths
-    }
-    return result
-}
-
-// MARK: - Output Path Parsing
-
-private func parseOutputSuffix(configJSON: [String: Any], options: CommandLineOptions) -> String? {
-    return (configJSON["outputSuffix"] as? String) ?? options.outputSuffix.arguments.first
-}
-
-private func parseOutputPaths(configJSON: [String: Any], options: CommandLineOptions, outputSuffix: String?, screenshotPaths: [String]) -> [String: String] {
-    guard let suffix = outputSuffix else {
-        guard options.outputPath.arguments.count == screenshotPaths.count else {
-            return [:]
-        }
-        var result = [String: String]()
-        for (screenshotPath, outputPath) in zip(screenshotPaths, options.outputPath.arguments) {
-            result[screenshotPath] = outputPath
-        }
-        return result
-    }
-    var result = [String: String]()
-    for screenshotPath in screenshotPaths {
-        result[screenshotPath] = "\((screenshotPath as NSString).deletingPathExtension)\(suffix).png"
     }
     return result
 }
@@ -313,7 +176,7 @@ private class NumericComponentsParser {
         guard stringComponents.count == count else {
             throw NSError(description: "Failed to parse numeric components from \(string)")
         }
-        let intComponents = stringComponents.flatMap({ Int($0) })
+        let intComponents = stringComponents.compactMap { Int($0) }
         guard intComponents.count == stringComponents.count else {
             throw NSError(description: "Failed to parse numeric components from \(string)")
         }

@@ -67,13 +67,6 @@ final class CommandLineOptions {
         numArgsRequired: 1,
         isRepeatable: false)
 
-    let outputPath = CommandLineOption(
-        flags: ["-o", "--output"],
-        usageText: "The path under which to store the resulting PNG. Can be supplied multiple times.",
-        argumentPlaceholder: "PATH",
-        numArgsRequired: 1,
-        isRepeatable: true)
-
     let verbose = CommandLineOption(
         flags: ["-v", "--verbose"],
         usageText: "Print logging information to STDOUT",
@@ -82,7 +75,7 @@ final class CommandLineOptions {
         isRepeatable: false)
 
     private var all: [CommandLineOption] {
-        return [help, configPath, outputPath, verbose]
+        return [help, configPath, verbose]
     }
 
     // MARK: - Parsing & Validation
