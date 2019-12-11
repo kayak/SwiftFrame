@@ -8,16 +8,10 @@ let package = Package(
     platforms: [
         .macOS(.v10_13)
     ],
-//    dependencies: [
-//        .package(url: "https://github.com/apple/swift-package-manager.git", .revision("swift-5.1-RELEASE"))
-//    ],
     targets: [
-        .target(
-            name: "SwiftFrame",
-            dependencies: ["SwiftFrameCore"]),
-        .target(name: "SwiftFrameCore"),
+        .target(name: "SwiftFrame"),
         .testTarget(
             name: "SwiftFrameTests",
-            dependencies: ["SwiftFrameCore"]),
+            dependencies: ["SwiftFrame"]),
     ]
 )

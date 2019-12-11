@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SwiftFrameCore
+@testable import SwiftFrame
 
 class ViewportComputerTests: XCTestCase {
 

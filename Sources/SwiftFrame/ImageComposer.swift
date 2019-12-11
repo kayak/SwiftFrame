@@ -24,7 +24,7 @@ final class ImageComposer {
     // MARK: - Composition
 
     func compose(
-        background: Background,
+        //background: Background,
         frame: NSImage,
         framePadding: Int,
         viewport: NSRect,
@@ -37,7 +37,7 @@ final class ImageComposer {
     {
         let context = try createContext(size: screenshot.size)
 
-        addBackground(background, context: context)
+        //addBackground(background, context: context)
 
         let titleRect = try add(title: titleText, font: titleFont, color: titleColor, padding: titlePadding, context: context)
 
@@ -68,27 +68,27 @@ final class ImageComposer {
         return context
     }
 
-    private func addBackground(_ background: Background, context: CGContext) {
-        switch background {
-        case .solid(let color):
-            context.setFillColor(color.cgColor)
-            context.fill(CGRect(x: 0, y: 0, width: context.width, height: context.height))
-        case .linearGradient(let direction, let colors):
-            var locations = [CGFloat]()
-            locations.append(CGFloat(0))
-            locations.append(contentsOf: (1..<colors.count-1).map({ CGFloat($0) / CGFloat(colors.count - 1) }))
-            locations.append(CGFloat(1))
-            let gradient = CGGradient(
-                colorsSpace: CGColorSpaceCreateDeviceRGB(),
-                colors: colors.map({ $0.cgColor }) as CFArray,
-                locations: locations)
-            context.drawLinearGradient(
-                gradient!,
-                start: CGPoint(x: direction.relativeStartX * CGFloat(context.width), y: direction.relativeStartY * CGFloat(context.height)),
-                end: CGPoint(x: direction.relativeEndX * CGFloat(context.width), y: direction.relativeEndY * CGFloat(context.height)),
-                options: CGGradientDrawingOptions(rawValue: 0))
-        }
-    }
+//    private func addBackground(_ background: Background, context: CGContext) {
+//        switch background {
+//        case .solid(let color):
+//            context.setFillColor(color.cgColor)
+//            context.fill(CGRect(x: 0, y: 0, width: context.width, height: context.height))
+//        case .linearGradient(let direction, let colors):
+//            var locations = [CGFloat]()
+//            locations.append(CGFloat(0))
+//            locations.append(contentsOf: (1..<colors.count-1).map({ CGFloat($0) / CGFloat(colors.count - 1) }))
+//            locations.append(CGFloat(1))
+//            let gradient = CGGradient(
+//                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+//                colors: colors.map({ $0.cgColor }) as CFArray,
+//                locations: locations)
+//            context.drawLinearGradient(
+//                gradient!,
+//                start: CGPoint(x: direction.relativeStartX * CGFloat(context.width), y: direction.relativeStartY * CGFloat(context.height)),
+//                end: CGPoint(x: direction.relativeEndX * CGFloat(context.width), y: direction.relativeEndY * CGFloat(context.height)),
+//                options: CGGradientDrawingOptions(rawValue: 0))
+//        }
+//    }
 
     // Returns the rect used for rendering the title
     private func add(title: String, font: NSFont, color: NSColor, padding: NSEdgeInsets, context: CGContext) throws -> NSRect {

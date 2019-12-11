@@ -49,7 +49,7 @@ final class CommandLineOption {
 
 // MARK: - Option Collection
 
-final class CommandLineOptions {
+public final class CommandLineOptions {
 
     // MARK: - Options
 

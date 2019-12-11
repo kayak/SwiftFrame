@@ -44,7 +44,7 @@ final class TextRenderer {
         lowerBound: CGFloat = 1,
         upperBound: CGFloat) throws -> CGFloat
     {
-        if fabs(upperBound - lowerBound) < 1e-5 {
+        if abs(upperBound - lowerBound) < 1e-5 {
             if numberOfLines(text: text, font: font.toFont(ofSize: upperBound), width: width, isSmallerOrEqualTo: lines) {
                 return upperBound
             }
@@ -85,7 +85,7 @@ final class TextRenderer {
         lowerBound: CGFloat = 0,
         upperBound: CGFloat) throws -> CGFloat
     {
-        if fabs(upperBound - lowerBound) < 1e-5 {
+        if abs(upperBound - lowerBound) < 1e-5 {
             if numberOfLines(text: text, font: font, width: upperBound, isSmallerOrEqualTo: lines) {
                 return upperBound
             }
