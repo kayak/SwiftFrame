@@ -4,7 +4,7 @@ import AppKit
 extension String {
 
     func registerFont(at size: CGFloat = 20) throws -> NSFont {
-        let fontName = try FontRegistry().registerFont(atPath: self)
+        let fontName = try FontRegistry.shared.registerFont(atPath: self)
         guard let font = NSFont(name: fontName, size: size) else {
             throw NSError(description: "Failed to load title font with name \(fontName)")
         }

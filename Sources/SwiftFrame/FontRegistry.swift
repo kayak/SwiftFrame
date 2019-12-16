@@ -3,6 +3,10 @@ import Foundation
 
 final class FontRegistry {
 
+    static var shared = FontRegistry()
+
+    private var registeredFontPaths = [String]()
+
     /// Registers the font file at the specified path and returns the font name argument that needs to be passed
     /// into `NSFont` for instantiating it
     func registerFont(atPath path: String) throws -> String {
@@ -14,8 +18,12 @@ final class FontRegistry {
         defer {
             error?.release()
         }
-        if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
-            throw NSError(description: error?.takeRetainedValue().localizedDescription ?? "Failed to load font file at \(url.absoluteString)")
+
+        if !registeredFontPaths.contains(path) {
+            if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
+                throw NSError(description: error?.takeRetainedValue().localizedDescription ?? "Failed to load font file at \(url.absoluteString)")
+            }
+            registeredFontPaths.append(path)
         }
         return try fontName(from: url)
     }
