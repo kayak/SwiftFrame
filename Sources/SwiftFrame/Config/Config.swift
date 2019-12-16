@@ -1,32 +1,77 @@
-import AppKit
 import Foundation
+import AppKit
 
-let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
-
-// MARK: - Screenshot Path Parsing
-
-private func parseScreenshotPaths(folderPath: String, outputSuffix: String?) throws -> [String] {
-    return (try FileManager.default.contentsOfDirectory(atPath: folderPath))
-        .filter { path in
-            if let suffix = outputSuffix, (path as NSString).deletingPathExtension.hasSuffix(suffix) {
-                return false
-            }
-            return kScreenshotExtensions.contains((path as NSString).pathExtension.lowercased())
-        }
-        .map { (folderPath as NSString).appendingPathComponent($0) }
-        .sorted()
+protocol ConfigValidatable {
+    func validate() throws
+    func printSummary(insetByTabs tabs: Int)
 }
 
-private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) -> [Frame: [String]] {
-    var result: [Frame: [String]] = [:]
-    for path in screenshotPaths {
-        guard let frame = frames.first(where: { $0.matches(path: path) }) else {
-            print(CommandLineFormatter.formatWarning("No matching frame for screenshot \(path)"))
-            continue
-        }
-        var paths = result[frame] ?? []
-        paths.append(path)
-        result[frame] = paths
+// First key is locale, second is regular key in string file
+typealias LocalizedStringFiles = [String : [String : String]]
+
+public struct ConfigFile: Decodable, ConfigValidatable {
+    let outputWholeImage: Bool
+    let deviceData: [DeviceData]
+    let titlesPath: URL
+    let titles: LocalizedStringFiles
+    let maxFontSize: Int
+    let outputPaths: [URL]
+    let font: NSFont
+    let textColor: NSColor
+
+    enum CodingKeys: String, CodingKey {
+        case outputWholeImage = "alsoOutputWholeImage"
+        case deviceData
+        case titlesPath
+        case maxFontSize
+        case outputPaths
+        case fontFile
+        case textColor
     }
-    return result
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        outputWholeImage = try container.decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
+        deviceData = try container.decode([DeviceData].self, forKey: .deviceData)
+        maxFontSize = try container.decode(Int.self, forKey: .maxFontSize)
+        outputPaths = try container.decode([URL].self, forKey: .outputPaths)
+
+        let fontPathString = try container.decode(String.self, forKey: .fontFile)
+        self.font = try fontPathString.registerFont()
+
+        let colorHexString = try container.decode(String.self, forKey: .textColor)
+        textColor = try NSColor(hexString: colorHexString)
+
+        titlesPath = try container.decode(URL.self, forKey: .titlesPath)
+        var parsedTitles = LocalizedStringFiles()
+        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+            .filter { $0.pathExtension == "strings" }
+        textFiles.forEach { textFile in
+            parsedTitles[textFile.lastPathComponent] = NSDictionary(contentsOf: textFile) as? [String: String]
+        }
+        titles = parsedTitles
+    }
+
+    func validate() throws {
+        try deviceData.forEach { try $0.validate() }
+    }
+
+    func printSummary(insetByTabs tabs: Int) {
+        print("### Config Summary Begin")
+        print(CommandLineFormatter.formatKeyValue("Outputs whole image as well as slices", value: outputWholeImage))
+        print(CommandLineFormatter.formatKeyValue("Title Color", value: textColor.hexString, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Title Font", value: font.fontName, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("String Files", value: titles.count, insetBy: tabs))
+
+        print("Output paths:")
+        outputPaths.forEach { print(String(repeating: "\t", count: tabs + 1) + $0.absoluteString.formattedGreen()) }
+
+        print("Device data:")
+        deviceData.forEach {
+            $0.printSummary(insetByTabs: tabs + 1)
+            print("")
+        }
+        print("### Config Summary End")
+    }
 }

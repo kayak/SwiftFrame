@@ -1,6 +1,8 @@
 import AppKit
 import Foundation
 
+let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
+
 struct DeviceData: Decodable, ConfigValidatable {
     let outputSuffix: String
     let screenshotsPath: URL
@@ -41,8 +43,28 @@ struct DeviceData: Decodable, ConfigValidatable {
 
     func validate() throws {
         // TODO: Validate screenshot size compared to template file
+        try screenshots.forEach { localeDict in
+            guard let first = localeDict.value.first?.value else {
+                return
+            }
+            try localeDict.value.forEach {
+                if $0.value.size != first.size {
+                    throw NSError(description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"")
+                }
+            }
+        }
+
         try screenshotData.forEach { try $0.validate() }
         try textData.forEach { try $0.validate() }
+
+        let screenshotNames = screenshotData.map { $0.screenshotName }
+        try screenshots.forEach { localeDict in
+            try screenshotNames.forEach { name in
+                if localeDict.value[name] == nil {
+                    throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \(name)")
+                }
+            }
+        }
     }
 
     func printSummary(insetByTabs tabs: Int) {
