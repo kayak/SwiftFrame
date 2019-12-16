@@ -5,10 +5,11 @@ final class FontRegistry {
 
     /// Registers the font file at the specified path and returns the font name argument that needs to be passed
     /// into `NSFont` for instantiating it
-    func registerFont(atURL url: URL) throws -> String {
-        guard FileManager.default.fileExists(atPath: url.absoluteString) else {
-            throw NSError(description: "Font file at \(url.absoluteString) does not exist")
+    func registerFont(atPath path: String) throws -> String {
+        guard FileManager.default.fileExists(atPath: path) else {
+            throw NSError(description: "Font file at \(path) does not exist")
         }
+        let url = URL(fileURLWithPath: path)
         var error: Unmanaged<CFError>? = nil
         defer {
             error?.release()

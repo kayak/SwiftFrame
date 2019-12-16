@@ -30,8 +30,8 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         maxFontSize = try container.decode(Int.self, forKey: .maxFontSize)
         outputPaths = try container.decode([URL].self, forKey: .outputPaths)
 
-        let fontPath = try container.decode(URL.self, forKey: .font)
-        self.font = try fontPath.registerFont()
+        let fontPathString = try container.decode(String.self, forKey: .font)
+        self.font = try fontPathString.registerFont()
 
         let colorHexString = try container.decode(String.self, forKey: .textColor)
         textColor = try NSColor(hexString: colorHexString)
@@ -54,6 +54,9 @@ public struct ConfigFile: Decodable, ConfigValidatable {
 
         print("Output paths:")
         outputPaths.forEach { print("\t" + $0.absoluteString) }
+
+        print("### Device data:")
+        deviceData.forEach { $0.printSummary() }
 //        print("Title Padding: \(titlePadding)")
 //        for (index, element) in screenshotPathsByFrame.enumerated() {
 //            print("Frame #\(index + 1) Path: \(element.key.path)")

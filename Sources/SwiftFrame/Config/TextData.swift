@@ -25,8 +25,8 @@ struct TextData: Decodable, ConfigValidatable {
         topRight = try container.decode(Point.self, forKey: .topRight)
         maxFontSizeOverride = try container.decodeIfPresent(Int.self, forKey: .maxFontSizeOverride)
 
-        if let customFontPath = try container.decodeIfPresent(URL.self, forKey: .customFont) {
-            customFont = try customFontPath.registerFont()
+        if let customFontPathString = try container.decodeIfPresent(String.self, forKey: .customFont) {
+            customFont = try customFontPathString.registerFont()
         } else {
             customFont = nil
         }
@@ -43,6 +43,8 @@ struct TextData: Decodable, ConfigValidatable {
     }
 
     func printSummary() {
-
+        print("Text ID: \(titleIdentifier)")
+        print("\tBottom left: (\(bottomLeft.x), \(bottomLeft.y))")
+        print("\tTop right: (\(topRight.x), \(topRight.y))")
     }
 }

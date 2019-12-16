@@ -1,6 +1,22 @@
 import Foundation
+import AppKit
 
 extension String {
+
+    func registerFont(at size: CGFloat = 20) throws -> NSFont {
+        let fontName = try FontRegistry().registerFont(atPath: self)
+        guard let font = NSFont(name: fontName, size: size) else {
+            throw NSError(description: "Failed to load title font with name \(fontName)")
+        }
+        return font
+    }
+
+    private func pathRelativeToFile(_ path: String, fragment: String) -> String {
+        var components = (path as NSString).pathComponents
+        components.removeLast()
+        components.append(contentsOf: (fragment as NSString).pathComponents)
+        return NSString.path(withComponents: components) as String
+    }
 
     /// Breaks the receiver on the specified delimiter to form lines of the given length. The line length
     /// cannot be guaranteed and may be exceeded if the receiver doesn't allow otherwise.
