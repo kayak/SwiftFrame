@@ -20,6 +20,8 @@ do {
     let config = try JSONDecoder().decode(ConfigFile.self, from: data)
     let verbose = options.verbose.isSpecified
 
+    try config.validate()
+
     if verbose {
         config.printSummary(insetByTabs: 0)
     }
@@ -75,7 +77,6 @@ do {
 } catch let error as NSError {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.
     // Interestingly, the same does not happen when building with Xcode directly.
-    print(error)
     print(CommandLineFormatter.formatError("\(error.localizedDescription)"))
     exit(1)
 }

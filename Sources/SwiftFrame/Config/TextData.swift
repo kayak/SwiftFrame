@@ -39,7 +39,9 @@ struct TextData: Decodable, ConfigValidatable {
     }
 
     func validate() throws {
-
+        if (bottomLeft.x >= topRight.x) || (bottomLeft.y <= topRight.y) {
+            throw NSError(description: "Bad text bounds: \(bottomLeft.formattedString) and \(topRight.formattedString)")
+        }
     }
 
     func printSummary(insetByTabs tabs: Int) {

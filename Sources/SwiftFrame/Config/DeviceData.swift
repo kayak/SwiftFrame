@@ -4,7 +4,7 @@ import Foundation
 struct DeviceData: Decodable, ConfigValidatable {
     let outputSuffix: String
     let screenshotsPath: URL
-    let screenshots: [String : [NSImage]]
+    let screenshots: [String : [String: NSImage]]
     let templateFilePath: URL
     let templateImage: NSImage
     let screenshotData: [ScreenshotData]
@@ -27,19 +27,22 @@ struct DeviceData: Decodable, ConfigValidatable {
         textData = try container.decode([TextData].self, forKey: .textData)
 
         screenshotsPath = try container.decode(URL.self, forKey: .screenshots)
-        var parsedScreenshots = [String : [NSImage]]()
-        let subDirectories = screenshotsPath.subDirectories
-        try subDirectories.forEach { folder in
+        var parsedScreenshots = [String : [String : NSImage]]()
+        try screenshotsPath.subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension) }
-            let images = try imageFiles.map { try ImageLoader().loadImage(atPath: $0.absoluteString) }
-            parsedScreenshots[folder.lastPathComponent] = images
+            let imagesDictionary = try imageFiles.reduce(into: [String: NSImage]()) { dictionary, url in
+                dictionary[url.lastPathComponent] = try ImageLoader().loadImage(atURL: url)
+            }
+            parsedScreenshots[folder.lastPathComponent] = imagesDictionary
         }
         screenshots = parsedScreenshots
     }
 
     func validate() throws {
-
+        // TODO: Validate screenshot size compared to template file
+        try screenshotData.forEach { try $0.validate() }
+        try textData.forEach { try $0.validate() }
     }
 
     func printSummary(insetByTabs tabs: Int) {
@@ -52,11 +55,11 @@ struct DeviceData: Decodable, ConfigValidatable {
 }
 
 extension URL {
-    var isDirectory: Bool {
-        return (try? resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-    }
     var subDirectories: [URL] {
-        guard isDirectory else { return [] }
-        return (try? FileManager.default.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]).filter{ $0.isDirectory }) ?? []
+        guard hasDirectoryPath else {
+            print("is not directory")
+            return []
+        }
+        return (try? FileManager.default.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]).filter{ $0.hasDirectoryPath }) ?? []
     }
 }

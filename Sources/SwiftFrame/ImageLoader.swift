@@ -3,6 +3,13 @@ import Foundation
 
 final class ImageLoader {
 
+    func loadImage(atURL url: URL) throws -> NSImage {
+        guard let image = NSImage(contentsOf: url) else {
+            throw NSError(description: "Could not load image at \(url.absoluteString)")
+        }
+        return image
+    }
+
     func loadImage(atPath path: String) throws -> NSImage {
         guard FileManager.default.fileExists(atPath: path) else {
             throw NSError(description: "Image at \(path) does not exist")
