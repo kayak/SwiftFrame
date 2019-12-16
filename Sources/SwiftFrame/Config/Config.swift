@@ -30,31 +30,3 @@ private func groupScreenshotPaths(_ screenshotPaths: [String], frames: [Frame]) 
     }
     return result
 }
-
-// MARK: - Numeric Component Parsing
-
-private class NumericComponentsParser {
-
-    func rect(from string: String) throws -> NSRect {
-        let components = try intComponents(from: string, count: 4)
-        return NSRect(x: components[0], y: components[1], width: components[2] - components[0], height: components[3] - components[1])
-    }
-
-    func edgeInsets(from string: String) throws -> NSEdgeInsets {
-        let components = try intComponents(from: string, count: 4)
-        return NSEdgeInsets(top: CGFloat(components[0]), left: CGFloat(components[1]), bottom: CGFloat(components[2]), right: CGFloat(components[3]))
-    }
-
-    private func intComponents(from string: String, count: Int) throws -> [Int] {
-        let stringComponents = string.components(separatedBy: .whitespaces)
-        guard stringComponents.count == count else {
-            throw NSError(description: "Failed to parse numeric components from \(string)")
-        }
-        let intComponents = stringComponents.compactMap { Int($0) }
-        guard intComponents.count == stringComponents.count else {
-            throw NSError(description: "Failed to parse numeric components from \(string)")
-        }
-        return intComponents
-    }
-
-}

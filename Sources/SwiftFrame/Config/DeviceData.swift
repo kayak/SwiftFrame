@@ -1,10 +1,12 @@
+import AppKit
 import Foundation
 
 struct DeviceData: Decodable, ConfigValidatable {
     let outputSuffix: String
     let screenshotsPath: URL
-    let screenshots: [String : [URL]]
-    let templateFile: URL
+    let screenshots: [String : [NSImage]]
+    let templateFilePath: URL
+    let templateImage: NSImage
     let screenshotData: [ScreenshotData]
     let textData: [TextData]
 
@@ -19,17 +21,19 @@ struct DeviceData: Decodable, ConfigValidatable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         outputSuffix = try container.decode(String.self, forKey: .outputSuffix)
-        templateFile = try container.decode(URL.self, forKey: .templateFile)
+        templateFilePath = try container.decode(URL.self, forKey: .templateFile)
+        templateImage = try ImageLoader().loadImage(atPath: templateFilePath.absoluteString)
         screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData)
         textData = try container.decode([TextData].self, forKey: .textData)
 
         screenshotsPath = try container.decode(URL.self, forKey: .screenshots)
-        var parsedScreenshots = [String : [URL]]()
+        var parsedScreenshots = [String : [NSImage]]()
         let subDirectories = screenshotsPath.subDirectories
         try subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension) }
-            parsedScreenshots[folder.lastPathComponent] = imageFiles
+            let images = try imageFiles.map { try ImageLoader().loadImage(atPath: $0.absoluteString) }
+            parsedScreenshots[folder.lastPathComponent] = images
         }
         screenshots = parsedScreenshots
     }
@@ -38,13 +42,12 @@ struct DeviceData: Decodable, ConfigValidatable {
 
     }
 
-    func printSummary() {
-        print("Ouput suffix: \(outputSuffix)")
-        //print("Screenshots folder: \(screenshots.absoluteString)")
-        print("Template file path: \(templateFile.absoluteString)")
-        print("Screenshot folders: \(screenshots.count)")
-        screenshotData.forEach { $0.printSummary() }
-        textData.forEach { $0.printSummary() }
+    func printSummary(insetByTabs tabs: Int) {
+        print(CommandLineFormatter.formatKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Template file path", value: templateFilePath.absoluteString, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs))
+        screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
+        textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }
 }
 

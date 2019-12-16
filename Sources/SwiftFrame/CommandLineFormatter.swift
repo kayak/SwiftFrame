@@ -10,8 +10,16 @@ final class CommandLineFormatter {
         return "\u{001B}[0;31mError: \(text)\u{001B}[0;39m"
     }
 
-    class func formatKeyValue(_ key: String, value: Any) -> String {
-        return "\u{001B}[0;33m\(key):\u{001B}[0;39m \(value)"
+    class func formatKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) -> String {
+        let tabsString = String(repeating: "\t", count: tabs)
+        let formattedString = "\(key): \(String(describing: value).formattedGreen())"
+        return tabsString + formattedString
     }
 
+}
+
+extension String {
+    func formattedGreen() -> String {
+        "\u{001B}[0;32m" + self + "\u{001B}[0;39m"
+    }
 }

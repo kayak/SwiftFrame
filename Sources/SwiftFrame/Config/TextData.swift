@@ -42,9 +42,9 @@ struct TextData: Decodable, ConfigValidatable {
 
     }
 
-    func printSummary() {
-        print("Text ID: \(titleIdentifier)")
-        print("\tBottom left: (\(bottomLeft.x), \(bottomLeft.y))")
-        print("\tTop right: (\(topRight.x), \(topRight.y))")
+    func printSummary(insetByTabs tabs: Int) {
+        print(CommandLineFormatter.formatKeyValue("Text ID", value: titleIdentifier, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1))
+        print(CommandLineFormatter.formatKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1))
     }
 }

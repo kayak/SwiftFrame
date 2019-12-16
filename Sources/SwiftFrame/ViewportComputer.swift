@@ -116,6 +116,10 @@ struct Point: Codable {
     let x: Int
     let y: Int
 
+    var formattedString: String {
+        "(\(x), \(y))"
+    }
+
     func translated(to coordinate: Int, along axis: Axis) -> Point {
         return axis == .x ? Point(x: coordinate, y: y) : Point(x: x, y: coordinate)
     }

@@ -3,7 +3,7 @@ import AppKit
 
 protocol ConfigValidatable {
     func validate() throws
-    func printSummary()
+    func printSummary(insetByTabs tabs: Int)
 }
 
 // First key is locale, second is regular key in string file
@@ -51,22 +51,23 @@ public struct ConfigFile: Decodable, ConfigValidatable {
 
     func validate() throws {
         try deviceData.forEach { try $0.validate() }
-
-
     }
 
-    func printSummary() {
+    func printSummary(insetByTabs tabs: Int) {
         print("### Config Summary Begin")
-        print(CommandLineFormatter.formatKeyValue("Title Color", value: textColor.hexString))
-        print(CommandLineFormatter.formatKeyValue("Title Font", value: font.fontName))
-        print(CommandLineFormatter.formatKeyValue("Title Max Font Size", value: maxFontSize))
-        print(CommandLineFormatter.formatKeyValue("String Files", value: titles.count))
+        print(CommandLineFormatter.formatKeyValue("Title Color", value: textColor.hexString, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Title Font", value: font.fontName, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs))
+        print(CommandLineFormatter.formatKeyValue("String Files", value: titles.count, insetBy: tabs))
 
         print("Output paths:")
-        outputPaths.forEach { print("\t" + $0.absoluteString) }
+        outputPaths.forEach { print(String(repeating: "\t", count: tabs + 1) + $0.absoluteString.formattedGreen()) }
 
         print("### Device data:")
-        deviceData.forEach { $0.printSummary() }
+        deviceData.forEach {
+            $0.printSummary(insetByTabs: tabs + 1)
+            print("")
+        }
 //        print("Title Padding: \(titlePadding)")
 //        for (index, element) in screenshotPathsByFrame.enumerated() {
 //            print("Frame #\(index + 1) Path: \(element.key.path)")

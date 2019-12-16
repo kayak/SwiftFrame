@@ -21,7 +21,7 @@ do {
     let verbose = options.verbose.isSpecified
 
     if verbose {
-        config.printSummary()
+        config.printSummary(insetByTabs: 0)
     }
 
 //    for (frame, screenshots) in config.screenshotPathsByFrame {
