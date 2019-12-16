@@ -23,21 +23,15 @@ struct DeviceData: Decodable, ConfigValidatable {
         screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData)
         textData = try container.decode([TextData].self, forKey: .textData)
 
-        let screenshotsDirectory = try container.decode(String.self, forKey: .screenshots)
-        screenshotsPath = URL(fileURLWithPath: screenshotsDirectory, isDirectory: true)
-
-        if screenshotsPath.isDirectory {
-            var parsedScreenshots = [String : [URL]]()
-            let subDirectories = screenshotsPath.subDirectories
-            try subDirectories.forEach { folder in
-                let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-                    .filter { kScreenshotExtensions.contains($0.pathExtension) }
-                parsedScreenshots[folder.lastPathComponent] = imageFiles
-            }
-            screenshots = parsedScreenshots
-        } else {
-            throw NSError(description: "The specified screenshot path for device \"\(outputSuffix)\" is not a directory")
+        screenshotsPath = try container.decode(URL.self, forKey: .screenshots)
+        var parsedScreenshots = [String : [URL]]()
+        let subDirectories = screenshotsPath.subDirectories
+        try subDirectories.forEach { folder in
+            let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+                .filter { kScreenshotExtensions.contains($0.pathExtension) }
+            parsedScreenshots[folder.lastPathComponent] = imageFiles
         }
+        screenshots = parsedScreenshots
     }
 
     func validate() throws {
