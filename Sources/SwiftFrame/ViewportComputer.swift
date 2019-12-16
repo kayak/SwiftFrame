@@ -86,7 +86,7 @@ class ViewportComputer: ViewportComputerProtocol {
 
 // MARK: - Misc
 
-private enum Axis {
+enum Axis {
     case x, y
 
     var inverted: Axis {
@@ -99,7 +99,7 @@ private enum Axis {
     }
 }
 
-private enum Target {
+enum Target {
     case start, end
 
     func maximizingCoordinate(_ coordinate1: Int, _ coordinate2: Int) -> Int {
@@ -112,7 +112,7 @@ private enum Target {
     }
 }
 
-private struct Point {
+struct Point: Codable {
     let x: Int
     let y: Int
 

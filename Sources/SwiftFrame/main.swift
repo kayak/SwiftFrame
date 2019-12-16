@@ -16,9 +16,11 @@ do {
     }
     let configURL = URL(fileURLWithPath: configPath)
     let data = try Data(contentsOf: configURL)
+    
     let config = try JSONDecoder().decode(ConfigFile.self, from: data)
+    let verbose = options.verbose.isSpecified
 
-    if config.verbose {
+    if verbose {
         config.printSummary()
     }
 
@@ -70,9 +72,10 @@ do {
 //            try writer.write(image, toPath: outputPath)
 //        }
 //    }
-} catch {
+} catch let error as NSError {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.
     // Interestingly, the same does not happen when building with Xcode directly.
-    print(CommandLineFormatter().formatError("\((error as NSError).localizedDescription)"))
+    print(error)
+    print(CommandLineFormatter().formatError("\(error.localizedDescription)"))
     exit(1)
 }

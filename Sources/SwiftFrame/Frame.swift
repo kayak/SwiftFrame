@@ -43,8 +43,8 @@ class Frame: Equatable, Hashable {
 
     // MARK: - Hashable
 
-    var hashValue: Int {
-        return path.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(path.hashValue)
     }
 
 }
