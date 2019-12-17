@@ -11,7 +11,7 @@ final class CommandLineFormatter {
     }
 
     class func formatKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) -> String {
-        let tabsString = String(repeating: "\t", count: tabs)
+        let tabsString = String(repeating: " ", count: 4 * tabs)
         let formattedString = "\(key): \(String(describing: value).formattedGreen())"
         return tabsString + formattedString
     }

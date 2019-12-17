@@ -48,5 +48,17 @@ struct TextData: Decodable, ConfigValidatable {
         print(CommandLineFormatter.formatKeyValue("Text ID", value: titleIdentifier, insetBy: tabs))
         print(CommandLineFormatter.formatKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1))
         print(CommandLineFormatter.formatKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1))
+
+        if let fontName = customFont?.fontName {
+            print(CommandLineFormatter.formatKeyValue("Custom font", value: fontName, insetBy: tabs + 1))
+        }
+
+        if let ptSize = maxFontSizeOverride {
+            print(CommandLineFormatter.formatKeyValue("Max Point Size", value: ptSize, insetBy: tabs + 1))
+        }
+
+        if let textColorOverride = textColorOverride {
+            print(CommandLineFormatter.formatKeyValue("Custom color", value: textColorOverride.hexString, insetBy: tabs + 1))
+        }
     }
 }

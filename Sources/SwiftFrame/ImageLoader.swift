@@ -11,9 +11,6 @@ final class ImageLoader {
     }
 
     func loadImage(atPath path: String) throws -> NSImage {
-        guard FileManager.default.fileExists(atPath: path) else {
-            throw NSError(description: "Image at \(path) does not exist")
-        }
         guard let image = NSImage(contentsOfFile: path) else {
             throw NSError(description: "Could not load image at \(path)")
         }

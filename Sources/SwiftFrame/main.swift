@@ -24,6 +24,35 @@ do {
 
     if verbose {
         config.printSummary(insetByTabs: 0)
+        print("Press any key to continue")
+        _ = readLine()
+    }
+
+    print("Parsed and validated config file")
+
+    let writer = ImageWriter()
+
+    try config.deviceData.forEach { device in
+        try device.screenshots.forEach { locale, imageDict in
+            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix)".formattedGreen())
+
+            let composer = try ImageComposer(device.templateImage)
+
+            try device.screenshotData.forEach { data in
+                guard let image = imageDict[data.screenshotName] else {
+                    print("No image found")
+                    return
+                }
+                try composer.add(screenshot: image, with: data)
+                print("Rendered screenshot \(data.screenshotName)")
+            }
+
+            if let image = composer.renderFinalImage() {
+                try config.outputPaths.forEach {
+                    try writer.write(image, to: $0.absoluteString, deviceID: device.outputSuffix, locale: locale)
+                }
+            }
+        }
     }
 
 //    for (frame, screenshots) in config.screenshotPathsByFrame {
