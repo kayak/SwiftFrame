@@ -62,6 +62,10 @@ do {
                     try slices.enumerated().forEach { (offset, image) in
                         try writer.write(image, to: url.absoluteString, deviceID: device.outputSuffix + "-\(offset)", locale: locale)
                     }
+
+                    if config.outputWholeImage {
+                        try writer.write(image, to: url.absoluteString, deviceID: device.outputSuffix + "-big", locale: locale)
+                    }
                 }
             }
         }
