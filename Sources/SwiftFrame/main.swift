@@ -64,7 +64,7 @@ do {
                     }
 
                     if config.outputWholeImage {
-                        try writer.write(image, to: url.absoluteString, deviceID: device.outputSuffix + "-big", locale: locale)
+                        try writer.write(finalImage, to: url.absoluteString, deviceID: device.outputSuffix + "-big", locale: locale)
                     }
                 }
             }

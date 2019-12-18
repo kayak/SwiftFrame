@@ -35,7 +35,7 @@ struct DeviceData: Decodable, ConfigValidatable {
         var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-                .filter { kScreenshotExtensions.contains($0.pathExtension) }
+                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
             let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
                 let rep = url.bitmapRep
                 dictionary[url.lastPathComponent] = rep
