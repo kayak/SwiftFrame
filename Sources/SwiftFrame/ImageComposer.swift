@@ -3,7 +3,7 @@ import Foundation
 import CoreGraphics
 import CoreImage
 
-private let kNumTitleLines = 2
+private let kNumTitleLines = 3
 private let kMaxTitleFontSize = CGFloat(80)
 
 final class ImageComposer {
@@ -35,13 +35,13 @@ final class ImageComposer {
     }
 
     /// Adapts the specified font to fit all of the supplied titles at the same size taking padding and canvas width into account
-    func adapt(titleFont: NSFont, toFitTitleTexts titleTexts: [String], titlePadding: NSEdgeInsets, width: CGFloat) throws -> NSFont {
+    func adapt(titleFont: NSFont, toTitle title: String, width: CGFloat, maxFontSize: CGFloat) throws -> NSFont {
         let size = try textRenderer.maximumFontSizeThatFits(
-            texts: titleTexts,
+            text: title,
             font: titleFont,
             lines: kNumTitleLines,
-            width: width - titlePadding.left - titlePadding.right,
-            upperBound: kMaxTitleFontSize)
+            width: width,
+            upperBound: maxFontSize)
         return titleFont.toFont(ofSize: size)
     }
 
@@ -88,13 +88,9 @@ final class ImageComposer {
         context.draw(templateImage, in: self.templateImage.nativeRect)
     }
 
-    func add(title: String, font: NSFont, color: NSColor, textData: TextData) throws {
-        let width = try textRenderer.minimumWidthThatFits(
-            text: title,
-            font: font,
-            lines: kNumTitleLines,
-            upperBound: textData.rect.size.width)
-        textRenderer.render(text: title, font: font, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
+    func add(title: String, font: NSFont, color: NSColor, maxFontSize: Int, textData: TextData) throws {
+        let adaptedFont = try adapt(titleFont: font, toTitle: title, width: textData.rect.size.width, maxFontSize: CGFloat(maxFontSize))
+        textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
     func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {

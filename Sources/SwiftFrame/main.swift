@@ -56,10 +56,12 @@ do {
                     print("no title found with specified key")
                     return
                 }
+
                 try composer.add(
                     title: title,
                     font: data.customFont ?? config.font,
                     color: data.textColorOverride ?? config.textColor,
+                    maxFontSize: data.maxFontSizeOverride ?? config.maxFontSize,
                     textData: data)
             }
 
