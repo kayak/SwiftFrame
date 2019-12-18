@@ -51,7 +51,17 @@ do {
 
             try composer.addTemplateImage()
 
-            // TODO: Add titles
+            try device.textData.forEach { data in
+                guard let title = config.titles[locale]?[data.titleIdentifier] else {
+                    print("no title found with specified key")
+                    return
+                }
+                try composer.add(
+                    title: title,
+                    font: data.customFont ?? config.font,
+                    color: data.textColorOverride ?? config.textColor,
+                    textData: data)
+            }
 
             if let finalImage = composer.renderFinalImage() {
                 guard let size = imageDict.first?.value.nativeSize else {

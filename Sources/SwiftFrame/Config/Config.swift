@@ -47,7 +47,7 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }
         textFiles.forEach { textFile in
-            parsedTitles[textFile.lastPathComponent] = NSDictionary(contentsOf: textFile) as? [String: String]
+            parsedTitles[textFile.absoluteURL.fileName] = NSDictionary(contentsOf: textFile) as? [String: String]
         }
         titles = parsedTitles
     }
@@ -73,5 +73,13 @@ public struct ConfigFile: Decodable, ConfigValidatable {
             print("")
         }
         print("### Config Summary End")
+    }
+}
+
+extension URL {
+    var fileName: String {
+        var components = lastPathComponent.components(separatedBy: ".")
+        components.removeLast(1)
+        return components.joined(separator: ".")
     }
 }

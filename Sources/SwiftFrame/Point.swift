@@ -12,4 +12,8 @@ struct Point: Codable {
     var ciVector: CIVector {
         CIVector(x: CGFloat(x), y: CGFloat(y))
     }
+
+    var cgPoint: CGPoint {
+        CGPoint(x: x, y: y)
+    }
 }

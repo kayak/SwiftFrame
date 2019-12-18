@@ -15,8 +15,6 @@ final class ImageComposer {
     init(_ templateImage: NSBitmapImageRep) throws {
         self.templateImage = templateImage
         self.context = try ImageComposer.createContext(size: templateImage.nativeSize)
-
-        //context.draw(self.templateImage, in: rect)
     }
 
     // MARK: - Preparation
@@ -79,19 +77,6 @@ final class ImageComposer {
 //        return image
 //    }
 
-    // Returns the rect used for rendering the title
-//    private func add(title: String, font: NSFont, color: NSColor, padding: NSEdgeInsets, context: CGContext) throws -> NSRect {
-//        let width = try textRenderer.minimumWidthThatFits(
-//            text: title,
-//            font: font,
-//            lines: kNumTitleLines,
-//            upperBound: CGFloat(context.width) - padding.left - padding.right)
-//        let height = textRenderer.suggestHeightForRendering(text: title, font: font, width: width)
-//        let rect = CGRect(x: (CGFloat(context.width) - width) / 2, y: CGFloat(context.height) - padding.top - height, width: width, height: height)
-//        textRenderer.render(text: title, font: font, color: color, alignment: .center, rect: rect, context: context)
-//        return rect
-//    }
-
     func addTemplateImage() throws {
         guard let templateImage = templateImage.cgImage else {
             throw NSError(description: "Could not render template image")
@@ -101,6 +86,15 @@ final class ImageComposer {
         defer { context.restoreGState() }
 
         context.draw(templateImage, in: self.templateImage.nativeRect)
+    }
+
+    func add(title: String, font: NSFont, color: NSColor, textData: TextData) throws {
+        let width = try textRenderer.minimumWidthThatFits(
+            text: title,
+            font: font,
+            lines: kNumTitleLines,
+            upperBound: textData.rect.size.width)
+        textRenderer.render(text: title, font: font, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
     func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {

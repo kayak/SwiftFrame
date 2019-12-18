@@ -5,9 +5,15 @@ struct TextData: Decodable, ConfigValidatable {
     let titleIdentifier: String
     let bottomLeft: Point
     let topRight: Point
+    let textAlignment: NSTextAlignment
     let maxFontSizeOverride: Int?
     let customFont: NSFont?
     let textColorOverride: NSColor?
+
+
+    var rect: NSRect {
+        NSRect(origin: bottomLeft.cgPoint, size: CGSize(width: topRight.x - bottomLeft.x, height: topRight.y - bottomLeft.y))
+    }
 
     enum CodingKeys: String, CodingKey {
         case titleIdentifier
@@ -16,6 +22,7 @@ struct TextData: Decodable, ConfigValidatable {
         case customFont = "customFontPath"
         case bottomLeft
         case topRight
+        case textAlignment
     }
 
     init(from decoder: Decoder) throws {
@@ -23,6 +30,7 @@ struct TextData: Decodable, ConfigValidatable {
         titleIdentifier = try container.decode(String.self, forKey: .titleIdentifier)
         bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
         topRight = try container.decode(Point.self, forKey: .topRight)
+        textAlignment = try container.decode(NSTextAlignment.self, forKey: .textAlignment)
         maxFontSizeOverride = try container.decodeIfPresent(Int.self, forKey: .maxFontSizeOverride)
 
         if let customFontPathString = try container.decodeIfPresent(String.self, forKey: .customFont) {
@@ -39,7 +47,7 @@ struct TextData: Decodable, ConfigValidatable {
     }
 
     func validate() throws {
-        if (bottomLeft.x >= topRight.x) || (bottomLeft.y <= topRight.y) {
+        if (bottomLeft.x >= topRight.x) || (bottomLeft.y >= topRight.y) {
             throw NSError(description: "Bad text bounds: \(bottomLeft.formattedString) and \(topRight.formattedString)")
         }
     }
@@ -62,3 +70,5 @@ struct TextData: Decodable, ConfigValidatable {
         }
     }
 }
+
+extension NSTextAlignment: Codable {}
