@@ -12,10 +12,10 @@ typealias LocalizedStringFiles = [String : [String : String]]
 public struct ConfigFile: Decodable, ConfigValidatable {
     let outputWholeImage: Bool
     let deviceData: [DeviceData]
-    let titlesPath: URL
+    let titlesPath: LocalURL
     let titles: LocalizedStringFiles
     let maxFontSize: Int
-    let outputPaths: [URL]
+    let outputPaths: [LocalURL]
     let font: NSFont
     let textColor: NSColor
 
@@ -34,7 +34,7 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         outputWholeImage = try container.decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
         deviceData = try container.decode([DeviceData].self, forKey: .deviceData)
         maxFontSize = try container.decode(Int.self, forKey: .maxFontSize)
-        outputPaths = try container.decode([URL].self, forKey: .outputPaths)
+        outputPaths = try container.decode([LocalURL].self, forKey: .outputPaths)
 
         let fontPathString = try container.decode(String.self, forKey: .fontFile)
         self.font = try fontPathString.registerFont()
@@ -42,9 +42,9 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         let colorHexString = try container.decode(String.self, forKey: .textColor)
         textColor = try NSColor(hexString: colorHexString)
 
-        titlesPath = try container.decode(URL.self, forKey: .titlesPath)
+        titlesPath = try container.decode(LocalURL.self, forKey: .titlesPath)
         var parsedTitles = LocalizedStringFiles()
-        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }
         textFiles.forEach { textFile in
             parsedTitles[textFile.lastPathComponent] = NSDictionary(contentsOf: textFile) as? [String: String]

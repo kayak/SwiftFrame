@@ -9,7 +9,7 @@ struct Point: Codable {
         "(\(x), \(y))"
     }
 
-    var cgPoint: CGPoint {
-        return CGPoint(x: x, y: y)
+    var ciVector: CIVector {
+        CIVector(x: CGFloat(x), y: CGFloat(y))
     }
 }

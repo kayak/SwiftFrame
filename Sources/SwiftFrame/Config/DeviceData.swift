@@ -5,10 +5,10 @@ let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
 struct DeviceData: Decodable, ConfigValidatable {
     let outputSuffix: String
-    let screenshotsPath: URL
-    let screenshots: [String : [String: NSImage]]
-    let templateFilePath: URL
-    let templateImage: NSImage
+    let screenshotsPath: LocalURL
+    let screenshots: [String : [String: NSBitmapImageRep]]
+    let templateFilePath: LocalURL
+    let templateImage: NSBitmapImageRep
     let screenshotData: [ScreenshotData]
     let textData: [TextData]
 
@@ -22,19 +22,23 @@ struct DeviceData: Decodable, ConfigValidatable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        templateFilePath = try container.decode(LocalURL.self, forKey: .templateFile)
+        guard let rep = templateFilePath.absoluteURL.bitmapRep else {
+            throw NSError(description: "Error while loading template image")
+        }
+        templateImage = rep
         outputSuffix = try container.decode(String.self, forKey: .outputSuffix)
-        templateFilePath = try container.decode(URL.self, forKey: .templateFile)
-        templateImage = try ImageLoader().loadImage(atPath: templateFilePath.absoluteString)
         screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData)
         textData = try container.decode([TextData].self, forKey: .textData)
+        screenshotsPath = try container.decode(LocalURL.self, forKey: .screenshots)
 
-        screenshotsPath = try container.decode(URL.self, forKey: .screenshots)
-        var parsedScreenshots = [String : [String : NSImage]]()
-        try screenshotsPath.subDirectories.forEach { folder in
+        var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
+        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension) }
-            let imagesDictionary = try imageFiles.reduce(into: [String: NSImage]()) { dictionary, url in
-                dictionary[url.lastPathComponent] = try ImageLoader().loadImage(atURL: url)
+            let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
+                let rep = url.bitmapRep
+                dictionary[url.lastPathComponent] = rep
             }
             parsedScreenshots[folder.lastPathComponent] = imagesDictionary
         }
@@ -73,15 +77,5 @@ struct DeviceData: Decodable, ConfigValidatable {
         print(CommandLineFormatter.formatKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs))
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
-    }
-}
-
-extension URL {
-    var subDirectories: [URL] {
-        guard hasDirectoryPath else {
-            print("is not directory")
-            return []
-        }
-        return (try? FileManager.default.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]).filter{ $0.hasDirectoryPath }) ?? []
     }
 }

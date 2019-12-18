@@ -9,18 +9,12 @@ private let kMaxTitleFontSize = CGFloat(80)
 final class ImageComposer {
 
     private let textRenderer = TextRenderer()
-    private let templateImage: CGImage
-    private let imageSize: NSRect
+    private let templateImage: NSBitmapImageRep
     private let context: CGContext
 
-    init(_ templateImage: NSImage) throws {
-        var rect = NSRect(origin: .zero, size: templateImage.size)
-        guard let image = templateImage.cgImage(forProposedRect: &rect, context: nil, hints: nil) else {
-            throw NSError(description: "Could not create CGImage from template file")
-        }
-        self.templateImage = image
-        self.imageSize = rect
-        self.context = try ImageComposer.createContext(size: templateImage.size)
+    init(_ templateImage: NSBitmapImageRep) throws {
+        self.templateImage = templateImage
+        self.context = try ImageComposer.createContext(size: templateImage.nativeSize)
 
         //context.draw(self.templateImage, in: rect)
     }
@@ -85,28 +79,6 @@ final class ImageComposer {
 //        return image
 //    }
 
-//    private func addBackground(_ background: Background, context: CGContext) {
-//        switch background {
-//        case .solid(let color):
-//            context.setFillColor(color.cgColor)
-//            context.fill(CGRect(x: 0, y: 0, width: context.width, height: context.height))
-//        case .linearGradient(let direction, let colors):
-//            var locations = [CGFloat]()
-//            locations.append(CGFloat(0))
-//            locations.append(contentsOf: (1..<colors.count-1).map({ CGFloat($0) / CGFloat(colors.count - 1) }))
-//            locations.append(CGFloat(1))
-//            let gradient = CGGradient(
-//                colorsSpace: CGColorSpaceCreateDeviceRGB(),
-//                colors: colors.map({ $0.cgColor }) as CFArray,
-//                locations: locations)
-//            context.drawLinearGradient(
-//                gradient!,
-//                start: CGPoint(x: direction.relativeStartX * CGFloat(context.width), y: direction.relativeStartY * CGFloat(context.height)),
-//                end: CGPoint(x: direction.relativeEndX * CGFloat(context.width), y: direction.relativeEndY * CGFloat(context.height)),
-//                options: CGGradientDrawingOptions(rawValue: 0))
-//        }
-//    }
-
     // Returns the rect used for rendering the title
 //    private func add(title: String, font: NSFont, color: NSColor, padding: NSEdgeInsets, context: CGContext) throws -> NSRect {
 //        let width = try textRenderer.minimumWidthThatFits(
@@ -119,83 +91,87 @@ final class ImageComposer {
 //        textRenderer.render(text: title, font: font, color: color, alignment: .center, rect: rect, context: context)
 //        return rect
 //    }
-//
-//    private func add(frame: NSImage, scale: CGFloat, yOffset: CGFloat, context: CGContext) {
-//        context.saveGState()
-//        context.scaleBy(x: scale, y: scale)
-//        context.translateBy(x: (CGFloat(context.width) / scale - frame.size.width) / 2.0, y: yOffset)
-//        var rect = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
-//        context.draw(frame.cgImage(forProposedRect: &rect, context: nil, hints: nil)!, in: rect)
-//        context.restoreGState()
-//    }
-//
-//    private func add(screenshot: NSImage, frame: NSImage, viewport: NSRect, viewportMask: NSImage?, scale: CGFloat, yOffset: CGFloat, context: CGContext) {
-//        context.saveGState()
-//        context.scaleBy(x: scale, y: scale)
-//        context.translateBy(x: (CGFloat(context.width) / scale - viewport.size.width) / 2.0 - viewport.origin.x, y: yOffset)
-//        var rect = viewport
-//        if let mask = viewportMask?.cgImage(forProposedRect: &rect, context: nil, hints: nil) {
-//            context.clip(to: viewport, mask: mask)
-//        }
-//        context.draw(screenshot.cgImage(forProposedRect: &rect, context: nil, hints: nil)!, in: rect)
-//        context.restoreGState()
-//    }
 
-    func add(screenshot: NSImage, with data: ScreenshotData) throws {
-        let cgImage = try renderScreenshot(screenshot, with: data)
+    func addTemplateImage() throws {
+        guard let templateImage = templateImage.cgImage else {
+            throw NSError(description: "Could not render template image")
+        }
 
         context.saveGState()
         defer { context.restoreGState() }
 
-        context.draw(cgImage, in: imageSize)
+        context.draw(templateImage, in: self.templateImage.nativeRect)
     }
 
-    private func renderScreenshot(_ screenshot: NSImage, with data: ScreenshotData) throws -> CGImage {
-        guard let ciImage = screenshot.ciImage else {
-            throw NSError(description: "Could not convert screenshot into required format")
-        }
+    func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
+        let cgImage = try renderScreenshot(screenshot, with: data)
+        let rect = calculateRect(for: data)
 
-        let background = CIImage(cgImage: templateImage)
-        let composite = CIFilter(name: "CISourceAtopCompositing")!
+        context.saveGState()
+        defer { context.restoreGState() }
+
+        context.draw(cgImage, in: rect)
+    }
+
+    private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData) throws -> CGImage {
+        let ciImage = CIImage(bitmapImageRep: screenshot)
+
         let perspectiveTransform = CIFilter(name: "CIPerspectiveTransform")!
-
-        perspectiveTransform.setValue(CIVector(cgPoint: data.topLeft!.cgPoint),
-                                      forKey: "inputTopLeft")
-        perspectiveTransform.setValue(CIVector(cgPoint: data.topRight!.cgPoint),
-                                      forKey: "inputTopRight")
-        perspectiveTransform.setValue(CIVector(cgPoint: data.bottomRight.cgPoint),
-                                      forKey: "inputBottomRight")
-        perspectiveTransform.setValue(CIVector(cgPoint: data.bottomLeft.cgPoint),
-                                      forKey: "inputBottomLeft")
-        perspectiveTransform.setValue(ciImage,
-                                      forKey: kCIInputImageKey)
-
-        composite.setValue(background,
-                           forKey: kCIInputBackgroundImageKey)
-        composite.setValue(perspectiveTransform.outputImage!,
-                           forKey: kCIInputImageKey)
+        perspectiveTransform.setValue(data.topLeft!.ciVector, forKey: "inputTopLeft")
+        perspectiveTransform.setValue(data.topRight!.ciVector, forKey: "inputTopRight")
+        perspectiveTransform.setValue(data.bottomRight.ciVector, forKey: "inputBottomRight")
+        perspectiveTransform.setValue(data.bottomLeft.ciVector, forKey: "inputBottomLeft")
+        perspectiveTransform.setValue(ciImage, forKey: kCIInputImageKey)
 
         guard
-            let compositeImage = composite.outputImage,
-            let cgImage = CIContext().createCGImage(compositeImage, from: imageSize)
+            let compositeImage = perspectiveTransform.outputImage,
+            let cgImage = CIContext().createCGImage(compositeImage, from: calculateRect(for: data))
         else {
             throw NSError(description: "Could not skew screenshot")
         }
         return cgImage
     }
 
+    func calculateRect(for screenshotData: ScreenshotData) -> NSRect {
+        let xCoordinates = [
+            screenshotData.bottomLeft.x,
+            screenshotData.bottomRight.x,
+            screenshotData.topLeft?.x,
+            screenshotData.topRight?.x
+        ].compactMap { $0 }
+
+        let yCoordinates = [
+            screenshotData.bottomLeft.y,
+            screenshotData.bottomRight.y,
+            screenshotData.topLeft?.y,
+            screenshotData.topRight?.y
+        ].compactMap { $0 }
+
+        // Temp
+        let minX = xCoordinates.min()!
+        let maxX = xCoordinates.max()!
+        let minY = yCoordinates.min()!
+        let maxY = yCoordinates.max()!
+
+        return NSRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+    }
+
     // MARK: - Exporting
 
     func renderFinalImage() -> CGImage? {
-        //context.draw(templateImage, in: imageSize)
-        return context.makeImage()
+        context.makeImage()
     }
 
 }
 
-extension NSImage {
-    public var ciImage: CIImage? {
-        guard let imageData = self.tiffRepresentation else { return nil }
-        return CIImage(data: imageData)
+extension NSBitmapImageRep {
+    /// When dealing with screenshots from an iOS device for example, the size returned by the `size` property
+    /// is scaled down by the UIKit scale of the device. You can use this property to get the actual pixel size
+    var nativeSize: NSSize {
+        NSSize(width: pixelsWide, height: pixelsHigh)
+    }
+
+    var nativeRect: NSRect {
+        NSRect(origin: .zero, size: nativeSize)
     }
 }

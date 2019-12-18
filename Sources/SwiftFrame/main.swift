@@ -34,18 +34,20 @@ do {
 
     try config.deviceData.forEach { device in
         try device.screenshots.forEach { locale, imageDict in
-            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix)".formattedGreen())
+            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix):")
 
             let composer = try ImageComposer(device.templateImage)
 
             try device.screenshotData.forEach { data in
                 guard let image = imageDict[data.screenshotName] else {
-                    print("No image found")
+                    print("No image found".formattedRed(), insetByTabs: 1)
                     return
                 }
                 try composer.add(screenshot: image, with: data)
-                print("Rendered screenshot \(data.screenshotName)")
+                print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
             }
+
+            try composer.addTemplateImage()
 
             if let image = composer.renderFinalImage() {
                 try config.outputPaths.forEach {
