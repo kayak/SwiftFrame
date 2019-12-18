@@ -34,28 +34,40 @@ do {
 
     try config.deviceData.forEach { device in
         try device.screenshots.forEach { locale, imageDict in
-            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix):")
+            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix)")
 
             let composer = try ImageComposer(device.templateImage)
 
             try device.screenshotData.forEach { data in
                 guard let image = imageDict[data.screenshotName] else {
-                    print("No image found".formattedRed(), insetByTabs: 1)
-                    return
+                    throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
                 }
                 try composer.add(screenshot: image, with: data)
-                print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
+
+                if verbose {
+                    print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
+                }
             }
 
             try composer.addTemplateImage()
 
-            if let image = composer.renderFinalImage() {
-                try config.outputPaths.forEach {
-                    try writer.write(image, to: $0.absoluteString, deviceID: device.outputSuffix, locale: locale)
+            // TODO: Add titles
+
+            if let finalImage = composer.renderFinalImage() {
+                guard let size = imageDict.first?.value.nativeSize else {
+                    return
+                }
+                let slices = composer.slice(image: finalImage, with: size)
+                try config.outputPaths.forEach { url in
+                    try slices.enumerated().forEach { (offset, image) in
+                        try writer.write(image, to: url.absoluteString, deviceID: device.outputSuffix + "-\(offset)", locale: locale)
+                    }
                 }
             }
         }
     }
+
+    print("Done!".formattedGreen())
 
 //    for (frame, screenshots) in config.screenshotPathsByFrame {
 //        let imageLoader = ImageLoader()

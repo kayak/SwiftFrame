@@ -65,7 +65,7 @@ struct DeviceData: Decodable, ConfigValidatable {
         try screenshots.forEach { localeDict in
             try screenshotNames.forEach { name in
                 if localeDict.value[name] == nil {
-                    throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \(name)")
+                    throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \"\(name)\"")
                 }
             }
         }

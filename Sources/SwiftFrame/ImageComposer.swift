@@ -162,6 +162,21 @@ final class ImageComposer {
         context.makeImage()
     }
 
+    func slice(image: CGImage, with size: NSSize) -> [CGImage] {
+        guard size.width.truncatingRemainder(dividingBy: CGFloat(size.width)) == 0 else {
+            print("Image width is not a multiple in width of desired size")
+            return []
+        }
+        let numberOfSlices = image.width / Int(size.width)
+        var croppedImages = [CGImage?]()
+
+        for i in 0..<numberOfSlices {
+            let rect = CGRect(x: size.width * CGFloat(i), y: 0, width: size.width, height: size.height)
+            croppedImages.append(image.cropping(to: rect))
+        }
+        return croppedImages.compactMap { $0 }
+    }
+
 }
 
 extension NSBitmapImageRep {

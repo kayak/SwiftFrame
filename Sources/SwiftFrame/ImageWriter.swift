@@ -9,8 +9,10 @@ final class ImageWriter {
             throw NSError(description: "Failed to convert composed image to PNG")
         }
         let fileName = "\(locale)-\(deviceID).png"
-        let url = URL(fileURLWithPath: directoryPath).appendingPathComponent(fileName)
-        try data.write(to: url)
+        let url = URL(fileURLWithPath: directoryPath).appendingPathComponent(locale)
+
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        try data.write(to: url.appendingPathComponent(fileName))
     }
 
 }
