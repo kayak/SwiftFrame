@@ -5,61 +5,34 @@ final class TextRenderer {
 
     // MARK: - Fitting & Size Computations
 
-    static func maximumFontSizeThatFits(text: String, font: NSFont, bounds: NSRect, upperBound: CGFloat, alignment: NSTextAlignment? = nil) -> CGFloat {
-        let constrainingDimension = min(bounds.width, bounds.height)
-        let properBounds = CGRect(origin: .zero, size: bounds.size)
-        var attributes: [NSAttributedString.Key : Any] = [.font: font]
-
-        if let alignment = alignment {
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.alignment = alignment
-            attributes[.paragraphStyle] = paragraphStyle
-        }
-
-        let infiniteBounds = CGSize(width: CGFloat.infinity, height: CGFloat.infinity)
-        var bestFontSize: CGFloat = constrainingDimension
-
-        for fontSize in stride(from: bestFontSize, through: 0, by: -1) {
-            attributes[.font] = font.toFont(ofSize: fontSize)
-
-            let currentFrame = text.boundingRect(with: infiniteBounds, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: attributes, context: nil)
-
-            if properBounds.contains(currentFrame) {
-                bestFontSize = fontSize
-                break
-            }
-        }
-        return min(bestFontSize, upperBound)
-    }
-
     /// Determines the maximum point size of the specified font that allows to render all of the given texts
     /// onto a particular number of lines
-    func maximumFontSizeThatFits(
-        texts: [String],
-        font: NSFont,
-        lines: Int,
-        width: CGFloat,
-        lowerBound: CGFloat = 1,
-        upperBound: CGFloat) throws -> CGFloat
-    {
-        guard !texts.isEmpty else {
-            throw NSError(description: "Cannot determine common maximum font size without texts")
-        }
-        var commonMaximum = CGFloat.greatestFiniteMagnitude
-        for text in texts {
-            let maximum = try maximumFontSizeThatFits(
-                text: text,
-                font: font,
-                lines: lines,
-                width: width,
-                lowerBound: lowerBound,
-                upperBound: upperBound)
-            if maximum < commonMaximum {
-                commonMaximum = maximum
-            }
-        }
-        return commonMaximum
-    }
+//    func maximumFontSizeThatFits(
+//        texts: [String],
+//        font: NSFont,
+//        lines: Int,
+//        rect: CGRect,
+//        lowerBound: CGFloat = 1,
+//        upperBound: CGFloat) throws -> CGFloat
+//    {
+//        guard !texts.isEmpty else {
+//            throw NSError(description: "Cannot determine common maximum font size without texts")
+//        }
+//        var commonMaximum = CGFloat.greatestFiniteMagnitude
+//        for text in texts {
+//            let maximum = try maximumFontSizeThatFits(
+//                text: text,
+//                font: font,
+//                lines: lines,
+//                rect: rect,
+//                lowerBound: lowerBound,
+//                upperBound: upperBound)
+//            if maximum < commonMaximum {
+//                commonMaximum = maximum
+//            }
+//        }
+//        return commonMaximum
+//    }
 
     /// Determines the maximum point size of the specified font that allows to render the given text onto a
     /// particular number of lines
@@ -67,70 +40,36 @@ final class TextRenderer {
         text: String,
         font: NSFont,
         lines: Int,
-        width: CGFloat,
+        rect: CGRect,
         lowerBound: CGFloat = 1,
         upperBound: CGFloat) throws -> CGFloat
     {
         if abs(upperBound - lowerBound) < 1e-5 {
-            if numberOfLines(text: text, font: font.toFont(ofSize: upperBound), width: width, isSmallerOrEqualTo: lines) {
+            if numberOfLines(text: text, font: font.toFont(ofSize: upperBound), rect: rect, isSmallerOrEqualTo: lines) {
                 return upperBound
             }
-            if numberOfLines(text: text, font: font.toFont(ofSize: lowerBound), width: width, isSmallerOrEqualTo: lines) {
+            if numberOfLines(text: text, font: font.toFont(ofSize: lowerBound), rect: rect, isSmallerOrEqualTo: lines) {
                 return lowerBound
             }
             throw NSError(description: "Could not fit \"\(text)\" onto \(lines) lines")
         }
         let size = (lowerBound + upperBound) / 2.0
-        if numberOfLines(text: text, font: font.toFont(ofSize: size), width: width, isSmallerOrEqualTo: lines) {
-            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, width: width, lowerBound: size, upperBound: upperBound)
+        print("trying size", size)
+        if numberOfLines(text: text, font: font.toFont(ofSize: size), rect: rect, isSmallerOrEqualTo: lines) {
+            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, rect: rect, lowerBound: size, upperBound: upperBound)
         } else {
-            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, width: width, lowerBound: lowerBound, upperBound: size)
+            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, rect: rect, lowerBound: lowerBound, upperBound: size)
         }
     }
 
-    private func numberOfLines(text: String, font: NSFont, width: CGFloat, isSmallerOrEqualTo maximum: Int) -> Bool {
+    private func numberOfLines(text: String, font: NSFont, rect: CGRect, isSmallerOrEqualTo maximum: Int) -> Bool {
         let attributes = makeAttributes(font: font)
         let attributedText = NSAttributedString(string: text, attributes: attributes)
-        let rect = NSRect(x: 0, y: 0, width: width, height: attributedText.size().height * CGFloat(maximum + 3)) // Make sure to have enough vertical space
-        let frame = makeFrame(from: attributedText, in: rect)
-        return CFArrayGetCount(CTFrameGetLines(frame)) <= maximum
-    }
-
-    func suggestHeightForRendering(text: String, font: NSFont, width: CGFloat) -> CGFloat {
-        let attributes = makeAttributes(font: font)
-        let attributedText = NSAttributedString(string: text, attributes: attributes)
-        let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
-        let size = CTFramesetterSuggestFrameSizeWithConstraints(
-            frameSetter,
-            CFRange(location: 0, length: 0),
-            nil,
-            CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
-            nil)
-        return size.height
-    }
-
-    func minimumWidthThatFits(
-        text: String,
-        font: NSFont,
-        lines: Int,
-        lowerBound: CGFloat = 0,
-        upperBound: CGFloat) throws -> CGFloat
-    {
-        if abs(upperBound - lowerBound) < 1e-5 {
-            if numberOfLines(text: text, font: font, width: upperBound, isSmallerOrEqualTo: lines) {
-                return upperBound
-            }
-            if numberOfLines(text: text, font: font, width: lowerBound, isSmallerOrEqualTo: lines) {
-                return lowerBound
-            }
-            throw NSError(description: "Could not fit \"\(text)\" onto \(lines) lines")
-        }
-        let width = (lowerBound + upperBound) / 2.0
-        if numberOfLines(text: text, font: font, width: width, isSmallerOrEqualTo: lines) {
-            return try minimumWidthThatFits(text: text, font: font, lines: lines, lowerBound: lowerBound, upperBound: width)
-        } else {
-            return try minimumWidthThatFits(text: text, font: font, lines: lines, lowerBound: width, upperBound: upperBound)
-        }
+        let originRect = NSRect(origin: .zero, size: rect.size)
+        let frame = makeFrame(from: attributedText, in: originRect)
+        let numberOfLines = CFArrayGetCount(CTFrameGetLines(frame))
+        print(numberOfLines)
+        return numberOfLines <= maximum
     }
 
     // MARK: - Frame Rendering

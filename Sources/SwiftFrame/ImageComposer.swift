@@ -3,12 +3,9 @@ import Foundation
 import CoreGraphics
 import CoreImage
 
-private let kNumTitleLines = 3
-private let kMaxTitleFontSize = CGFloat(80)
-
 final class ImageComposer {
 
-    private let textRenderer = TextRenderer()
+    public let textRenderer = TextRenderer()
     private let templateImage: NSBitmapImageRep
     private let context: CGContext
 
@@ -34,17 +31,6 @@ final class ImageComposer {
         return context
     }
 
-    /// Adapts the specified font to fit all of the supplied titles at the same size taking padding and canvas width into account
-    func adapt(titleFont: NSFont, toFitTitleTexts titleTexts: [String], width: CGFloat) throws -> NSFont {
-        let size = try textRenderer.maximumFontSizeThatFits(
-            texts: titleTexts,
-            font: titleFont,
-            lines: kNumTitleLines,
-            width: width,
-            upperBound: kMaxTitleFontSize)
-        return titleFont.toFont(ofSize: size)
-    }
-
     // MARK: - Composition
 
     func addTemplateImage() throws {
@@ -59,7 +45,8 @@ final class ImageComposer {
     }
 
     func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws {
-        let adaptedFont = font.toFont(ofSize: maxFontSize)
+        let fontSize = try textRenderer.maximumFontSizeThatFits(text: title, font: font, lines: 3, rect: textData.rect, lowerBound: 1, upperBound: maxFontSize)
+        let adaptedFont = font.toFont(ofSize: fontSize)
         textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 

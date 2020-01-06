@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-typealias AssociatedString = (string: String, data: TextData, maxFontSize: CGFloat)
+typealias AssociatedString = (string: String, data: TextData)
 
 struct TextData: Decodable, ConfigValidatable {
     let titleIdentifier: String

@@ -55,38 +55,26 @@ do {
                 guard let title = config.titles[locale]?[$0.titleIdentifier] else {
                     throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
                 }
-                let maxFontSize = TextRenderer.maximumFontSizeThatFits(
-                    text: title,
-                    font: $0.customFont ?? config.font,
-                    bounds: $0.rect,
-                    upperBound: $0.maxFontSizeOverride ?? config.maxFontSize,
-                    alignment: $0.textAlignment)
-                return (title, $0, maxFontSize)
+                return (title, $0)
             }
 
             let maxFontSizeByGroup = config.textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
-                guard let maxSize = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier }).map({ $0.maxFontSize }).min() else {
-                    return
-                }
-                dictionary[group.identifier] = min(maxSize, group.maxFontSize)
+                let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
+                dictionary[group.identifier] = group.sharedFontSize(with: strings, globalFont: config.font, globalMaxSize: config.maxFontSize)
             }
 
-            try device.textData.forEach { data in
-                guard let title = config.titles[locale]?[data.titleIdentifier] else {
-                    throw NSError(description: "Title with key \"\(data.titleIdentifier)\" not found in string file \"\(locale)\"")
-                }
-
-                let fontSize = maxFontSizeByGroup[safe: data.groupIdentifier] ?? data.maxFontSizeOverride ?? config.maxFontSize
+            try constructedTitles.forEach {
+                let fontSize: CGFloat = maxFontSizeByGroup[safe: $0.data.groupIdentifier] ?? config.maxFontSize
 
                 try composer.add(
-                    title: title,
-                    font: data.customFont ?? config.font,
-                    color: data.textColorOverride ?? config.textColor,
+                    title: $0.string,
+                    font: $0.data.customFont ?? config.font,
+                    color: $0.data.textColorOverride ?? config.textColor,
                     maxFontSize: fontSize,
-                    textData: data)
+                    textData: $0.data)
 
                 if verbose {
-                    print("Rendered title with font size \(fontSize)")
+                    print("Rendered title with font size \(fontSize), group id: \($0.data.groupIdentifier)")
                 }
             }
 
