@@ -45,7 +45,8 @@ final class ImageComposer {
     }
 
     func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws {
-        let fontSize = try textRenderer.maximumFontSizeThatFits(text: title, font: font, lines: 3, rect: textData.rect, lowerBound: 1, upperBound: maxFontSize)
+        let fontSize = try textRenderer.maximumFontSizeThatFits(string: title, maxFontSize: maxFontSize, minFontScale: 0.1, size: textData.rect.size, font: font)
+        print("adapted font size:", fontSize)
         let adaptedFont = font.toFont(ofSize: fontSize)
         textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }

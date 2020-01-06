@@ -73,9 +73,9 @@ do {
                     maxFontSize: fontSize,
                     textData: $0.data)
 
-                if verbose {
-                    print("Rendered title with font size \(fontSize), group id: \($0.data.groupIdentifier)")
-                }
+//                if verbose {
+//                    print("Rendered title with font size \(fontSize), group id: \($0.data.groupIdentifier)")
+//                }
             }
 
             if let finalImage = composer.renderFinalImage() {

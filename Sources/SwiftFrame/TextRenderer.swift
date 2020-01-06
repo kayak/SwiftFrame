@@ -5,61 +5,74 @@ final class TextRenderer {
 
     // MARK: - Fitting & Size Computations
 
-    /// Determines the maximum point size of the specified font that allows to render all of the given texts
-    /// onto a particular number of lines
-//    func maximumFontSizeThatFits(
-//        texts: [String],
-//        font: NSFont,
-//        lines: Int,
-//        rect: CGRect,
-//        lowerBound: CGFloat = 1,
-//        upperBound: CGFloat) throws -> CGFloat
-//    {
-//        guard !texts.isEmpty else {
-//            throw NSError(description: "Cannot determine common maximum font size without texts")
-//        }
-//        var commonMaximum = CGFloat.greatestFiniteMagnitude
-//        for text in texts {
-//            let maximum = try maximumFontSizeThatFits(
-//                text: text,
-//                font: font,
-//                lines: lines,
-//                rect: rect,
-//                lowerBound: lowerBound,
-//                upperBound: upperBound)
-//            if maximum < commonMaximum {
-//                commonMaximum = maximum
-//            }
-//        }
-//        return commonMaximum
-//    }
+    private enum FontSizeState {
+        case fit, tooBig, tooSmall
+    }
+
+    private func binarySearch(string: String, minSize: CGFloat, maxSize: CGFloat, size: CGSize, constraintSize: CGSize, font: NSFont) -> CGFloat {
+        let fontSize = (minSize + maxSize) / 2
+        var attributes = makeAttributes(font: font)
+        attributes[NSAttributedString.Key.font] = font.toFont(ofSize: fontSize)
+
+        let rect = string.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
+        let state = multiLineSizeState(rect: rect, size: size)
+
+        // if the search range is smaller than 0.1 of a font size we stop
+        // returning either side of min or max depending on the state
+        let diff = maxSize - minSize
+        guard diff > 0.1 else {
+            switch state {
+            case .tooSmall:
+                return maxSize
+            default:
+                return minSize
+            }
+        }
+
+        switch state {
+        case .fit: return fontSize
+        case .tooBig: return binarySearch(string: string, minSize: minSize, maxSize: fontSize, size: size, constraintSize: constraintSize, font: font)
+        case .tooSmall: return binarySearch(string: string, minSize: fontSize, maxSize: maxSize, size: size, constraintSize: constraintSize, font: font)
+        }
+    }
+
+    private func singleLineSizeState(rect: CGRect, size: CGSize) -> FontSizeState {
+        if rect.width >= size.width + 10 && rect.width <= size.width {
+            return .fit
+        } else if rect.width > size.width {
+            return .tooBig
+        } else {
+            return .tooSmall
+        }
+    }
+
+    private func multiLineSizeState(rect: CGRect, size: CGSize) -> FontSizeState {
+        // if rect within 10 of size
+        if rect.height < size.height + 10 &&
+            rect.height > size.height - 10 &&
+            rect.width > size.width + 10 &&
+            rect.width < size.width - 10 {
+            return .fit
+        } else if rect.height > size.height || rect.width > size.width {
+            return .tooBig
+        } else {
+            return .tooSmall
+        }
+    }
 
     /// Determines the maximum point size of the specified font that allows to render the given text onto a
     /// particular number of lines
-    func maximumFontSizeThatFits(
-        text: String,
-        font: NSFont,
-        lines: Int,
-        rect: CGRect,
-        lowerBound: CGFloat = 1,
-        upperBound: CGFloat) throws -> CGFloat
-    {
-        if abs(upperBound - lowerBound) < 1e-5 {
-            if numberOfLines(text: text, font: font.toFont(ofSize: upperBound), rect: rect, isSmallerOrEqualTo: lines) {
-                return upperBound
-            }
-            if numberOfLines(text: text, font: font.toFont(ofSize: lowerBound), rect: rect, isSmallerOrEqualTo: lines) {
-                return lowerBound
-            }
-            throw NSError(description: "Could not fit \"\(text)\" onto \(lines) lines")
+    func maximumFontSizeThatFits(string: String, maxFontSize: CGFloat = 100, minFontScale: CGFloat = 0.1, size: CGSize, font: NSFont) throws -> CGFloat {
+        let maxFontSize = maxFontSize.isNaN ? 100 : maxFontSize
+        let minFontScale = minFontScale.isNaN ? 0.1 : minFontScale
+        let minimumFontSize = maxFontSize * minFontScale
+        guard !string.isEmpty else {
+            return maxFontSize
         }
-        let size = (lowerBound + upperBound) / 2.0
-        print("trying size", size)
-        if numberOfLines(text: text, font: font.toFont(ofSize: size), rect: rect, isSmallerOrEqualTo: lines) {
-            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, rect: rect, lowerBound: size, upperBound: upperBound)
-        } else {
-            return try maximumFontSizeThatFits(text: text, font: font, lines: lines, rect: rect, lowerBound: lowerBound, upperBound: size)
-        }
+
+        let constraintSize = CGSize(width: size.width, height: CGFloat.greatestFiniteMagnitude)
+        let calculatedFontSize = binarySearch(string: string, minSize: minimumFontSize, maxSize: maxFontSize, size: size, constraintSize: constraintSize, font: font)
+        return (calculatedFontSize * 10.0).rounded(.down) / 10.0
     }
 
     private func numberOfLines(text: String, font: NSFont, rect: CGRect, isSmallerOrEqualTo maximum: Int) -> Bool {
@@ -68,7 +81,6 @@ final class TextRenderer {
         let originRect = NSRect(origin: .zero, size: rect.size)
         let frame = makeFrame(from: attributedText, in: originRect)
         let numberOfLines = CFArrayGetCount(CTFrameGetLines(frame))
-        print(numberOfLines)
         return numberOfLines <= maximum
     }
 

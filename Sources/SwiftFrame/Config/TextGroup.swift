@@ -19,12 +19,7 @@ struct TextGroup: Codable, ConfigValidatable, Hashable {
         let textRenderer = TextRenderer()
         let maxFontSizes: [CGFloat] = strings.compactMap {
             do {
-                return try textRenderer.maximumFontSizeThatFits(
-                    text: $0.string,
-                    font: $0.data.customFont ?? globalFont,
-                    lines: kNumTitleLines,
-                    rect: $0.data.rect,
-                    upperBound: $0.data.maxFontSizeOverride ?? globalMaxSize)
+                return try textRenderer.maximumFontSizeThatFits(string: $0.string, maxFontSize: $0.data.maxFontSizeOverride ?? globalMaxSize, minFontScale: 0.1, size: $0.data.rect.size, font: $0.data.customFont ?? globalFont)
             } catch {
                 return nil
             }
