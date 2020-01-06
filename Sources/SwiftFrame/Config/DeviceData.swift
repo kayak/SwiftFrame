@@ -45,6 +45,18 @@ struct DeviceData: Decodable, ConfigValidatable {
         screenshots = parsedScreenshots
     }
 
+    func groupTextData(with groups: [TextGroup]) -> [TextGroup: [TextData]] {
+        var dict = [TextGroup: [TextData]]()
+        groups.forEach { group in
+            dict[group] = textData.filter { $0.groupIdentifier == group.identifier }
+        }
+        return dict
+    }
+
+    func collectFrames(for textGroup: TextGroup) -> [NSRect] {
+        return textData.filter { $0.groupIdentifier == textGroup.identifier }.map { $0.rect }
+    }
+
     func validate() throws {
         // TODO: Validate screenshot size compared to template file
         try screenshots.forEach { localeDict in

@@ -2,6 +2,12 @@ import AppKit
 import Foundation
 
 extension URL {
+    var fileName: String {
+        var components = lastPathComponent.components(separatedBy: ".")
+        components.removeLast(1)
+        return components.joined(separator: ".")
+    }
+
     var subDirectories: [URL] {
         guard hasDirectoryPath else {
             print("is not directory")

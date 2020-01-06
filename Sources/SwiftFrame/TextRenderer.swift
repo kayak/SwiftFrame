@@ -5,6 +5,33 @@ final class TextRenderer {
 
     // MARK: - Fitting & Size Computations
 
+    static func maximumFontSizeThatFits(text: String, font: NSFont, bounds: NSRect, upperBound: CGFloat, alignment: NSTextAlignment? = nil) -> CGFloat {
+        let constrainingDimension = min(bounds.width, bounds.height)
+        let properBounds = CGRect(origin: .zero, size: bounds.size)
+        var attributes: [NSAttributedString.Key : Any] = [.font: font]
+
+        if let alignment = alignment {
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = alignment
+            attributes[.paragraphStyle] = paragraphStyle
+        }
+
+        let infiniteBounds = CGSize(width: CGFloat.infinity, height: CGFloat.infinity)
+        var bestFontSize: CGFloat = constrainingDimension
+
+        for fontSize in stride(from: bestFontSize, through: 0, by: -1) {
+            attributes[.font] = font.toFont(ofSize: fontSize)
+
+            let currentFrame = text.boundingRect(with: infiniteBounds, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: attributes, context: nil)
+
+            if properBounds.contains(currentFrame) {
+                bestFontSize = fontSize
+                break
+            }
+        }
+        return min(bestFontSize, upperBound)
+    }
+
     /// Determines the maximum point size of the specified font that allows to render all of the given texts
     /// onto a particular number of lines
     func maximumFontSizeThatFits(
@@ -73,8 +100,12 @@ final class TextRenderer {
         let attributes = makeAttributes(font: font)
         let attributedText = NSAttributedString(string: text, attributes: attributes)
         let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
-        let size = CTFramesetterSuggestFrameSizeWithConstraints(frameSetter, CFRange(location: 0, length: 0), nil,
-            CGSize(width: width, height: CGFloat.greatestFiniteMagnitude), nil)
+        let size = CTFramesetterSuggestFrameSizeWithConstraints(
+            frameSetter,
+            CFRange(location: 0, length: 0),
+            nil,
+            CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
+            nil)
         return size.height
     }
 
@@ -109,6 +140,11 @@ final class TextRenderer {
         let attributedText = NSAttributedString(string: text, attributes: attributes)
         let frame = makeFrame(from: attributedText, in: rect)
         CTFrameDraw(frame, context)
+
+        // DEBUG
+
+        context.addRect(rect)
+        context.drawPath(using: .stroke)
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {

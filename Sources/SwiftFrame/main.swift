@@ -24,7 +24,7 @@ do {
 
     if verbose {
         config.printSummary(insetByTabs: 0)
-        print("Press any key to continue")
+        print("Press return key to continue")
         _ = readLine()
     }
 
@@ -51,23 +51,48 @@ do {
 
             try composer.addTemplateImage()
 
-            try device.textData.forEach { data in
-                guard let title = config.titles[locale]?[data.titleIdentifier] else {
-                    print("no title found with specified key")
+            let constructedTitles: [AssociatedString] = try device.textData.map {
+                guard let title = config.titles[locale]?[$0.titleIdentifier] else {
+                    throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
+                }
+                let maxFontSize = TextRenderer.maximumFontSizeThatFits(
+                    text: title,
+                    font: $0.customFont ?? config.font,
+                    bounds: $0.rect,
+                    upperBound: $0.maxFontSizeOverride ?? config.maxFontSize,
+                    alignment: $0.textAlignment)
+                return (title, $0, maxFontSize)
+            }
+
+            let maxFontSizeByGroup = config.textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
+                guard let maxSize = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier }).map({ $0.maxFontSize }).min() else {
                     return
                 }
+                dictionary[group.identifier] = min(maxSize, group.maxFontSize)
+            }
+
+            try device.textData.forEach { data in
+                guard let title = config.titles[locale]?[data.titleIdentifier] else {
+                    throw NSError(description: "Title with key \"\(data.titleIdentifier)\" not found in string file \"\(locale)\"")
+                }
+
+                let fontSize = maxFontSizeByGroup[safe: data.groupIdentifier] ?? data.maxFontSizeOverride ?? config.maxFontSize
 
                 try composer.add(
                     title: title,
                     font: data.customFont ?? config.font,
                     color: data.textColorOverride ?? config.textColor,
-                    maxFontSize: data.maxFontSizeOverride ?? config.maxFontSize,
+                    maxFontSize: fontSize,
                     textData: data)
+
+                if verbose {
+                    print("Rendered title with font size \(fontSize)")
+                }
             }
 
             if let finalImage = composer.renderFinalImage() {
                 guard let size = imageDict.first?.value.nativeSize else {
-                    return
+                    throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
                 }
                 let slices = composer.slice(image: finalImage, with: size)
                 try config.outputPaths.forEach { url in
@@ -79,6 +104,8 @@ do {
                         try writer.write(finalImage, to: url.absoluteString, deviceID: device.outputSuffix + "-big", locale: locale)
                     }
                 }
+            } else {
+                throw NSError(description: "Could not create final image")
             }
         }
     }

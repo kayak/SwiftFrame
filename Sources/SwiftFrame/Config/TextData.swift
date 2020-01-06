@@ -1,15 +1,18 @@
 import AppKit
 import Foundation
 
+typealias AssociatedString = (string: String, data: TextData, maxFontSize: CGFloat)
+
 struct TextData: Decodable, ConfigValidatable {
     let titleIdentifier: String
     let bottomLeft: Point
     let topRight: Point
     let textAlignment: NSTextAlignment
-    let maxFontSizeOverride: Int?
+    /// Text group will be prioritized over this, if specified
+    let maxFontSizeOverride: CGFloat?
     let customFont: NSFont?
     let textColorOverride: NSColor?
-
+    let groupIdentifier: String?
 
     var rect: NSRect {
         NSRect(origin: bottomLeft.cgPoint, size: CGSize(width: topRight.x - bottomLeft.x, height: topRight.y - bottomLeft.y))
@@ -23,6 +26,7 @@ struct TextData: Decodable, ConfigValidatable {
         case bottomLeft
         case topRight
         case textAlignment
+        case groupIdentifier
     }
 
     init(from decoder: Decoder) throws {
@@ -31,7 +35,8 @@ struct TextData: Decodable, ConfigValidatable {
         bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
         topRight = try container.decode(Point.self, forKey: .topRight)
         textAlignment = try container.decode(NSTextAlignment.self, forKey: .textAlignment)
-        maxFontSizeOverride = try container.decodeIfPresent(Int.self, forKey: .maxFontSizeOverride)
+        maxFontSizeOverride = try container.decodeIfPresent(CGFloat.self, forKey: .maxFontSizeOverride)
+        groupIdentifier = try container.decodeIfPresent(String.self, forKey: .groupIdentifier)
 
         if let customFontPathString = try container.decodeIfPresent(String.self, forKey: .customFont) {
             customFont = try customFontPathString.registerFont()
@@ -71,4 +76,24 @@ struct TextData: Decodable, ConfigValidatable {
     }
 }
 
-extension NSTextAlignment: Codable {}
+extension NSTextAlignment: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let alignmentString = try container.decode(String.self)
+        switch alignmentString {
+        case "left":
+            self.init(rawValue: 0)!
+        case "right":
+            self.init(rawValue: 1)!
+        case "center":
+            self.init(rawValue: 2)!
+        case "justified":
+            self.init(rawValue: 3)!
+        case "natural":
+            self.init(rawValue: 4)!
+        default:
+            throw NSError(description: "Invalid text alignment \"\(alignmentString)\" was parsed")
+        }
+    }
+
+}

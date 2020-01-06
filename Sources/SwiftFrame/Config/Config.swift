@@ -12,9 +12,10 @@ typealias LocalizedStringFiles = [String : [String : String]]
 public struct ConfigFile: Decodable, ConfigValidatable {
     let outputWholeImage: Bool
     let deviceData: [DeviceData]
+    let textGroups: [TextGroup]
     let titlesPath: LocalURL
     let titles: LocalizedStringFiles
-    let maxFontSize: Int
+    let maxFontSize: CGFloat
     let outputPaths: [LocalURL]
     let font: NSFont
     let textColor: NSColor
@@ -22,6 +23,7 @@ public struct ConfigFile: Decodable, ConfigValidatable {
     enum CodingKeys: String, CodingKey {
         case outputWholeImage = "alsoOutputWholeImage"
         case deviceData
+        case textGroups
         case titlesPath
         case maxFontSize
         case outputPaths
@@ -33,7 +35,8 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         outputWholeImage = try container.decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
         deviceData = try container.decode([DeviceData].self, forKey: .deviceData)
-        maxFontSize = try container.decode(Int.self, forKey: .maxFontSize)
+        textGroups = try container.decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
+        maxFontSize = try container.decode(CGFloat.self, forKey: .maxFontSize)
         outputPaths = try container.decode([LocalURL].self, forKey: .outputPaths)
 
         let fontPathString = try container.decode(String.self, forKey: .fontFile)
@@ -53,6 +56,9 @@ public struct ConfigFile: Decodable, ConfigValidatable {
     }
 
     func validate() throws {
+        guard !deviceData.isEmpty else {
+            throw NSError(description: "No screenshot data was supplied")
+        }
         try deviceData.forEach { try $0.validate() }
     }
 
@@ -72,14 +78,17 @@ public struct ConfigFile: Decodable, ConfigValidatable {
             $0.printSummary(insetByTabs: tabs + 1)
             print("")
         }
-        print("### Config Summary End")
-    }
-}
 
-extension URL {
-    var fileName: String {
-        var components = lastPathComponent.components(separatedBy: ".")
-        components.removeLast(1)
-        return components.joined(separator: ".")
+        if !textGroups.isEmpty {
+            print("Text groups:")
+            textGroups.forEach {
+                $0.printSummary(insetByTabs: tabs + 1)
+                print("")
+            }
+        } else {
+            print("No implicit text groups defined, using global max font size\n")
+        }
+
+        print("### Config Summary End")
     }
 }
