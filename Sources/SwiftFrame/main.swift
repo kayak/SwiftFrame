@@ -64,18 +64,26 @@ do {
             }
 
             try constructedTitles.forEach {
-                let fontSize: CGFloat = maxFontSizeByGroup[safe: $0.data.groupIdentifier] ?? config.maxFontSize
+                if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
+                    // Can use fixed font size since common maximum has already been calculated
+                    composer.add(
+                        title: $0.string,
+                        font: $0.data.customFont ?? config.font,
+                        color: $0.data.textColorOverride ?? config.textColor,
+                        fixedFontSize: sharedSize,
+                        textData: $0.data)
+                } else {
+                    let renderedFontsize = try composer.add(
+                        title: $0.string,
+                        font: $0.data.customFont ?? config.font,
+                        color: $0.data.textColorOverride ?? config.textColor,
+                        maxFontSize: config.maxFontSize,
+                        textData: $0.data)
 
-                try composer.add(
-                    title: $0.string,
-                    font: $0.data.customFont ?? config.font,
-                    color: $0.data.textColorOverride ?? config.textColor,
-                    maxFontSize: fontSize,
-                    textData: $0.data)
-
-//                if verbose {
-//                    print("Rendered title with font size \(fontSize), group id: \($0.data.groupIdentifier)")
-//                }
+                    if verbose {
+                        print("Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))")
+                    }
+                }
             }
 
             if let finalImage = composer.renderFinalImage() {
@@ -100,54 +108,6 @@ do {
 
     print("Done!".formattedGreen())
 
-//    for (frame, screenshots) in config.screenshotPathsByFrame {
-//        let imageLoader = ImageLoader()
-//        let composer = ImageComposer()
-//        let writer = ImageWriter()
-//
-//        let adaptedTitleFont = try composer.adapt(
-//            titleFont: config.titleFont,
-//            toFitTitleTexts: config.titleTexts,
-//            titlePadding: config.titlePadding,
-//            width: frame.viewport.size.width)
-//
-//        if config.verbose {
-//            print("Scaled title font to \(adaptedTitleFont.pointSize) points...")
-//        }
-//
-//        for i in 0 ..< screenshots.count {
-//            let screenshot = try imageLoader.loadImage(
-//                atPath: screenshots[i],
-//                forSize: frame.viewport.size,
-//                allowDownsampling: config.downsamplingAllowed)
-//
-//            if config.verbose {
-//                print("Framing \(screenshots[i])...")
-//            }
-//
-//            let image = try composer.compose(
-//                background: config.background,
-//                frame: frame.image,
-//                framePadding: frame.padding,
-//                viewport: frame.viewport,
-//                viewportMask: frame.viewportMask,
-//                screenshot: screenshot,
-//                titleText: config.titleTexts[i],
-//                titleFont: adaptedTitleFont,
-//                titleColor: config.titleColor,
-//                titlePadding: config.titlePadding)
-//
-//            guard let outputPath = config.outputPathsByScreenshotPath[screenshots[i]] else {
-//                throw NSError(description: "Could not determine output path for \(screenshots[i])")
-//            }
-//
-//            if config.verbose {
-//                print("Writing framed image to \(outputPath)...")
-//            }
-//
-//            try writer.write(image, toPath: outputPath)
-//        }
-//    }
 } catch let error as NSError {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.
     // Interestingly, the same does not happen when building with Xcode directly.

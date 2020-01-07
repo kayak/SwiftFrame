@@ -44,10 +44,15 @@ final class ImageComposer {
         context.draw(templateImage, in: self.templateImage.nativeRect)
     }
 
-    func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws {
-        let fontSize = try textRenderer.maximumFontSizeThatFits(string: title, maxFontSize: maxFontSize, minFontScale: 0.1, size: textData.rect.size, font: font)
-        print("adapted font size:", fontSize)
+    func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
+        let fontSize = try textRenderer.maximumFontSizeThatFits(string: title, size: textData.rect.size, font: font, maxFontSize: maxFontSize)
         let adaptedFont = font.toFont(ofSize: fontSize)
+        textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
+        return fontSize
+    }
+
+    func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) {
+        let adaptedFont = font.toFont(ofSize: fixedFontSize)
         textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 

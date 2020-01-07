@@ -19,11 +19,16 @@ struct TextGroup: Codable, ConfigValidatable, Hashable {
         let textRenderer = TextRenderer()
         let maxFontSizes: [CGFloat] = strings.compactMap {
             do {
-                return try textRenderer.maximumFontSizeThatFits(string: $0.string, maxFontSize: $0.data.maxFontSizeOverride ?? globalMaxSize, minFontScale: 0.1, size: $0.data.rect.size, font: $0.data.customFont ?? globalFont)
+                return try textRenderer.maximumFontSizeThatFits(
+                    string: $0.string,
+                    size: $0.data.rect.size,
+                    font: $0.data.customFont ?? globalFont,
+                    maxFontSize: $0.data.maxFontSizeOverride ?? globalMaxSize)
             } catch {
                 return nil
             }
         }
+        // Can force-unwrap since array will never be empty
         return ([globalMaxSize] + maxFontSizes).min()!
     }
 }

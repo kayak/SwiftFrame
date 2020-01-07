@@ -9,18 +9,28 @@ final class TextRenderer {
         case fit, tooBig, tooSmall
     }
 
-    private func binarySearch(string: String, minSize: CGFloat, maxSize: CGFloat, size: CGSize, constraintSize: CGSize, font: NSFont) -> CGFloat {
-        let fontSize = (minSize + maxSize) / 2
-        var attributes = makeAttributes(font: font)
-        attributes[NSAttributedString.Key.font] = font.toFont(ofSize: fontSize)
+    /// Determines the maximum point size of the specified font that allows to render the given text onto a
+    /// particular number of lines
+    func maximumFontSizeThatFits(string: String, size: CGSize, font: NSFont, maxFontSize: CGFloat, minFontSize: CGFloat = 1) throws -> CGFloat {
+        guard !string.isEmpty else {
+            throw NSError(description: "Empyt string was passed to TextRenderer")
+        }
 
-        let rect = string.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
-        let state = multiLineSizeState(rect: rect, size: size)
+        let constraintSize = CGSize(width: size.width, height: CGFloat.greatestFiniteMagnitude)
+        let calculatedFontSize = maxFontSizeThatFits(string: string, minSize: minFontSize, maxSize: maxFontSize, size: size, constraintSize: constraintSize, font: font)
+        return calculatedFontSize.rounded(.down)
+    }
+
+    private func maxFontSizeThatFits(string: String, minSize: CGFloat, maxSize: CGFloat, size: CGSize, constraintSize: CGSize, font: NSFont) -> CGFloat {
+        let fontSize = (minSize + maxSize) / 2
+        let attributes = makeAttributes(font: font.toFont(ofSize: fontSize))
+
+        let stringRect = string.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
+        let state = multiLineSizeState(stringSize: stringRect.size, desiredSize: size)
 
         // if the search range is smaller than 0.1 of a font size we stop
         // returning either side of min or max depending on the state
-        let diff = maxSize - minSize
-        guard diff > 0.1 else {
+        guard abs(maxSize - minSize) > 1e-5 else {
             switch state {
             case .tooSmall:
                 return maxSize
@@ -30,58 +40,24 @@ final class TextRenderer {
         }
 
         switch state {
-        case .fit: return fontSize
-        case .tooBig: return binarySearch(string: string, minSize: minSize, maxSize: fontSize, size: size, constraintSize: constraintSize, font: font)
-        case .tooSmall: return binarySearch(string: string, minSize: fontSize, maxSize: maxSize, size: size, constraintSize: constraintSize, font: font)
+        case .fit:
+            return fontSize
+        case .tooBig:
+            return maxFontSizeThatFits(string: string, minSize: minSize, maxSize: fontSize, size: size, constraintSize: constraintSize, font: font)
+        case .tooSmall:
+            return maxFontSizeThatFits(string: string, minSize: fontSize, maxSize: maxSize, size: size, constraintSize: constraintSize, font: font)
         }
     }
 
-    private func singleLineSizeState(rect: CGRect, size: CGSize) -> FontSizeState {
-        if rect.width >= size.width + 10 && rect.width <= size.width {
+    private func multiLineSizeState(stringSize: CGSize, desiredSize: CGSize) -> FontSizeState {
+        // if rect is within two percent of size, consider text to fit
+        if stringSize.isWithin(desiredSize, tolerancePercent: 2) {
             return .fit
-        } else if rect.width > size.width {
+        } else if stringSize.height > desiredSize.height || stringSize.width > desiredSize.width {
             return .tooBig
         } else {
             return .tooSmall
         }
-    }
-
-    private func multiLineSizeState(rect: CGRect, size: CGSize) -> FontSizeState {
-        // if rect within 10 of size
-        if rect.height < size.height + 10 &&
-            rect.height > size.height - 10 &&
-            rect.width > size.width + 10 &&
-            rect.width < size.width - 10 {
-            return .fit
-        } else if rect.height > size.height || rect.width > size.width {
-            return .tooBig
-        } else {
-            return .tooSmall
-        }
-    }
-
-    /// Determines the maximum point size of the specified font that allows to render the given text onto a
-    /// particular number of lines
-    func maximumFontSizeThatFits(string: String, maxFontSize: CGFloat = 100, minFontScale: CGFloat = 0.1, size: CGSize, font: NSFont) throws -> CGFloat {
-        let maxFontSize = maxFontSize.isNaN ? 100 : maxFontSize
-        let minFontScale = minFontScale.isNaN ? 0.1 : minFontScale
-        let minimumFontSize = maxFontSize * minFontScale
-        guard !string.isEmpty else {
-            return maxFontSize
-        }
-
-        let constraintSize = CGSize(width: size.width, height: CGFloat.greatestFiniteMagnitude)
-        let calculatedFontSize = binarySearch(string: string, minSize: minimumFontSize, maxSize: maxFontSize, size: size, constraintSize: constraintSize, font: font)
-        return (calculatedFontSize * 10.0).rounded(.down) / 10.0
-    }
-
-    private func numberOfLines(text: String, font: NSFont, rect: CGRect, isSmallerOrEqualTo maximum: Int) -> Bool {
-        let attributes = makeAttributes(font: font)
-        let attributedText = NSAttributedString(string: text, attributes: attributes)
-        let originRect = NSRect(origin: .zero, size: rect.size)
-        let frame = makeFrame(from: attributedText, in: originRect)
-        let numberOfLines = CFArrayGetCount(CTFrameGetLines(frame))
-        return numberOfLines <= maximum
     }
 
     // MARK: - Frame Rendering
@@ -91,11 +67,6 @@ final class TextRenderer {
         let attributedText = NSAttributedString(string: text, attributes: attributes)
         let frame = makeFrame(from: attributedText, in: rect)
         CTFrameDraw(frame, context)
-
-        // DEBUG
-
-        context.addRect(rect)
-        context.drawPath(using: .stroke)
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
@@ -119,4 +90,18 @@ final class TextRenderer {
         return attributes
     }
 
+}
+
+extension CGSize {
+    func isWithin(_ otherSize: CGSize, tolerancePercent: Int) -> Bool {
+        guard percent >= -100 else {
+            return false
+        }
+
+        let fraction = CGFloat(percent + 100) / 100.00
+        return otherSize.height < height * fraction
+            && otherSize.height * fraction < height
+            && otherSize.width < width * fraction
+            && otherSize.width * fraction < width
+    }
 }
