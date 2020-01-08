@@ -1,9 +1,9 @@
 import AppKit
 import Foundation
 
-private let kMinFontSize: CGFloat = 4
+private let kMinFontSize: CGFloat = 5
 
-final class TextRenderer {
+public final class TextRenderer {
 
     private enum FontSizeState {
         case fit, tooBig, tooSmall
@@ -16,13 +16,10 @@ final class TextRenderer {
             throw NSError(description: "Could not make attributed string")
         }
 
+        print("rendered at", font.pointSize)
+
         let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
-
-        // DEBUG
-
-        context.addRect(rect)
-        context.drawPath(using: .stroke)
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
@@ -42,8 +39,8 @@ final class TextRenderer {
 
         let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize, size: size)
 
-        // Subtract 0.5 to avoid floating point precision issues
-        return calculatedFontSize.rounded(.down) - 0.5
+        // Subtract 0.1 to avoid floating point precision issues
+        return calculatedFontSize - 0.1
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: NSTextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {

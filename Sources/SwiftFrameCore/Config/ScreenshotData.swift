@@ -1,7 +1,7 @@
 import Foundation
 
-struct ScreenshotData: Decodable, ConfigValidatable {
-    let screenshotName: String
+public struct ScreenshotData: Decodable, ConfigValidatable {
+    public let screenshotName: String
     let bottomLeft: Point
     let bottomRight: Point
     let topLeft: Point
@@ -17,7 +17,7 @@ struct ScreenshotData: Decodable, ConfigValidatable {
         case zIndex
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.screenshotName = try container.decode(String.self, forKey: .screenshotName)
         self.bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
@@ -27,14 +27,14 @@ struct ScreenshotData: Decodable, ConfigValidatable {
         self.zIndex = try container.decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
     }
 
-    func validate() throws {}
+    public func validate() throws {}
 
-    func printSummary(insetByTabs tabs: Int) {
-        print(CommandLineFormatter.formatKeyValue("Screenshot Name", value: screenshotName, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1))
-        print(CommandLineFormatter.formatKeyValue("Bottom Right", value: bottomRight.formattedString, insetBy: tabs + 1))
-        print(CommandLineFormatter.formatKeyValue("Top Left", value: topLeft.formattedString, insetBy: tabs + 1))
-        print(CommandLineFormatter.formatKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1))
-        print(CommandLineFormatter.formatKeyValue("Z Index", value: zIndex, insetBy: tabs + 1))
+    public func printSummary(insetByTabs tabs: Int) {
+        CommandLineFormatter.printKeyValue("Screenshot Name", value: screenshotName, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Left", value: topLeft.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Z Index", value: zIndex, insetBy: tabs + 1)
     }
 }

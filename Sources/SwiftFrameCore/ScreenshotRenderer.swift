@@ -26,8 +26,8 @@ final class ScreenshotRenderer {
         guard
             let compositeImage = perspectiveTransform.outputImage,
             let cgImage = CIContext().createCGImage(compositeImage, from: calculateRect(for: data))
-            else {
-                throw NSError(description: "Could not skew screenshot")
+        else {
+            throw NSError(description: "Could not skew screenshot")
         }
         return cgImage
     }
@@ -47,7 +47,7 @@ final class ScreenshotRenderer {
             screenshotData.topRight.y
         ]
 
-        // Can force-unwrap since we sequence is guaranteed to be non-empty
+        // Can force-unwrap since the are never empty
         let minX = xCoordinates.min()!
         let maxX = xCoordinates.max()!
         let minY = yCoordinates.min()!

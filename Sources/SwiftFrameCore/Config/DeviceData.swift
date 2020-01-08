@@ -3,14 +3,14 @@ import Foundation
 
 let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
-struct DeviceData: Decodable, ConfigValidatable {
-    let outputSuffix: String
+public struct DeviceData: Decodable, ConfigValidatable {
+    public let outputSuffix: String
     let screenshotsPath: LocalURL
-    let screenshots: [String : [String: NSBitmapImageRep]]
+    public let screenshots: [String : [String: NSBitmapImageRep]]
     let templateFilePath: LocalURL
-    let templateImage: NSBitmapImageRep
-    let screenshotData: [ScreenshotData]
-    let textData: [TextData]
+    public let templateImage: NSBitmapImageRep
+    public let screenshotData: [ScreenshotData]
+    public let textData: [TextData]
 
     enum CodingKeys: String, CodingKey {
         case outputSuffix
@@ -20,7 +20,7 @@ struct DeviceData: Decodable, ConfigValidatable {
         case textData
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         templateFilePath = try container.decode(LocalURL.self, forKey: .templateFile)
         guard let rep = templateFilePath.absoluteURL.bitmapRep else {
@@ -57,7 +57,7 @@ struct DeviceData: Decodable, ConfigValidatable {
         return textData.filter { $0.groupIdentifier == textGroup.identifier }.map { $0.rect }
     }
 
-    func validate() throws {
+    public func validate() throws {
         // TODO: Validate screenshot size compared to template file
         try screenshots.forEach { localeDict in
             guard let first = localeDict.value.first?.value else {
@@ -83,10 +83,10 @@ struct DeviceData: Decodable, ConfigValidatable {
         }
     }
 
-    func printSummary(insetByTabs tabs: Int) {
-        print(CommandLineFormatter.formatKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Template file path", value: templateFilePath.absoluteString, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs))
+    public func printSummary(insetByTabs tabs: Int) {
+        CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Template file path", value: templateFilePath.absoluteString, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }

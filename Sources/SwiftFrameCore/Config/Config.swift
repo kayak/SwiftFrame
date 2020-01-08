@@ -1,24 +1,24 @@
 import Foundation
 import AppKit
 
-protocol ConfigValidatable {
+public protocol ConfigValidatable {
     func validate() throws
     func printSummary(insetByTabs tabs: Int)
 }
 
 // First key is locale, second is regular key in string file
-typealias LocalizedStringFiles = [String : [String : String]]
+public typealias LocalizedStringFiles = [String : [String : String]]
 
 public struct ConfigFile: Decodable, ConfigValidatable {
-    let outputWholeImage: Bool
-    let deviceData: [DeviceData]
-    let textGroups: [TextGroup]
-    let titlesPath: LocalURL
-    let titles: LocalizedStringFiles
-    let maxFontSize: CGFloat
-    let outputPaths: [LocalURL]
-    let font: NSFont
-    let textColor: NSColor
+    public let outputWholeImage: Bool
+    public let deviceData: [DeviceData]
+    public let textGroups: [TextGroup]
+    public let titlesPath: LocalURL
+    public let titles: LocalizedStringFiles
+    public let maxFontSize: CGFloat
+    public let outputPaths: [LocalURL]
+    public let font: NSFont
+    public let textColor: NSColor
 
     enum CodingKeys: String, CodingKey {
         case outputWholeImage = "alsoOutputWholeImage"
@@ -55,20 +55,20 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         titles = parsedTitles
     }
 
-    func validate() throws {
+    public func validate() throws {
         guard !deviceData.isEmpty else {
             throw NSError(description: "No screenshot data was supplied")
         }
         try deviceData.forEach { try $0.validate() }
     }
 
-    func printSummary(insetByTabs tabs: Int) {
+    public func printSummary(insetByTabs tabs: Int) {
         print("### Config Summary Begin")
-        print(CommandLineFormatter.formatKeyValue("Outputs whole image as well as slices", value: outputWholeImage))
-        print(CommandLineFormatter.formatKeyValue("Title Color", value: textColor.hexString, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Title Font", value: font.fontName, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("String Files", value: titles.count, insetBy: tabs))
+        CommandLineFormatter.printKeyValue("Outputs whole image as well as slices", value: outputWholeImage)
+        CommandLineFormatter.printKeyValue("Title Color", value: textColor.hexString, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Title Font", value: font.fontName, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
 
         print("Output paths:")
         outputPaths.forEach { print(String(repeating: "\t", count: tabs + 1) + $0.absoluteString.formattedGreen()) }

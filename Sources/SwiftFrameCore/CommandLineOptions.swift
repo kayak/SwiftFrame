@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Option Class
 
-final class CommandLineOption {
+public final class CommandLineOption {
 
     let flags: [String]
 
@@ -14,8 +14,8 @@ final class CommandLineOption {
 
     let group: Int?
 
-    private(set) var isSpecified = false
-    private(set) var arguments = [String]()
+    public private(set) var isSpecified = false
+    public private(set) var arguments = [String]()
 
     // MARK: - Object Lifecycle
 
@@ -51,23 +51,27 @@ final class CommandLineOption {
 
 public final class CommandLineOptions {
 
+    // MARK: - Init
+
+    public init() {}
+
     // MARK: - Options
 
-    let help = CommandLineOption(
+    public let help = CommandLineOption(
         flags: ["-h", "--help"],
         usageText: "Display this message and exit",
         argumentPlaceholder: nil,
         numArgsRequired: 0,
         isRepeatable: false)
 
-    let configPath = CommandLineOption(
+    public let configPath = CommandLineOption(
         flags: ["-c", "--config"],
         usageText: "Read configuration values from the specified file",
         argumentPlaceholder: "PATH",
         numArgsRequired: 1,
         isRepeatable: false)
 
-    let verbose = CommandLineOption(
+    public let verbose = CommandLineOption(
         flags: ["-v", "--verbose"],
         usageText: "Print logging information to STDOUT",
         argumentPlaceholder: nil,
@@ -80,7 +84,7 @@ public final class CommandLineOptions {
 
     // MARK: - Parsing & Validation
 
-    func parse(arguments: [String]) throws {
+    public func parse(arguments: [String]) throws {
         let remainder = parse(Array(arguments.suffix(from: 1)), at: 0)
         try validate(remainder: remainder)
     }
@@ -109,7 +113,7 @@ public final class CommandLineOptions {
 
     // MARK: - Usage Info
 
-    func summarizeUsage() -> String {
+    public func summarizeUsage() -> String {
         var lines = [String]()
         let flags = all.map({ $0.flags.joined(separator: ", ") + "\($0.argumentPlaceholder != nil ? " \($0.argumentPlaceholder!)" : "")"})
         let maxFlagLength = flags.map({ $0.count }).max()!

@@ -1,6 +1,6 @@
 import Foundation
 
-extension Dictionary {
+public extension Dictionary {
 
     subscript(safe key: Key?) -> Value? {
         guard let key = key else {

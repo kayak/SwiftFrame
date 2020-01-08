@@ -1,18 +1,18 @@
 import Foundation
 
-struct LocalURL: Codable {
+public struct LocalURL: Codable {
     let rawPath: String
     private let url: URL
 
-    var absoluteURL: URL {
+    public var absoluteURL: URL {
         url.absoluteURL
     }
 
-    var absoluteString: String {
+    public var absoluteString: String {
         url.absoluteString
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawPath = try container.decode(String.self)
         url = URL(fileURLWithPath: rawPath)

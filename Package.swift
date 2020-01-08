@@ -9,9 +9,10 @@ let package = Package(
         .macOS(.v10_13)
     ],
     targets: [
-        .target(name: "SwiftFrame"),
+        .target(name: "SwiftFrame", dependencies: ["SwiftFrameCore"]),
+        .target(name: "SwiftFrameCore"),
         .testTarget(
             name: "SwiftFrameTests",
-            dependencies: ["SwiftFrame"]),
+            dependencies: ["SwiftFrameCore"]),
     ]
 )

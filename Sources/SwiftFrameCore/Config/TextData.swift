@@ -1,18 +1,18 @@
 import AppKit
 import Foundation
 
-typealias AssociatedString = (string: String, data: TextData)
+public typealias AssociatedString = (string: String, data: TextData)
 
-struct TextData: Decodable, ConfigValidatable {
-    let titleIdentifier: String
+public struct TextData: Decodable, ConfigValidatable {
+    public let titleIdentifier: String
     let bottomLeft: Point
     let topRight: Point
-    let textAlignment: NSTextAlignment
+    public let textAlignment: NSTextAlignment
     /// Text group will be prioritized over this, if specified
-    let maxFontSizeOverride: CGFloat?
-    let customFont: NSFont?
-    let textColorOverride: NSColor?
-    let groupIdentifier: String?
+    public let maxFontSizeOverride: CGFloat?
+    public let customFont: NSFont?
+    public let textColorOverride: NSColor?
+    public let groupIdentifier: String?
 
     var rect: NSRect {
         NSRect(origin: bottomLeft.cgPoint, size: CGSize(width: topRight.x - bottomLeft.x, height: topRight.y - bottomLeft.y))
@@ -29,7 +29,7 @@ struct TextData: Decodable, ConfigValidatable {
         case groupIdentifier
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         titleIdentifier = try container.decode(String.self, forKey: .titleIdentifier)
         bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
@@ -51,27 +51,27 @@ struct TextData: Decodable, ConfigValidatable {
         }
     }
 
-    func validate() throws {
+    public func validate() throws {
         if (bottomLeft.x >= topRight.x) || (bottomLeft.y >= topRight.y) {
             throw NSError(description: "Bad text bounds: \(bottomLeft.formattedString) and \(topRight.formattedString)")
         }
     }
 
-    func printSummary(insetByTabs tabs: Int) {
-        print(CommandLineFormatter.formatKeyValue("Text ID", value: titleIdentifier, insetBy: tabs))
-        print(CommandLineFormatter.formatKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1))
-        print(CommandLineFormatter.formatKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1))
+    public func printSummary(insetByTabs tabs: Int) {
+        CommandLineFormatter.printKeyValue("Text ID", value: titleIdentifier, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1)
 
         if let fontName = customFont?.fontName {
-            print(CommandLineFormatter.formatKeyValue("Custom font", value: fontName, insetBy: tabs + 1))
+            CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)
         }
 
         if let ptSize = maxFontSizeOverride {
-            print(CommandLineFormatter.formatKeyValue("Max Point Size", value: ptSize, insetBy: tabs + 1))
+            CommandLineFormatter.printKeyValue("Max Point Size", value: ptSize, insetBy: tabs + 1)
         }
 
         if let textColorOverride = textColorOverride {
-            print(CommandLineFormatter.formatKeyValue("Custom color", value: textColorOverride.hexString, insetBy: tabs + 1))
+            CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.hexString, insetBy: tabs + 1)
         }
     }
 }
@@ -87,7 +87,7 @@ extension NSTextAlignment: Codable {
             self.init(rawValue: 1)!
         case "center":
             self.init(rawValue: 2)!
-        case "justified":
+        case "justify":
             self.init(rawValue: 3)!
         case "natural":
             self.init(rawValue: 4)!

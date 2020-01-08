@@ -1,9 +1,11 @@
 import AppKit
 import Foundation
 
-final class ImageWriter {
+public final class ImageWriter {
 
-    func write(_ image: CGImage, to directoryPath: String, deviceID: String, locale: String) throws {
+    public init() {}
+
+    public func write(_ image: CGImage, to directoryPath: String, deviceID: String, locale: String) throws {
         let rep = NSBitmapImageRep(cgImage: image)
         guard let data = rep.representation(using: .png, properties: [:]) else {
             throw NSError(description: "Failed to convert composed image to PNG")
