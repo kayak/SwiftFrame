@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 
 extension URL {
+
     var fileName: String {
         var components = lastPathComponent.components(separatedBy: ".")
         components.removeLast(1)
@@ -22,4 +23,5 @@ extension URL {
         }
         return NSBitmapImageRep(data: data)
     }
+    
 }

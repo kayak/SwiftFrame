@@ -6,6 +6,7 @@ import CoreImage
 final class ImageComposer {
 
     public let textRenderer = TextRenderer()
+    private let screenshotRenderer = ScreenshotRenderer()
     private let templateImage: NSBitmapImageRep
     private let context: CGContext
 
@@ -25,7 +26,7 @@ final class ImageComposer {
             bytesPerRow: 0,
             space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-            else {
+        else {
                 throw NSError(description: "Failed to create graphics context")
         }
         return context
@@ -57,56 +58,7 @@ final class ImageComposer {
     }
 
     func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
-        let cgImage = try renderScreenshot(screenshot, with: data)
-        let rect = calculateRect(for: data)
-
-        context.saveGState()
-        defer { context.restoreGState() }
-
-        context.draw(cgImage, in: rect)
-    }
-
-    private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData) throws -> CGImage {
-        let ciImage = CIImage(bitmapImageRep: screenshot)
-
-        let perspectiveTransform = CIFilter(name: "CIPerspectiveTransform")!
-        perspectiveTransform.setValue(data.topLeft.ciVector, forKey: "inputTopLeft")
-        perspectiveTransform.setValue(data.topRight.ciVector, forKey: "inputTopRight")
-        perspectiveTransform.setValue(data.bottomRight.ciVector, forKey: "inputBottomRight")
-        perspectiveTransform.setValue(data.bottomLeft.ciVector, forKey: "inputBottomLeft")
-        perspectiveTransform.setValue(ciImage, forKey: kCIInputImageKey)
-
-        guard
-            let compositeImage = perspectiveTransform.outputImage,
-            let cgImage = CIContext().createCGImage(compositeImage, from: calculateRect(for: data))
-        else {
-            throw NSError(description: "Could not skew screenshot")
-        }
-        return cgImage
-    }
-
-    func calculateRect(for screenshotData: ScreenshotData) -> NSRect {
-        let xCoordinates = [
-            screenshotData.bottomLeft.x,
-            screenshotData.bottomRight.x,
-            screenshotData.topLeft.x,
-            screenshotData.topRight.x
-        ]
-
-        let yCoordinates = [
-            screenshotData.bottomLeft.y,
-            screenshotData.bottomRight.y,
-            screenshotData.topLeft.y,
-            screenshotData.topRight.y
-        ]
-
-        // Can force-unwrap since we sequence is guaranteed to be non-empty
-        let minX = xCoordinates.min()!
-        let maxX = xCoordinates.max()!
-        let minY = yCoordinates.min()!
-        let maxY = yCoordinates.max()!
-
-        return NSRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+        try screenshotRenderer.render(screenshot: screenshot, with: data, in: context)
     }
 
     // MARK: - Exporting
