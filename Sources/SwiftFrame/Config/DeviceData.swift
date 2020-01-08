@@ -28,7 +28,7 @@ struct DeviceData: Decodable, ConfigValidatable {
         }
         templateImage = rep
         outputSuffix = try container.decode(String.self, forKey: .outputSuffix)
-        screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData)
+        screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData).sorted { $0.zIndex < $1.zIndex }
         textData = try container.decode([TextData].self, forKey: .textData)
         screenshotsPath = try container.decode(LocalURL.self, forKey: .screenshots)
 
@@ -64,7 +64,7 @@ struct DeviceData: Decodable, ConfigValidatable {
                 return
             }
             try localeDict.value.forEach {
-                if $0.value.size != first.size {
+                if $0.value.nativeSize != first.nativeSize {
                     throw NSError(description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"")
                 }
             }
