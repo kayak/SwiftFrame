@@ -66,7 +66,7 @@ do {
             try constructedTitles.forEach {
                 if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
                     // Can use fixed font size since common maximum has already been calculated
-                    composer.add(
+                    try composer.add(
                         title: $0.string,
                         font: $0.data.customFont ?? config.font,
                         color: $0.data.textColorOverride ?? config.textColor,

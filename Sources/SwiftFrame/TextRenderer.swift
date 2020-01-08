@@ -62,10 +62,13 @@ final class TextRenderer {
 
     // MARK: - Frame Rendering
 
-    func render(text: String, font: NSFont, color: NSColor, alignment: NSTextAlignment, rect: NSRect, context: CGContext) {
-        let attributes = makeAttributes(font: font, color: color, alignment: alignment)
-        let attributedText = NSAttributedString(string: text, attributes: attributes)
-        let frame = makeFrame(from: attributedText, in: rect)
+    func render(text: String, font: NSFont, color: NSColor, alignment: NSTextAlignment, rect: NSRect, context: CGContext) throws {
+        let htmlString = makeHTMLAttributedString(for: text, font: font, color: color, alignment: alignment)
+        guard let stringData = htmlString.data(using: .utf8), let attributedString = NSAttributedString(html: stringData, documentAttributes: nil) else {
+            throw NSError(description: "Could not convert string to UTF-8 data")
+        }
+
+        let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
     }
 
@@ -76,6 +79,21 @@ final class TextRenderer {
     }
 
     // MARK: - Misc
+
+    private func makeHTMLAttributedString(for text: String, font: NSFont, color: NSColor, alignment: NSTextAlignment?) -> String {
+        var attributes = [
+            "font-family: \(font.fontName)",
+            "font-size: \(Int(font.pointSize))",
+            "color: \(color.hexString)",
+        ]
+
+        if let alignment = alignment {
+            attributes.append("text-align: \(alignment.cssName)")
+        }
+
+        let constructedAttributes = attributes.joined(separator: "; ")
+        return String(format: "<span style=\"%@\">%@</span>", constructedAttributes, text)
+    }
 
     private func makeAttributes(font: NSFont, color: NSColor? = nil, alignment: NSTextAlignment? = nil) -> [NSAttributedString.Key: Any] {
         var attributes: [NSAttributedString.Key: Any] = [.font: font]
@@ -92,8 +110,25 @@ final class TextRenderer {
 
 }
 
+extension NSTextAlignment {
+    var cssName: String {
+        switch self {
+        case .left:
+            return "left"
+        case .right:
+            return "right"
+        case .center:
+            return "center"
+        case .justified:
+            return "justify"
+        default:
+            return "inherit"
+        }
+    }
+}
+
 extension CGSize {
-    func isWithin(_ otherSize: CGSize, tolerancePercent: Int) -> Bool {
+    func isWithin(_ otherSize: CGSize, tolerancePercent percent: Int) -> Bool {
         guard percent >= -100 else {
             return false
         }

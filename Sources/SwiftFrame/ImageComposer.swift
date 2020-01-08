@@ -47,13 +47,13 @@ final class ImageComposer {
     func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
         let fontSize = try textRenderer.maximumFontSizeThatFits(string: title, size: textData.rect.size, font: font, maxFontSize: maxFontSize)
         let adaptedFont = font.toFont(ofSize: fontSize)
-        textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
+        try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
         return fontSize
     }
 
-    func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) {
+    func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) throws {
         let adaptedFont = font.toFont(ofSize: fixedFontSize)
-        textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
+        try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
     func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
