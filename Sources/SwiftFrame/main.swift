@@ -77,7 +77,7 @@ do {
                         title: $0.string,
                         font: $0.data.customFont ?? config.font,
                         color: $0.data.textColorOverride ?? config.textColor,
-                        maxFontSize: config.maxFontSize,
+                        maxFontSize: $0.data.maxFontSizeOverride ?? config.maxFontSize,
                         textData: $0.data)
 
                     if verbose {
