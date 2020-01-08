@@ -6,7 +6,7 @@ public protocol ConfigValidatable {
     func printSummary(insetByTabs tabs: Int)
 }
 
-// First key is locale, second is regular key in string file
+/// First key is locale, second is regular key in string file
 public typealias LocalizedStringFiles = [String : [String : String]]
 
 public struct ConfigFile: Decodable, ConfigValidatable {

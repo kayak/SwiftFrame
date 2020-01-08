@@ -16,7 +16,8 @@ public final class TextRenderer {
             throw NSError(description: "Could not make attributed string")
         }
 
-        print("rendered at", font.pointSize)
+        context.saveGState()
+        defer { context.restoreGState() }
 
         let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
@@ -37,10 +38,10 @@ public final class TextRenderer {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize, size: size)
+        // Add 0.1 to the max font size to make absolutely sure that text will fit
+        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize + 0.1, size: size)
 
-        // Subtract 0.1 to avoid floating point precision issues
-        return calculatedFontSize - 0.1
+        return calculatedFontSize >= maxFontSize ? maxFontSize : calculatedFontSize
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: NSTextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {

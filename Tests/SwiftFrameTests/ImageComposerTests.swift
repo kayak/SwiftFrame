@@ -39,7 +39,7 @@ class ImageComposerTests: XCTestCase {
 
 }
 
-private func makeImageRepresentationWithSize(_ size: CGSize) -> NSBitmapImageRep {
+func makeImageRepresentationWithSize(_ size: CGSize) -> NSBitmapImageRep {
     let context = CGContext(
         data: nil,
         width: Int(size.width),
