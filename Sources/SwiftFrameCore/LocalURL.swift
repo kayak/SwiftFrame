@@ -1,5 +1,6 @@
 import Foundation
 
+/// Wrapper struct to avoid some errors related to relative paths
 public struct LocalURL: Codable {
     let rawPath: String
     private let url: URL

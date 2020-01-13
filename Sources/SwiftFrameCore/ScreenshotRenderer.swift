@@ -17,6 +17,7 @@ final class ScreenshotRenderer {
         let ciImage = CIImage(bitmapImageRep: screenshot)
 
         let perspectiveTransform = CIFilter(name: "CIPerspectiveTransform")!
+        perspectiveTransform.setDefaults()
         perspectiveTransform.setValue(data.topLeft.ciVector, forKey: "inputTopLeft")
         perspectiveTransform.setValue(data.topRight.ciVector, forKey: "inputTopRight")
         perspectiveTransform.setValue(data.bottomRight.ciVector, forKey: "inputBottomRight")

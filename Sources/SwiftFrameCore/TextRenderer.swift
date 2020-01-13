@@ -5,16 +5,10 @@ private let kMinFontSize: CGFloat = 5
 
 public final class TextRenderer {
 
-    private enum FontSizeState {
-        case fit, tooBig, tooSmall
-    }
-
     // MARK: - Frame Rendering
 
     func render(text: String, font: NSFont, color: NSColor, alignment: NSTextAlignment, rect: NSRect, context: CGContext) throws {
-        guard let attributedString = makeAttributedString(for: text, font: font, color: color, alignment: alignment) else {
-            throw NSError(description: "Could not make attributed string")
-        }
+        let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
         defer { context.restoreGState() }
@@ -38,10 +32,9 @@ public final class TextRenderer {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        // Add 0.1 to the max font size to make absolutely sure that text will fit
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize + 0.1, size: size)
-
-        return calculatedFontSize >= maxFontSize ? maxFontSize : calculatedFontSize
+        // Add 0.1 to max font size to make absolutely the text fits
+        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize, size: size)
+        return min(calculatedFontSize, maxFontSize)
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: NSTextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
@@ -49,65 +42,53 @@ public final class TextRenderer {
         let adaptedFont = font.toFont(ofSize: fontSize)
 
         // Need to use attributed strings since it may contain bold parts which are wider than their non-bold counterpart
-        guard let attributedString = makeAttributedString(for: string, font: adaptedFont, color: .red, alignment: alignment) else {
-            throw NSError(description: "Could not make attributed string")
-        }
+        let attributedString = try makeAttributedString(for: string, font: adaptedFont, alignment: alignment)
 
-        let constraintSize = CGSize(width: size.width, height: CGFloat.greatestFiniteMagnitude)
-        let stringRect = attributedString.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin)
-        let state = multiLineSizeState(stringSize: stringRect.size, desiredSize: size)
-
-        // if the search range is smaller than 0.1 of a font size we stop
+        // if the search range is smaller than 1e-5 of a font size we stop
         // returning either side of min or max depending on the state
         guard abs(maxSize - minSize) > 1e-5 else {
-            switch state {
-            case .tooSmall:
+            let maxSizeString = try makeAttributedString(for: string, font: font.toFont(ofSize: maxSize), alignment: alignment)
+            if formattedString(maxSizeString, fitsIntoRect: size) {
                 return maxSize
-            default:
+            }
+            let smallSizeString = try makeAttributedString(for: string, font: font.toFont(ofSize: minSize), alignment: alignment)
+            if formattedString(smallSizeString, fitsIntoRect: size) {
                 return minSize
             }
+            throw NSError(description: "Could not fit text \"\(attributedString.string)\" into rectangle of size \(size)")
         }
 
-        switch state {
-        case .fit:
-            return fontSize
-        case .tooBig:
-            return try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: minSize, maxSize: fontSize, size: size)
-        case .tooSmall:
+        if formattedString(attributedString, fitsIntoRect: size) {
             return try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: fontSize, maxSize: maxSize, size: size)
+        } else {
+            return try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: minSize, maxSize: fontSize, size: size)
         }
     }
 
-    private func multiLineSizeState(stringSize: CGSize, desiredSize: CGSize) -> FontSizeState {
-        // if rect is within two percent of size, consider text to fit
-        if stringSize.isWithin(desiredSize, tolerancePercent: 2) {
-            return .fit
-        } else if stringSize.height > desiredSize.height || stringSize.width > desiredSize.width {
-            return .tooBig
-        } else {
-            return .tooSmall
-        }
+    private func formattedString(_ attributedString: NSAttributedString, fitsIntoRect desiredSize: CGSize) -> Bool {
+        let constraintSize = CGSize(width: desiredSize.width, height: CGFloat.greatestFiniteMagnitude)
+        let stringSize = attributedString.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin).size
+        return stringSize.width <= desiredSize.width && stringSize.height <= desiredSize.height
     }
 
     // MARK: - Misc
 
-    private func makeAttributedString(for htmlString: String, font: NSFont, color: NSColor, alignment: NSTextAlignment? = nil) -> NSAttributedString? {
+    private func makeAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white, alignment: NSTextAlignment) throws -> NSAttributedString {
         let htmlString = makeHTMLFormattedString(for: htmlString, font: font, color: color)
         guard let stringData = htmlString.data(using: .utf8), let attributedString = NSMutableAttributedString(html: stringData, documentAttributes: nil) else {
-            return nil
+            throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
         }
-
-        if let alignment = alignment {
-            attributedString.setAlignment(alignment, range: NSRange(location: 0, length: attributedString.length))
-        }
+        attributedString.setAlignment(alignment, range: NSRange(location: 0, length: attributedString.length))
         return attributedString
     }
 
     private func makeHTMLFormattedString(for text: String, font: NSFont, color: NSColor) -> String {
+        let colorHexString = color.usingColorSpace(.genericRGB)?.hexString ?? color.hexString
+
         let attributes = [
             "font-family: \(font.fontName)",
             "font-size: \(Int(font.pointSize))",
-            "color: \(color.hexString)",
+            "color: \(colorHexString)",
         ]
 
         let constructedAttributes = attributes.joined(separator: "; ")
@@ -130,6 +111,12 @@ extension NSTextAlignment {
         default:
             return "inherit"
         }
+    }
+}
+
+extension Int {
+    var percentFraction: CGFloat {
+        return CGFloat(self) / 100.00
     }
 }
 
