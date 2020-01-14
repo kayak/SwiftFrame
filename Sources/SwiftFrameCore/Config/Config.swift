@@ -71,7 +71,7 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
 
         print("Output paths:")
-        outputPaths.forEach { print(String(repeating: "\t", count: tabs + 1) + $0.absoluteString.formattedGreen()) }
+        outputPaths.forEach { print($0.absoluteString.formattedGreen(), insetByTabs: tabs + 1) }
 
         print("Device data:")
         deviceData.forEach {

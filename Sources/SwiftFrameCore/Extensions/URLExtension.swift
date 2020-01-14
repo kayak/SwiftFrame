@@ -11,7 +11,6 @@ extension URL {
 
     var subDirectories: [URL] {
         guard hasDirectoryPath else {
-            print("is not directory")
             return []
         }
         return (try? FileManager.default.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]).filter{ $0.hasDirectoryPath }) ?? []

@@ -10,9 +10,10 @@ class TextRendererTests: XCTestCase {
         let veryLargeSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: 2000)
         let maxSize = try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
-            size: veryLargeSize,
             font: NSFont.systemFont(ofSize: 200),
-            maxFontSize: 400)
+            alignment: .center,
+            maxSize: 400,
+            size: veryLargeSize)
 
         XCTAssertEqual(maxSize, 400)
     }
@@ -23,9 +24,10 @@ class TextRendererTests: XCTestCase {
 
         XCTAssertThrowsError(try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
-            size: smallSize,
             font: NSFont.systemFont(ofSize: 200),
-            maxFontSize: 400))
+            alignment: .center,
+            maxSize: 400,
+            size: smallSize))
     }
 
 }

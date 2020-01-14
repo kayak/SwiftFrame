@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-private let kMinFontSize: CGFloat = 5
+private let kMinFontSize: CGFloat = 1
 
 public final class TextRenderer {
 
@@ -15,6 +15,9 @@ public final class TextRenderer {
 
         let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
+
+        context.addRect(rect)
+        context.drawPath(using: .stroke)
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
@@ -27,14 +30,13 @@ public final class TextRenderer {
 
     /// Determines the maximum point size of the specified font that allows to render the given text onto a
     /// particular number of lines
-    func maximumFontSizeThatFits(string: String, size: CGSize, font: NSFont, maxFontSize: CGFloat) throws -> CGFloat {
+    func maximumFontSizeThatFits(string: String, font: NSFont, alignment: NSTextAlignment, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
         guard !string.isEmpty else {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        // Add 0.1 to max font size to make absolutely the text fits
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: .center, minSize: kMinFontSize, maxSize: maxFontSize, size: size)
-        return min(calculatedFontSize, maxFontSize)
+        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: kMinFontSize, maxSize: maxSize, size: size)
+        return min(calculatedFontSize.rounded(.down), maxSize)
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: NSTextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
@@ -47,11 +49,11 @@ public final class TextRenderer {
         // if the search range is smaller than 1e-5 of a font size we stop
         // returning either side of min or max depending on the state
         guard abs(maxSize - minSize) > 1e-5 else {
-            let maxSizeString = try makeAttributedString(for: string, font: font.toFont(ofSize: maxSize), alignment: alignment)
+            let maxSizeString = try makeAttributedString(for: string, font: adaptedFont.toFont(ofSize: maxSize), alignment: alignment)
             if formattedString(maxSizeString, fitsIntoRect: size) {
                 return maxSize
             }
-            let smallSizeString = try makeAttributedString(for: string, font: font.toFont(ofSize: minSize), alignment: alignment)
+            let smallSizeString = try makeAttributedString(for: string, font: adaptedFont.toFont(ofSize: minSize), alignment: alignment)
             if formattedString(smallSizeString, fitsIntoRect: size) {
                 return minSize
             }
@@ -59,15 +61,16 @@ public final class TextRenderer {
         }
 
         if formattedString(attributedString, fitsIntoRect: size) {
-            return try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: fontSize, maxSize: maxSize, size: size)
+            return try maxFontSizeThatFits(string: string, font: adaptedFont, alignment: alignment, minSize: fontSize, maxSize: maxSize, size: size)
         } else {
-            return try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: minSize, maxSize: fontSize, size: size)
+            return try maxFontSizeThatFits(string: string, font: adaptedFont, alignment: alignment, minSize: minSize, maxSize: fontSize, size: size)
         }
     }
 
     private func formattedString(_ attributedString: NSAttributedString, fitsIntoRect desiredSize: CGSize) -> Bool {
         let constraintSize = CGSize(width: desiredSize.width, height: CGFloat.greatestFiniteMagnitude)
         let stringSize = attributedString.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin).size
+
         return stringSize.width <= desiredSize.width && stringSize.height <= desiredSize.height
     }
 

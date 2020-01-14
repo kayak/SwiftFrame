@@ -5,8 +5,8 @@ public typealias AssociatedString = (string: String, data: TextData)
 
 public struct TextData: Decodable, ConfigValidatable {
     public let titleIdentifier: String
-    let bottomLeft: Point
-    let topRight: Point
+    let topLeft: Point
+    let bottomRight: Point
     public let textAlignment: NSTextAlignment
     /// Text group will be prioritized over this, if specified
     public let maxFontSizeOverride: CGFloat?
@@ -15,7 +15,8 @@ public struct TextData: Decodable, ConfigValidatable {
     public let groupIdentifier: String?
 
     var rect: NSRect {
-        NSRect(origin: bottomLeft.cgPoint, size: CGSize(width: topRight.x - bottomLeft.x, height: topRight.y - bottomLeft.y))
+        let origin = CGPoint(x: topLeft.x, y: bottomRight.y)
+        return NSRect(origin: origin, size: CGSize(width: bottomRight.x - topLeft.x, height: topLeft.y - bottomRight.y))
     }
 
     enum CodingKeys: String, CodingKey {
@@ -23,8 +24,8 @@ public struct TextData: Decodable, ConfigValidatable {
         case textColorOverride
         case maxFontSizeOverride
         case customFont = "customFontPath"
-        case bottomLeft
-        case topRight
+        case topLeft
+        case bottomRight
         case textAlignment
         case groupIdentifier
     }
@@ -32,8 +33,8 @@ public struct TextData: Decodable, ConfigValidatable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         titleIdentifier = try container.decode(String.self, forKey: .titleIdentifier)
-        bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
-        topRight = try container.decode(Point.self, forKey: .topRight)
+        topLeft = try container.decode(Point.self, forKey: .topLeft)
+        bottomRight = try container.decode(Point.self, forKey: .bottomRight)
         textAlignment = try container.decode(NSTextAlignment.self, forKey: .textAlignment)
         maxFontSizeOverride = try container.decodeIfPresent(CGFloat.self, forKey: .maxFontSizeOverride)
         groupIdentifier = try container.decodeIfPresent(String.self, forKey: .groupIdentifier)
@@ -52,15 +53,15 @@ public struct TextData: Decodable, ConfigValidatable {
     }
 
     public func validate() throws {
-        if (bottomLeft.x >= topRight.x) || (bottomLeft.y >= topRight.y) {
-            throw NSError(description: "Bad text bounds: \(bottomLeft.formattedString) and \(topRight.formattedString)")
+        if (topLeft.x >= bottomRight.x) || (topLeft.y <= bottomRight.y) {
+            throw NSError(description: "Bad text bounds: \(topLeft.formattedString) and \(bottomRight.formattedString)")
         }
     }
 
     public func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Text ID", value: titleIdentifier, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Left", value: topLeft.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight.formattedString, insetBy: tabs + 1)
 
         if let fontName = customFont?.fontName {
             CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)

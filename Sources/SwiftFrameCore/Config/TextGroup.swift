@@ -21,9 +21,10 @@ public struct TextGroup: Codable, ConfigValidatable, Hashable {
             do {
                 return try textRenderer.maximumFontSizeThatFits(
                     string: $0.string,
-                    size: $0.data.rect.size,
                     font: $0.data.customFont ?? globalFont,
-                    maxFontSize: $0.data.maxFontSizeOverride ?? globalMaxSize)
+                    alignment: $0.data.textAlignment,
+                    maxSize: $0.data.maxFontSizeOverride ?? globalMaxSize,
+                    size: $0.data.rect.size)
             } catch {
                 return nil
             }
