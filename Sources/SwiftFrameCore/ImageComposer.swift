@@ -5,10 +5,14 @@ import CoreImage
 
 public final class ImageComposer {
 
+    // MARK: - Properties
+
     public let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
     private let templateImage: NSBitmapImageRep
     private let context: CGContext
+
+    // MARK: - Init
 
     public init(_ templateImage: NSBitmapImageRep) throws {
         self.templateImage = templateImage

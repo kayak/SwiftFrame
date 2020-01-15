@@ -4,6 +4,8 @@ import Foundation
 
 public final class CommandLineOption {
 
+    // MARK: - Properties
+
     let flags: [String]
 
     let usageText: String
@@ -17,7 +19,7 @@ public final class CommandLineOption {
     public private(set) var isSpecified = false
     public private(set) var arguments = [String]()
 
-    // MARK: - Object Lifecycle
+    // MARK: - Init
 
     init(flags: [String], usageText: String, argumentPlaceholder: String?, numArgsRequired: Int, isRepeatable: Bool, group: Int? = nil) {
         self.flags = flags

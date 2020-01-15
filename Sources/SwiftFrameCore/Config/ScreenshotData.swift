@@ -1,12 +1,17 @@
 import Foundation
 
 public struct ScreenshotData: Decodable, ConfigValidatable {
+
+    // MARK: - Properties
+
     public let screenshotName: String
-    let bottomLeft: Point
-    let bottomRight: Point
-    let topLeft: Point
-    let topRight: Point
-    let zIndex: Int
+    internal let bottomLeft: Point
+    internal let bottomRight: Point
+    internal let topLeft: Point
+    internal let topRight: Point
+    internal let zIndex: Int
+
+    // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case screenshotName
@@ -17,15 +22,40 @@ public struct ScreenshotData: Decodable, ConfigValidatable {
         case zIndex
     }
 
+    // MARK: - Init
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.screenshotName = try container.decode(String.self, forKey: .screenshotName)
-        self.bottomLeft = try container.decode(Point.self, forKey: .bottomLeft)
-        self.bottomRight = try container.decode(Point.self, forKey: .bottomRight)
-        self.topLeft = try container.decode(Point.self, forKey: .topLeft)
-        self.topRight = try container.decode(Point.self, forKey: .topRight)
+        self.screenshotName = try container.ky_decode(String.self, forKey: .screenshotName)
+        self.bottomLeft = try container.ky_decode(Point.self, forKey: .bottomLeft)
+        self.bottomRight = try container.ky_decode(Point.self, forKey: .bottomRight)
+        self.topLeft = try container.ky_decode(Point.self, forKey: .topLeft)
+        self.topRight = try container.ky_decode(Point.self, forKey: .topRight)
         self.zIndex = try container.decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
     }
+
+    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int) {
+        self.screenshotName = screenshotName
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.zIndex = zIndex
+    }
+
+    // MARK: - Misc
+
+    public func convertToBottomLeftOrigin(with size: CGSize) -> ScreenshotData {
+        return ScreenshotData(
+            screenshotName: screenshotName,
+            bottomLeft: bottomLeft.convertToBottomLeftOrigin(with: size),
+            bottomRight: bottomRight.convertToBottomLeftOrigin(with: size),
+            topLeft: topLeft.convertToBottomLeftOrigin(with: size),
+            topRight: topRight.convertToBottomLeftOrigin(with: size),
+            zIndex: zIndex)
+    }
+
+    // MARK: - ConfigValidatable
 
     public func validate() throws {}
 

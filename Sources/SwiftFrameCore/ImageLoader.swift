@@ -3,6 +3,8 @@ import Foundation
 
 final class ImageLoader {
 
+    // MARK: - Image Loading
+
     func loadImage(atURL url: URL) throws -> NSImage {
         guard let image = NSImage(contentsOf: url) else {
             throw NSError(description: "Could not load image at \(url.absoluteString)")

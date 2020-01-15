@@ -3,7 +3,11 @@ import Foundation
 
 public final class ImageWriter {
 
+    // MARK: - Init
+
     public init() {}
+
+    // MARK: - Writing Images
 
     public func write(_ image: CGImage, to directoryPath: String, deviceID: String, locale: String) throws {
         let rep = NSBitmapImageRep(cgImage: image)

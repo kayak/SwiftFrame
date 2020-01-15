@@ -61,7 +61,10 @@ do {
 
             let maxFontSizeByGroup = config.textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
                 let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
-                dictionary[group.identifier] = group.sharedFontSize(with: strings, globalFont: config.font, globalMaxSize: config.maxFontSize)
+                dictionary[group.identifier] = group.sharedFontSize(
+                    with: strings,
+                    globalFont: config.font,
+                    globalMaxSize: config.maxFontSize)
             }
 
             try constructedTitles.forEach {

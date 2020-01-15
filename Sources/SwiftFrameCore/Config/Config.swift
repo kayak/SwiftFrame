@@ -10,6 +10,9 @@ public protocol ConfigValidatable {
 public typealias LocalizedStringFiles = [String : [String : String]]
 
 public struct ConfigFile: Decodable, ConfigValidatable {
+
+    // MARK: - Properties
+
     public let outputWholeImage: Bool
     public let deviceData: [DeviceData]
     public let textGroups: [TextGroup]
@@ -19,6 +22,8 @@ public struct ConfigFile: Decodable, ConfigValidatable {
     public let outputPaths: [LocalURL]
     public let font: NSFont
     public let textColor: NSColor
+
+    // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case outputWholeImage = "alsoOutputWholeImage"
@@ -31,21 +36,23 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         case textColor
     }
 
+    // MARK: - Init
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         outputWholeImage = try container.decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
-        deviceData = try container.decode([DeviceData].self, forKey: .deviceData)
+        deviceData = try container.ky_decode([DeviceData].self, forKey: .deviceData)
         textGroups = try container.decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
-        maxFontSize = try container.decode(CGFloat.self, forKey: .maxFontSize)
-        outputPaths = try container.decode([LocalURL].self, forKey: .outputPaths)
+        maxFontSize = try container.ky_decode(CGFloat.self, forKey: .maxFontSize)
+        outputPaths = try container.ky_decode([LocalURL].self, forKey: .outputPaths)
 
-        let fontPathString = try container.decode(String.self, forKey: .fontFile)
+        let fontPathString = try container.ky_decode(String.self, forKey: .fontFile)
         self.font = try fontPathString.registerFont()
 
-        let colorHexString = try container.decode(String.self, forKey: .textColor)
+        let colorHexString = try container.ky_decode(String.self, forKey: .textColor)
         textColor = try NSColor(hexString: colorHexString)
 
-        titlesPath = try container.decode(LocalURL.self, forKey: .titlesPath)
+        titlesPath = try container.ky_decode(LocalURL.self, forKey: .titlesPath)
         var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }
@@ -54,6 +61,8 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         }
         titles = parsedTitles
     }
+
+    // MARK: - ConfigValidatable
 
     public func validate() throws {
         guard !deviceData.isEmpty else {

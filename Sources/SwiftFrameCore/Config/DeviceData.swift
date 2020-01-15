@@ -3,14 +3,19 @@ import Foundation
 
 let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
-public struct DeviceData: Decodable, ConfigValidatable {
+public final class DeviceData: Decodable, ConfigValidatable {
+
+    // MARK: - Properties
+
     public let outputSuffix: String
-    let screenshotsPath: LocalURL
     public let screenshots: [String : [String: NSBitmapImageRep]]
-    let templateFilePath: LocalURL
     public let templateImage: NSBitmapImageRep
-    public let screenshotData: [ScreenshotData]
-    public let textData: [TextData]
+    public private(set) var screenshotData = [ScreenshotData]()
+    public private(set) var textData = [TextData]()
+    private let screenshotsPath: LocalURL
+    private let templateFilePath: LocalURL
+
+    // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case outputSuffix
@@ -18,19 +23,22 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateFile
         case screenshotData
         case textData
+        case coordinatesOriginIsTopLeft
     }
 
-    public init(from decoder: Decoder) throws {
+    // MARK: - Init
+
+    required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        templateFilePath = try container.decode(LocalURL.self, forKey: .templateFile)
+        templateFilePath = try container.ky_decode(LocalURL.self, forKey: .templateFile)
         guard let rep = templateFilePath.absoluteURL.bitmapRep else {
             throw NSError(description: "Error while loading template image")
         }
         templateImage = rep
-        outputSuffix = try container.decode(String.self, forKey: .outputSuffix)
-        screenshotData = try container.decode([ScreenshotData].self, forKey: .screenshotData).sorted { $0.zIndex < $1.zIndex }
-        textData = try container.decode([TextData].self, forKey: .textData)
-        screenshotsPath = try container.decode(LocalURL.self, forKey: .screenshots)
+        outputSuffix = try container.ky_decode(String.self, forKey: .outputSuffix)
+        screenshotData = try container.ky_decode([ScreenshotData].self, forKey: .screenshotData).sorted { $0.zIndex < $1.zIndex }
+        textData = try container.ky_decode([TextData].self, forKey: .textData)
+        screenshotsPath = try container.ky_decode(LocalURL.self, forKey: .screenshots)
 
         var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
@@ -43,6 +51,17 @@ public struct DeviceData: Decodable, ConfigValidatable {
             parsedScreenshots[folder.lastPathComponent] = imagesDictionary
         }
         screenshots = parsedScreenshots
+
+        if try container.ky_decode(Bool.self, forKey: .coordinatesOriginIsTopLeft) {
+            convertTextAndScreenshotData()
+        }
+    }
+
+    // MARK: - Methods
+
+    private func convertTextAndScreenshotData() {
+        textData = textData.map { $0.convertToBottomLeftOrigin(with: templateImage.size) }
+        screenshotData = screenshotData.map { $0.convertToBottomLeftOrigin(with: templateImage.size) }
     }
 
     func groupTextData(with groups: [TextGroup]) -> [TextGroup: [TextData]] {
@@ -56,6 +75,8 @@ public struct DeviceData: Decodable, ConfigValidatable {
     func collectFrames(for textGroup: TextGroup) -> [NSRect] {
         return textData.filter { $0.groupIdentifier == textGroup.identifier }.map { $0.rect }
     }
+
+    // MARK: - ConfigValidatable
 
     public func validate() throws {
         // TODO: Validate screenshot size compared to template file
@@ -89,5 +110,22 @@ public struct DeviceData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
+    }
+}
+
+extension KeyedDecodingContainer {
+    func ky_decode<T>(_ type: T.Type, forKey key: Self.Key) throws -> T where T : Decodable {
+        do {
+            return try decode(type, forKey: key)
+        } catch let error as NSError {
+            switch error.code {
+            case 4865:
+                throw NSError(description: "The data with key \"\(key.stringValue)\" couldn’t be read because its is missing.")
+            case 4864:
+                throw NSError(description: "The data with key \"\(key.stringValue)\" couldn’t be read because it isn’t in the correct format.")
+            default:
+                throw error
+            }
+        }
     }
 }

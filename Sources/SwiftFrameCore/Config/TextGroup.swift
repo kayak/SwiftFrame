@@ -4,8 +4,13 @@ import Foundation
 private let kNumTitleLines = 3
 
 public struct TextGroup: Codable, ConfigValidatable, Hashable {
+
+    // MARK: - Properties
+
     public let identifier: String
     public let maxFontSize: CGFloat
+
+    // MARK: - ConfigValidatable
 
     public func validate() throws {}
 
@@ -14,6 +19,8 @@ public struct TextGroup: Codable, ConfigValidatable, Hashable {
         CommandLineFormatter.printKeyValue("Identifier", value: identifier, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Max font size", value: maxFontSize, insetBy: tabs + 1)
     }
+
+    // MARK: - Misc
 
     public func sharedFontSize(with strings: [AssociatedString], globalFont: NSFont, globalMaxSize: CGFloat) -> CGFloat {
         let textRenderer = TextRenderer()

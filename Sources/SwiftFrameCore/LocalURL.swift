@@ -2,6 +2,9 @@ import Foundation
 
 /// Wrapper struct to avoid some errors related to relative paths
 public struct LocalURL: Codable {
+
+    // MARK: - Properties
+
     let rawPath: String
     private let url: URL
 
@@ -12,6 +15,8 @@ public struct LocalURL: Codable {
     public var absoluteString: String {
         url.absoluteString
     }
+
+    // MARK: - Init
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

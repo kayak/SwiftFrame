@@ -3,9 +3,13 @@ import Foundation
 
 final class FontRegistry {
 
+    // MARK: - Properties
+
     static var shared = FontRegistry()
 
     private var registeredFontPaths = [String]()
+
+    // MARK: - Font Handling
 
     /// Registers the font file at the specified path and returns the font name argument that needs to be passed
     /// into `NSFont` for instantiating it
