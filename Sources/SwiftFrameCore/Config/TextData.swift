@@ -97,14 +97,14 @@ public struct TextData: Decodable, ConfigValidatable {
 
     public func validate() throws {
         if (topLeft.x >= bottomRight.x) || (topLeft.y <= bottomRight.y) {
-            throw NSError(description: "Bad text bounds: topLeft\(topLeft.formattedString) and bottomRight\(bottomRight.formattedString)")
+            throw NSError(description: "Bad text bounds - topLeft: \(topLeft) and bottomRight: \(bottomRight)")
         }
     }
 
     public func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Text ID", value: titleIdentifier, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Top Left", value: topLeft.formattedString, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
 
         if let fontName = customFont?.fontName {
             CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)

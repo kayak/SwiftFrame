@@ -61,10 +61,10 @@ public struct ScreenshotData: Decodable, ConfigValidatable {
 
     public func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Screenshot Name", value: screenshotName, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Bottom Left", value: bottomLeft.formattedString, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight.formattedString, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Top Left", value: topLeft.formattedString, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Top Right", value: topRight.formattedString, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Bottom Left", value: bottomLeft, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Top Right", value: topRight, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Z Index", value: zIndex, insetBy: tabs + 1)
     }
 }
