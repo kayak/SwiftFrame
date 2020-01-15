@@ -15,9 +15,6 @@ public final class TextRenderer {
 
         let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
-
-        context.addRect(rect)
-        context.drawPath(using: .stroke)
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
@@ -69,7 +66,7 @@ public final class TextRenderer {
 
     private func formattedString(_ attributedString: NSAttributedString, fitsIntoRect desiredSize: CGSize) -> Bool {
         let constraintSize = CGSize(width: desiredSize.width, height: CGFloat.greatestFiniteMagnitude)
-        let stringSize = attributedString.boundingRect(with: constraintSize, options: .usesLineFragmentOrigin).size
+        let stringSize = attributedString.boundingRect(with: constraintSize, options: [.usesLineFragmentOrigin, .usesFontLeading]).size
 
         return stringSize.width <= desiredSize.width && stringSize.height <= desiredSize.height
     }
