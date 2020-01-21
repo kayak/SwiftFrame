@@ -3,6 +3,14 @@ import Foundation
 
 extension String {
 
+    public func formattedGreen() -> String {
+        "\u{001B}[0;32m" + self + "\u{001B}[0;39m"
+    }
+
+    func formattedRed() -> String {
+        "\u{001B}[0;31m" + self + "\u{001B}[0;39m"
+    }
+
     func registerFont(at size: CGFloat = 20) throws -> NSFont {
         let fontName = try FontRegistry.shared.registerFont(atPath: self)
         guard let font = NSFont(name: fontName, size: size) else {

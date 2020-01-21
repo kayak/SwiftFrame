@@ -22,4 +22,5 @@ struct Point: Codable {
         let newY = Int(size.height) - y
         return Point(x: x, y: newY)
     }
+
 }

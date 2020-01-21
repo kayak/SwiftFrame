@@ -23,4 +23,5 @@ public struct LocalURL: Codable {
         rawPath = try container.decode(String.self)
         url = URL(fileURLWithPath: rawPath)
     }
+
 }

@@ -60,9 +60,3 @@ final class ScreenshotRenderer {
     }
 
 }
-
-extension CGContext {
-    var size: CGSize {
-        CGSize(width: width, height: height)
-    }
-}
