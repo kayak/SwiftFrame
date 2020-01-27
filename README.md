@@ -1,11 +1,11 @@
 # SwiftFrame
 
-SwiftFrame is a command line application for composing and laying out screenshots for usage on the App Store for example. Here's an example of a framed screenshot from the KAYAK iOS app.
+SwiftFrame is a command line application for composing and laying out screenshots. Here's an screenshot from the example app.
 
-![Framed Screenshot](https://github.com/kayak/SwiftFrame/blob/master/Example/Screenshots/iPhone5s%7Eframed.png)
+<img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" style="zoom:30%;" />
 
 ## Installation
-###Directly
+### Directly
 To build the project and install the CLI, run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`.
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
@@ -49,7 +49,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
   * `identifier`: the identifier of the text group
   * `maxFontSize`: the maximum font point size titles with this group ID should be using (if the calculated maximum font size which fits the bounding rectangles is smaller, this will be used) 
 
-##Example
+## Example
 
 To run the example, either install the CLI (see above) and run `swiftframe -c Example/example.config --verbose` or directly via `swift run swiftframe -c Example/proposal.config --verbose`
 
