@@ -41,10 +41,15 @@ final class FontRegistry {
     }
 
     private func fontName(from url: URL) throws -> String {
-        guard
-            let descriptor = (CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor])?.first,
-            let name = CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute) as? String
-        else {
+        guard let descriptors = (CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor]) else {
+            throw NSError(description: "Failed to load font descriptors from file at \(url.absoluteString)")
+        }
+
+        let descriptor: CTFontDescriptor? = descriptors.count > 1
+            ? descriptors.first(where: { CTFontDescriptorCopyAttribute($0, kCTFontStyleNameAttribute) as? String == "Regular" }) ?? descriptors.first
+            : descriptors.first
+
+        guard let unwrappedDescriptor = descriptor, let name = CTFontDescriptorCopyAttribute(unwrappedDescriptor, kCTFontNameAttribute) as? String else {
             throw NSError(description: "Failed to load font descriptors from file at \(url.absoluteString)")
         }
         return name
