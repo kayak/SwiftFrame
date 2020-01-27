@@ -1,33 +1,54 @@
 # SwiftFrame
 
-SwiftFrame is a command line application for composing framed screenshots. Here's an example of a framed screenshot from the KAYAK iOS app.
+SwiftFrame is a command line application for composing and laying out screenshots for usage on the App Store for example. Here's an example of a framed screenshot from the KAYAK iOS app.
 
 ![Framed Screenshot](https://github.com/kayak/SwiftFrame/blob/master/Example/Screenshots/iPhone5s%7Eframed.png)
 
+## Installation
+###Directly
+To build the project and install the CLI, run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`
+### [Mint](https://github.com/yonaskolb/mint)
+```
+$ mint install kayak/SwiftFrame
+```
+
 ## Usage
 
-Configuration is mostly possible through command-line arguments (see `swiftframe -h` for further information). However, in most cases it's more convenient to provide a configuration file. The latter is a plain JSON file supporting the following options:
+To use SwiftFrame, you need to pass it a configuration file (which is a plain JSON file). The format of the file is specified as following (indent levels represent levels within the JSON):
 
-- `background` – How to fill the canvas background. Colors are expected to specified in hex format (CSS-shorthand notation supported). Possible settings:
-  - Solid color in hex format, e.g. `"#FFFFFF"`
-  - Linear gradient in CSS notation, e.g. `"linear-gradient(to right bottom, #000, #FFF)"`
-- `titles` – Object detailing the rendering of titles. Child options:
-  - `color` – Title color in hex format, e.g. `"#000"`
-  - `font` – (Relative or absolute) path to a the font file
-  - `padding` – Padding in pixels used to surround the title. Components separated by space in the order `"TOP LEFT BOTTOM RIGHT"`, e.g. `"5 10 5 10"`.
-- `frames` – Object detailing the frames to be used. For every frame a key and an associated object are expected. The key is an escaped regular expression used for matching screenshot filenames, e.g. `".*iPhone5s\\.png"`. The object features the following optiojns:
-  - `path` – (absolute or relative) path to the frame image file
-  - `viewport` – Optional. The viewport coordinates in the frame's coordinate system given by the x and y components of the bottom left and top right corners, e.g. `"60 180 700 1316"`. If omitted, the viewport is determined programmatically by analyzing the frame image.
-  - `padding` – Horizontal padding in pixels used to surround the frame
-  - `hasNotch` – Whether or not the frame image has a notch and needs to be treated differently
-- `allowDownsampling` – Boolean indicating whether or not screenshots are allowed to be scaled down (retaining the aspect ratio) to fit the frame's viewport
-- `outputSuffix` – Suffix appended when writing framed screenshots to the file system
+* `titlesPath`: a path to a folder with `.strings` files, prefixed with the corresponding locale (e.g. `en.strings`)
+* `maxFontSize`: the maximum font point size to use
+* `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots
+* `fontFile`: a path to a font file
+* `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
+* `alsoOutputWholeImage`: a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots.
+* `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
+  * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
+  * `coordinatesOriginIsTopLeft`: **optional**, Boolean indicating whether the coordinates for screenshot corners and text titles are based on the top left corner instead of the bottom left one
+  * `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device
+  * `templateFile`: an image file that will be rendered above the screenshots to overlay device frames for example (see `Example/Template Files/iPhone X/TemplateFile.png`) **Note:** places where screenshots should go need to be transparent
+  * `screenshotData`: an array containing further information about screenshot coordinates
+    * `screenshotName`: the file name (just name, not path) to the screenshot file to render
+    * `zIndex`: **optional**, use this to avoid wrong rendering order if two screenshots need to overlap each other for example
+    * `bottomLeft`, `bottomRight`, `topLeft` and `topRight`: the corners of the screenshot to render
+      * `x`: The x coordinate of the corner point, relative to the left edge
+      * `y`: the y coordinate of the corner point, relative to the top or bottom edge, depending on `coordinatesOriginIsTopLeft`
+  * `textData`: an array containing further information about text titles coordinates and its layout
+    * `titleIdentifer`: the key that SwiftFrame should look for in the `.strings` file for a certain title
+    * `textColorOverride`: **optional**, a color in Hex format to use specifically for this title
+    * `textAlignment`: the text alignment in CSS style (`left`, `right`, `center`, `justify` or `natural`)
+    * `customFontPath`: **optional**, a path to a font file to use specifically for this title
+    * `groupIdentifier`: **optional**, an identifier for a text group (see below)
+    * `topLeft` and `bottomRight`: the bounding coordinate points of the text (as of right now, it's not possible to have rotated text)
+      * `x`: The x coordinate of the corner point, relative to the left edge
+      * `y`: the y coordinate of the corner point, relative to the top or bottom edge, depending on `coordinatesOriginIsTopLeft` 
+* `textGroups`: an array of text groups which you can use to force multiple titles to use the same font size
+  * `identifier`: the identifier of the text group
+  * `maxFontSize`: the maximum font point size titles with this group ID should be using (if the calculated maximum font size which fits the bounding rectangles is smaller, this will be used) 
 
-A working example using a configurtion file is set up inside the `Example` folder.
+##Example
 
-## Building
-
-The project includes a `build.sh` script for compiling the binary within the `Example` folder.
+To run the example, either install the CLI (see above) and run `swiftframe -c Example/example.config --verbose` or directly via `swift run SwiftFrame -c Example/proposal.config --verbose`
 
 ## Why not frameit?
 

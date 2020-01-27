@@ -8,6 +8,9 @@ let package = Package(
     platforms: [
         .macOS(.v10_13)
     ],
+    products: [
+    .executable(name: "swiftframe", targets: ["SwiftFrame"])
+    ],
     targets: [
         .target(name: "SwiftFrame", dependencies: ["SwiftFrameCore"]),
         .target(name: "SwiftFrameCore"),
