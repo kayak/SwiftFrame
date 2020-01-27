@@ -40,9 +40,9 @@ public struct ConfigFile: Decodable, ConfigValidatable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        outputWholeImage = try container.decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
+        outputWholeImage = try container.ky_decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
         deviceData = try container.ky_decode([DeviceData].self, forKey: .deviceData)
-        textGroups = try container.decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
+        textGroups = try container.ky_decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
         maxFontSize = try container.ky_decode(CGFloat.self, forKey: .maxFontSize)
         outputPaths = try container.ky_decode([LocalURL].self, forKey: .outputPaths)
 

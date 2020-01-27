@@ -43,16 +43,16 @@ public struct TextData: Decodable, ConfigValidatable {
         topLeft = try container.ky_decode(Point.self, forKey: .topLeft)
         bottomRight = try container.ky_decode(Point.self, forKey: .bottomRight)
         textAlignment = try container.ky_decode(NSTextAlignment.self, forKey: .textAlignment)
-        maxFontSizeOverride = try container.decodeIfPresent(CGFloat.self, forKey: .maxFontSizeOverride)
-        groupIdentifier = try container.decodeIfPresent(String.self, forKey: .groupIdentifier)
+        maxFontSizeOverride = try container.ky_decodeIfPresent(CGFloat.self, forKey: .maxFontSizeOverride)
+        groupIdentifier = try container.ky_decodeIfPresent(String.self, forKey: .groupIdentifier)
 
-        if let customFontPathString = try container.decodeIfPresent(String.self, forKey: .customFont) {
+        if let customFontPathString = try container.ky_decodeIfPresent(String.self, forKey: .customFont) {
             customFont = try FontRegistry.shared.registerFont(atPath: customFontPathString)
         } else {
             customFont = nil
         }
 
-        if let hexString = try container.decodeIfPresent(String.self, forKey: .textColorOverride) {
+        if let hexString = try container.ky_decodeIfPresent(String.self, forKey: .textColorOverride) {
             textColorOverride = try NSColor(hexString: hexString)
         } else {
             textColorOverride = nil

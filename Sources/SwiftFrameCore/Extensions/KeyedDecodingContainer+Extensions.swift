@@ -19,7 +19,7 @@ extension KeyedDecodingContainer {
 
     func ky_decodeIfPresent<T>(_ type: T.Type, forKey key: Self.Key) throws -> T? where T : Decodable {
         do {
-            return try ky_decodeIfPresent(type, forKey: key)
+            return try decodeIfPresent(type, forKey: key)
         } catch let error as NSError {
             switch error.code {
             case 4864:

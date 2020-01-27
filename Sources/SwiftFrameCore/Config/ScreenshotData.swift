@@ -31,7 +31,7 @@ public struct ScreenshotData: Decodable, ConfigValidatable {
         self.bottomRight = try container.ky_decode(Point.self, forKey: .bottomRight)
         self.topLeft = try container.ky_decode(Point.self, forKey: .topLeft)
         self.topRight = try container.ky_decode(Point.self, forKey: .topRight)
-        self.zIndex = try container.decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
+        self.zIndex = try container.ky_decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
     }
 
     internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int) {
