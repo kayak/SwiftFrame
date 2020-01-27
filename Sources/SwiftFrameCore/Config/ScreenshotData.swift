@@ -5,11 +5,11 @@ public struct ScreenshotData: Decodable, ConfigValidatable {
     // MARK: - Properties
 
     public let screenshotName: String
-    internal let bottomLeft: Point
-    internal let bottomRight: Point
-    internal let topLeft: Point
-    internal let topRight: Point
-    internal let zIndex: Int
+    public let bottomLeft: Point
+    public let bottomRight: Point
+    public let topLeft: Point
+    public let topRight: Point
+    public let zIndex: Int
 
     // MARK: - Coding Keys
 

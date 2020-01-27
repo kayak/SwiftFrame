@@ -14,8 +14,8 @@ public struct TextData: Decodable, ConfigValidatable {
     public let customFont: NSFont?
     public let textColorOverride: NSColor?
     public let groupIdentifier: String?
-    private let topLeft: Point
-    private let bottomRight: Point
+    public let topLeft: Point
+    public let bottomRight: Point
 
     var rect: NSRect {
         let origin = CGPoint(x: topLeft.x, y: bottomRight.y)

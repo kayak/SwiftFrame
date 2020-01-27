@@ -4,6 +4,19 @@ import XCTest
 
 class ImageComposerTests: XCTestCase {
 
+    let goodTextData: [String : Any] = [
+        "titleIdentifier": "someID",
+        "textAlignment": "center",
+        "topLeft": [
+            "x": 10,
+            "y": 20
+        ],
+        "bottomRight": [
+            "x": 15,
+            "y": 5
+        ]
+    ]
+
     func testRenderTemplateFile() throws {
         let templateFile = makeImageRepresentationWithSize(CGSize(width: 100, height: 50))
         let composer = try ImageComposer(templateFile)
@@ -21,7 +34,7 @@ class ImageComposerTests: XCTestCase {
         }
 
         let slices = composer.slice(image: image, with: NSSize(width: 20, height: 50))
-        XCTAssert(slices.count == 5)
+        XCTAssertEqual(slices.count, 5)
     }
 
     func testTemplateImagesNotCorrectSize() throws {
@@ -35,6 +48,34 @@ class ImageComposerTests: XCTestCase {
 
         let slices = composer.slice(image: image, with: NSSize(width: 30, height: 50))
         XCTAssert(slices.isEmpty)
+    }
+
+    func testCanRenderInContext() throws {
+        let data = try makeJSON(from: goodTextData)
+        let textData = try JSONDecoder().decode(TextData.self, from: data)
+
+        let size = CGSize(width: 100, height: 200)
+        let composer = try ImageComposer(makeImageRepresentationWithSize(size))
+        XCTAssertNoThrow(try composer.add(
+            title: "Some testing title",
+            font: .systemFont(ofSize: 20),
+            color: .red,
+            fixedFontSize: 30,
+            textData: textData))
+    }
+
+    func testRenderDynamicTextSize() throws {
+        let data = try makeJSON(from: goodTextData)
+        let textData = try JSONDecoder().decode(TextData.self, from: data)
+
+        let size = CGSize(width: 100, height: 200)
+        let composer = try ImageComposer(makeImageRepresentationWithSize(size))
+        XCTAssertNoThrow(try composer.add(
+            title: "Some very long but interesting title",
+            font: .systemFont(ofSize: 20),
+            color: .red,
+            maxFontSize: 4,
+            textData: textData))
     }
 
 }
