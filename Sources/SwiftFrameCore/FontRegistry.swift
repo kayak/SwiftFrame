@@ -32,6 +32,14 @@ final class FontRegistry {
         return try fontName(from: url)
     }
 
+    func registerFont(atPath path: String, with size: CGFloat = 20) throws -> NSFont {
+        let fontName = try registerFont(atPath: path)
+        guard let font = NSFont(name: fontName, size: size) else {
+            throw NSError(description: "Failed to load title font with name \(fontName)")
+        }
+        return font
+    }
+
     private func fontName(from url: URL) throws -> String {
         guard
             let descriptor = (CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor])?.first,

@@ -47,7 +47,7 @@ public struct ConfigFile: Decodable, ConfigValidatable {
         outputPaths = try container.ky_decode([LocalURL].self, forKey: .outputPaths)
 
         let fontPathString = try container.ky_decode(String.self, forKey: .fontFile)
-        self.font = try fontPathString.registerFont()
+        self.font = try FontRegistry.shared.registerFont(atPath: fontPathString)
 
         let colorHexString = try container.ky_decode(String.self, forKey: .textColor)
         textColor = try NSColor(hexString: colorHexString)

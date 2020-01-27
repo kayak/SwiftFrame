@@ -47,7 +47,7 @@ public struct TextData: Decodable, ConfigValidatable {
         groupIdentifier = try container.decodeIfPresent(String.self, forKey: .groupIdentifier)
 
         if let customFontPathString = try container.decodeIfPresent(String.self, forKey: .customFont) {
-            customFont = try customFontPathString.registerFont()
+            customFont = try FontRegistry.shared.registerFont(atPath: customFontPathString)
         } else {
             customFont = nil
         }

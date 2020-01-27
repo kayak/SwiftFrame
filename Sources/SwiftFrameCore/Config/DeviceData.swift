@@ -31,7 +31,7 @@ public final class DeviceData: Decodable, ConfigValidatable {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         templateFilePath = try container.ky_decode(LocalURL.self, forKey: .templateFile)
-        guard let rep = templateFilePath.absoluteURL.bitmapRep else {
+        guard let rep = ImageLoader.loadRepresentation(at: templateFilePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image")
         }
         templateImage = rep
@@ -45,7 +45,7 @@ public final class DeviceData: Decodable, ConfigValidatable {
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
             let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
-                let rep = url.bitmapRep
+                let rep = ImageLoader.loadRepresentation(at: url)
                 dictionary[url.lastPathComponent] = rep
             }
             parsedScreenshots[folder.lastPathComponent] = imagesDictionary

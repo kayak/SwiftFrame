@@ -11,21 +11,6 @@ extension String {
         "\u{001B}[0;31m" + self + "\u{001B}[0;39m"
     }
 
-    func registerFont(at size: CGFloat = 20) throws -> NSFont {
-        let fontName = try FontRegistry.shared.registerFont(atPath: self)
-        guard let font = NSFont(name: fontName, size: size) else {
-            throw NSError(description: "Failed to load title font with name \(fontName)")
-        }
-        return font
-    }
-
-    private func pathRelativeToFile(_ path: String, fragment: String) -> String {
-        var components = (path as NSString).pathComponents
-        components.removeLast()
-        components.append(contentsOf: (fragment as NSString).pathComponents)
-        return NSString.path(withComponents: components) as String
-    }
-
     /// Breaks the receiver on the specified delimiter to form lines of the given length. The line length
     /// cannot be guaranteed and may be exceeded if the receiver doesn't allow otherwise.
     func toFuzzyLines(ofLength lineLength: Int, breakingOn delimiter: String) -> [String] {
