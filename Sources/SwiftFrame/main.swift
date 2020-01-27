@@ -97,11 +97,11 @@ do {
                 let slices = composer.slice(image: finalImage, with: size)
                 try config.outputPaths.forEach { url in
                     try slices.enumerated().forEach { (offset, image) in
-                        try writer.write(image, to: url.absoluteString, deviceID: device.outputSuffix + "-\(offset)", locale: locale)
+                        try writer.write(image, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix, index: offset)
                     }
 
                     if config.outputWholeImage {
-                        try writer.write(finalImage, to: url.absoluteString, deviceID: device.outputSuffix + "-big", locale: locale)
+                        try writer.write(finalImage, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix + "-big")
                     }
                 }
             } else {

@@ -51,7 +51,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 
 ##Example
 
-To run the example, either install the CLI (see above) and run `swiftframe -c Example/example.config --verbose` or directly via `swift run SwiftFrame -c Example/proposal.config --verbose`
+To run the example, either install the CLI (see above) and run `swiftframe -c Example/example.config --verbose` or directly via `swift run swiftframe -c Example/proposal.config --verbose`
 
 ## Why not frameit?
 
