@@ -11,6 +11,10 @@ extension String {
         "\u{001B}[0;31m" + self + "\u{001B}[0;39m"
     }
 
+    public func formattedUnderlined() -> String {
+        "\u{001b}[4m" + self + "\u{001B}[0;39m"
+    }
+
     /// Breaks the receiver on the specified delimiter to form lines of the given length. The line length
     /// cannot be guaranteed and may be exceeded if the receiver doesn't allow otherwise.
     func toFuzzyLines(ofLength lineLength: Int, breakingOn delimiter: String) -> [String] {

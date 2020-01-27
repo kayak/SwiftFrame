@@ -29,13 +29,18 @@ do {
         _ = readLine()
     }
 
-    print("Parsed and validated config file")
+    print("Parsed and validated config file\n")
+
+    let start = CFAbsoluteTimeGetCurrent()
 
     let writer = ImageWriter()
 
     try config.deviceData.forEach { device in
         try device.screenshots.forEach { locale, imageDict in
-            print("Rendering screenshots for \"\(locale)\" for device \(device.outputSuffix)")
+
+            print("\(device.outputSuffix) - \(locale)".formattedUnderlined())
+
+            print("Rendering screenshots")
 
             let composer = try ImageComposer(device.templateImage)
 
@@ -67,6 +72,8 @@ do {
                     globalMaxSize: config.maxFontSize)
             }
 
+            print("Rendering text titles")
+
             try constructedTitles.forEach {
                 if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
                     // Can use fixed font size since common maximum has already been calculated
@@ -76,6 +83,12 @@ do {
                         color: $0.data.textColorOverride ?? config.textColor,
                         fixedFontSize: sharedSize,
                         textData: $0.data)
+
+                    if verbose {
+                        print(
+                            "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
+                            insetByTabs: 1)
+                    }
                 } else {
                     let renderedFontsize = try composer.add(
                         title: $0.string,
@@ -85,7 +98,9 @@ do {
                         textData: $0.data)
 
                     if verbose {
-                        print("Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))")
+                        print(
+                            "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
+                            insetByTabs: 1)
                     }
                 }
             }
@@ -107,10 +122,17 @@ do {
             } else {
                 throw NSError(description: "Could not create final image")
             }
+
+            print("Done\n")
         }
     }
 
-    print("Done!".formattedGreen())
+    let diff = CFAbsoluteTimeGetCurrent() - start
+    print("All done!".formattedGreen())
+
+    if verbose {
+        print("Rendered and sliced screenshots in \(String(format: "%.2f", diff)) seconds")
+    }
 
 } catch let error as NSError {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.

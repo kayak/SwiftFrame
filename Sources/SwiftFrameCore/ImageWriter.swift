@@ -21,7 +21,7 @@ public final class ImageWriter {
         } else {
             fileName = "\(locale)-\(deviceID).png"
         }
-        let url = URL(fileURLWithPath: directoryPath).appendingPathComponent(fileName)
+        let url = URL(fileURLWithPath: directoryPath).appendingPathComponent(locale)
 
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
         try data.write(to: url.appendingPathComponent(fileName))

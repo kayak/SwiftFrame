@@ -45,7 +45,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
     * `topLeft` and `bottomRight`: the bounding coordinate points of the text (as of right now, it's not possible to have rotated text)
       * `x`: The x coordinate of the corner point, relative to the left edge
       * `y`: the y coordinate of the corner point, relative to the top or bottom edge, depending on `coordinatesOriginIsTopLeft` 
-* `textGroups`: an array of text groups which you can use to force multiple titles to use the same font size
+* `textGroups`: **optional**, an array of text groups which you can use to force multiple titles to use the same font size
   * `identifier`: the identifier of the text group
   * `maxFontSize`: the maximum font point size titles with this group ID should be using (if the calculated maximum font size which fits the bounding rectangles is smaller, this will be used) 
 
