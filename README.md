@@ -6,11 +6,14 @@ SwiftFrame is a command line application for composing and laying out screenshot
 
 ## Installation
 ###Directly
-To build the project and install the CLI, run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`
+To build the project and install the CLI, run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`.
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
 $ mint install kayak/SwiftFrame
 ```
+
+### Make
+Simply run `make` or `make all` inside the SwiftFrame directory. This will compile a binary and install it into `usr/local/bin/swiftframe`.
 
 ## Usage
 
