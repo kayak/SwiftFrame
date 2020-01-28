@@ -50,4 +50,8 @@ extension DeviceData {
         return try! DeviceData(from: DeviceDataContainer.invertedData)
     }
 
+    static var invalidMockData: DeviceData {
+        return try! DeviceData(from: DeviceDataContainer.invalidData)
+    }
+
 }

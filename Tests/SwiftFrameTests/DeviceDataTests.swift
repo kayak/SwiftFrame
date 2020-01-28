@@ -66,16 +66,18 @@ func writeMockTemplateFile(deviceSuffix: String) throws {
 
 func setupMockDirectoryWithScreenshots() throws {
     let devices = ["debug_device1", "debug_device2"]
-
+    let locales = ["en", "de", "fr"]
     try devices.forEach { device in
         try writeMockTemplateFile(deviceSuffix: device)
     }
 
-    try ["en", "de", "fr"].forEach { locale in
+    try locales.forEach { locale in
         try devices.forEach { deviceString in
             try writeMockScreenshot(locale: locale, deviceSuffix: deviceString)
         }
     }
+
+    try writeStringFiles(for: locales)
 }
 
 func clearTestingDirectory() throws {
