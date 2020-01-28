@@ -3,7 +3,7 @@ import Foundation
 
 let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
-public final class DeviceData: Decodable, ConfigValidatable {
+public final class DeviceData: Decodable, JSONDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -27,6 +27,36 @@ public final class DeviceData: Decodable, ConfigValidatable {
     }
 
     // MARK: - Init
+
+    public init(from json: JSONDictionary) throws {
+        templateFilePath = try json.ky_decode(with: CodingKeys.templateFile)
+        guard let rep = ImageLoader.loadRepresentation(at: templateFilePath.absoluteURL) else {
+            throw NSError(description: "Error while loading template image")
+        }
+        templateImage = rep
+        outputSuffix = try json.ky_decode(with: CodingKeys.outputSuffix)
+        textData = try json.ky_decode(with: CodingKeys.textData)
+        screenshotsPath = try json.ky_decode(with: CodingKeys.screenshots)
+
+        let screenshotData: [ScreenshotData] = try json.ky_decode(with: CodingKeys.screenshotData)
+        self.screenshotData = screenshotData.sorted { $0.zIndex < $1.zIndex }
+
+        var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
+        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
+            let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
+            let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
+                let rep = ImageLoader.loadRepresentation(at: url)
+                dictionary[url.lastPathComponent] = rep
+            }
+            parsedScreenshots[folder.lastPathComponent] = imagesDictionary
+        }
+        screenshots = parsedScreenshots
+
+        if try json.ky_decode(with: CodingKeys.coordinatesOriginIsTopLeft) {
+            convertTextAndScreenshotData()
+        }
+    }
 
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: Decodable, ConfigValidatable {
+public struct ScreenshotData: Decodable, JSONDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -23,6 +23,15 @@ public struct ScreenshotData: Decodable, ConfigValidatable {
     }
 
     // MARK: - Init
+
+    public init(from json: JSONDictionary) throws {
+        self.screenshotName = try json.ky_decode(with: CodingKeys.screenshotName)
+        self.bottomLeft = try json.ky_decode(with: CodingKeys.bottomLeft)
+        self.bottomRight = try json.ky_decode(with: CodingKeys.bottomRight)
+        self.topLeft = try json.ky_decode(with: CodingKeys.topLeft)
+        self.topRight = try json.ky_decode(with: CodingKeys.topRight)
+        self.zIndex = try json.ky_decodeIfPresent(with: CodingKeys.zIndex) ?? 0
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

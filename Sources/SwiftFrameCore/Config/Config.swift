@@ -6,10 +6,16 @@ public protocol ConfigValidatable {
     func printSummary(insetByTabs tabs: Int)
 }
 
+public protocol JSONDecodable {
+    init(from json: JSONDictionary) throws
+}
+
 /// First key is locale, second is regular key in string file
 public typealias LocalizedStringFiles = [String : [String : String]]
 
-public struct ConfigFile: Decodable, ConfigValidatable {
+public typealias JSONDictionary = [String : Any]
+
+public struct ConfigFile: Decodable, JSONDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -37,6 +43,25 @@ public struct ConfigFile: Decodable, ConfigValidatable {
     }
 
     // MARK: - Init
+
+    public init(from json: JSONDictionary) throws {
+        outputWholeImage = try json.ky_decodeIfPresent(with: CodingKeys.outputWholeImage) ?? false
+        deviceData = try json.ky_decode(with: CodingKeys.deviceData)
+        textGroups = try json.ky_decodeIfPresent(with: CodingKeys.textGroups) ?? []
+        maxFontSize = try json.ky_decode(with: CodingKeys.maxFontSize)
+        outputPaths = try json.ky_decode(with: CodingKeys.outputPaths)
+        font = try json.ky_decode(with: CodingKeys.fontFile)
+        textColor = try json.ky_decode(with: CodingKeys.textColor)
+        titlesPath = try json.ky_decode(with: CodingKeys.titlesPath)
+        
+        var parsedTitles = LocalizedStringFiles()
+        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+            .filter { $0.pathExtension == "strings" }
+        textFiles.forEach { textFile in
+            parsedTitles[textFile.absoluteURL.fileName] = NSDictionary(contentsOf: textFile) as? [String: String]
+        }
+        titles = parsedTitles
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

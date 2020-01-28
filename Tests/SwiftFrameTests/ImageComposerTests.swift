@@ -6,15 +6,9 @@ class ImageComposerTests: XCTestCase {
 
     let goodTextData: [String : Any] = [
         "titleIdentifier": "someID",
-        "textAlignment": "center",
-        "topLeft": [
-            "x": 10,
-            "y": 20
-        ],
-        "bottomRight": [
-            "x": 15,
-            "y": 5
-        ]
+        "textAlignment": NSTextAlignment.center,
+        "topLeft": Point(x: 10, y: 20),
+        "bottomRight": Point(x: 15, y: 5)
     ]
 
     func testRenderTemplateFile() throws {
@@ -51,8 +45,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testCanRenderInContext() throws {
-        let data = try makeJSON(from: goodTextData)
-        let textData = try JSONDecoder().decode(TextData.self, from: data)
+        let textData = try TextData(from: goodTextData)
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))
@@ -65,8 +58,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testRenderDynamicTextSize() throws {
-        let data = try makeJSON(from: goodTextData)
-        let textData = try JSONDecoder().decode(TextData.self, from: data)
+        let textData = try TextData(from: goodTextData)
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))

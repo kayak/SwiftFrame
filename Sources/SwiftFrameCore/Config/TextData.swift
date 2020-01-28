@@ -3,7 +3,7 @@ import Foundation
 
 public typealias AssociatedString = (string: String, data: TextData)
 
-public struct TextData: Decodable, ConfigValidatable {
+public struct TextData: Decodable, JSONDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -36,6 +36,17 @@ public struct TextData: Decodable, ConfigValidatable {
     }
 
     // MARK: - Init
+
+    public init(from json: JSONDictionary) throws {
+        titleIdentifier = try json.ky_decode(with: CodingKeys.titleIdentifier)
+        topLeft = try json.ky_decode(with: CodingKeys.topLeft)
+        bottomRight = try json.ky_decode(with: CodingKeys.bottomRight)
+        textAlignment = try json.ky_decode(with: CodingKeys.textAlignment)
+        maxFontSizeOverride = try json.ky_decodeIfPresent(with: CodingKeys.maxFontSizeOverride)
+        groupIdentifier = try json.ky_decodeIfPresent(with: CodingKeys.groupIdentifier)
+        customFont = try json.ky_decodeIfPresent(with: CodingKeys.customFont)
+        textColorOverride = try json.ky_decodeIfPresent(with: CodingKeys.textColorOverride)
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
