@@ -18,6 +18,30 @@ class DeviceDataTests: XCTestCase {
         try clearTestingDirectory()
     }
 
+    func testValidateData() throws {
+        try setupMockDirectoryWithScreenshots()
+
+        let data = try DeviceData(from: DeviceDataContainer.goodData)
+        XCTAssertNoThrow(try data.validate())
+        try clearTestingDirectory()
+    }
+
+    func testInvalidDataThrows() throws {
+        try setupMockDirectoryWithScreenshots()
+
+        let data = try DeviceData(from: DeviceDataContainer.invalidData)
+        XCTAssertThrowsError(try data.validate())
+        try clearTestingDirectory()
+    }
+
+    func testInvertedData() throws {
+        try setupMockDirectoryWithScreenshots()
+
+        let data = try DeviceData(from: DeviceDataContainer.invertedData)
+        XCTAssertNoThrow(try data.validate())
+        try clearTestingDirectory()
+    }
+
 }
 
 func writeMockScreenshot(locale: String, deviceSuffix: String) throws {
@@ -26,7 +50,8 @@ func writeMockScreenshot(locale: String, deviceSuffix: String) throws {
         throw NSError(description: "Could not make CGImage from Bitmap")
     }
 
-    try ImageWriter().write(cgImage, to: "testing/", locale: locale, deviceID: deviceSuffix)
+    let url = URL(fileURLWithPath: "testing/screenshots/").appendingPathComponent(locale)
+    try ImageWriter().write(cgImage, to: url, fileName: deviceSuffix + ".png")
 }
 
 func writeMockTemplateFile(deviceSuffix: String) throws {

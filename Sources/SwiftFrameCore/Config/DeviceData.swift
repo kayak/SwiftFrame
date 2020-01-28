@@ -42,7 +42,6 @@ public final class DeviceData: KYDecodable, ConfigValidatable {
         self.screenshotData = screenshotData.sorted { $0.zIndex < $1.zIndex }
 
         var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
-
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }

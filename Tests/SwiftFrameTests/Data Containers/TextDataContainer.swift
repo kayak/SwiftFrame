@@ -25,10 +25,27 @@ struct TextDataContainer {
         "bottomRight": Point(x: 8, y: 20)
     ]
 
+    static let invertedData: [String : Any] = [
+        "titleIdentifier": "someID",
+        "textAlignment": NSTextAlignment.center,
+        "topLeft": Point(x: 10, y: 5),
+        "bottomRight": Point(x: 15, y: 20)
+    ]
+
 }
 
 extension TextData {
-    static var mockData: TextData {
+
+    static var goodMockData: TextData {
         return try! TextData(from: TextDataContainer.goodData)
     }
+
+    static var invalidMockData: TextData {
+        return try! TextData(from: TextDataContainer.invalidData)
+    }
+
+    static var invertedMockData: TextData {
+        return try! TextData(from: TextDataContainer.invertedData)
+    }
+
 }

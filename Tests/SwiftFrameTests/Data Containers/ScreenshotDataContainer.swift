@@ -4,7 +4,7 @@ import SwiftFrameCore
 struct ScreenshotDataContainer {
 
     static let goodData: JSONDictionary = [
-        "screenshotName": "some_Identifier",
+        "screenshotName": "debug_device1.png",
         "bottomLeft": Point(x: 10, y: 10),
         "bottomRight": Point(x: 40, y: 10),
         "topLeft": Point(x: 10, y: 200),
@@ -12,7 +12,7 @@ struct ScreenshotDataContainer {
     ]
 
     static let badData: JSONDictionary = [
-        "screenshotName": "some_Identifier",
+        "screenshotName": "debug_device1.png",
         "bottomLeft": [Point(x: 10, y: 200)],
         "bottomRight": Point(x: 40, y: 200),
         "topLeft": Point(x: 10, y: 10),
@@ -20,7 +20,7 @@ struct ScreenshotDataContainer {
     ]
 
     static let invertedCoordinatesData: JSONDictionary = [
-        "screenshotName": "some_Identifier",
+        "screenshotName": "debug_device1.png",
         "bottomLeft": Point(x: 10, y: 200),
         "bottomRight": Point(x: 40, y: 200),
         "topLeft": Point(x: 10, y: 10),
