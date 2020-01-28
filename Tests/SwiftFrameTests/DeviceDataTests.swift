@@ -81,5 +81,5 @@ func setupMockDirectoryWithScreenshots() throws {
 }
 
 func clearTestingDirectory() throws {
-    try FileManager.default.removeItem(atPath: "testing")
+    //try FileManager.default.removeItem(atPath: "testing")
 }

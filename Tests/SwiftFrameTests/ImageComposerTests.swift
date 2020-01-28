@@ -65,8 +65,8 @@ class ImageComposerTests: XCTestCase {
 
 }
 
-func makeImageRepresentationWithSize(_ size: CGSize) -> NSBitmapImageRep {
-    let context = CGContext(
+func makeCGContext(_ size: CGSize) -> CGContext {
+    CGContext(
         data: nil,
         width: Int(size.width),
         height: Int(size.height),
@@ -74,6 +74,10 @@ func makeImageRepresentationWithSize(_ size: CGSize) -> NSBitmapImageRep {
         bytesPerRow: 0,
         space: CGColorSpaceCreateDeviceRGB(),
         bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+}
+
+func makeImageRepresentationWithSize(_ size: CGSize) -> NSBitmapImageRep {
+    let context = makeCGContext(size)
     context.setFillColor(.white)
     context.fill(NSRect(x: 0, y: 0, width: size.width, height: size.height))
     return NSBitmapImageRep(cgImage: context.makeImage()!)

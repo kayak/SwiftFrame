@@ -70,6 +70,7 @@ public struct ConfigFile: KYDecodable, ConfigValidatable {
         textGroups = try container.ky_decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
         maxFontSize = try container.ky_decode(CGFloat.self, forKey: .maxFontSize)
         outputPaths = try container.ky_decode([LocalURL].self, forKey: .outputPaths)
+        titlesPath = try container.ky_decode(LocalURL.self, forKey: .titlesPath)
 
         let fontPathString = try container.ky_decode(String.self, forKey: .fontFile)
         self.font = try FontRegistry.shared.registerFont(atPath: fontPathString)
@@ -77,7 +78,6 @@ public struct ConfigFile: KYDecodable, ConfigValidatable {
         let colorHexString = try container.ky_decode(String.self, forKey: .textColor)
         textColor = try NSColor(hexString: colorHexString)
 
-        titlesPath = try container.ky_decode(LocalURL.self, forKey: .titlesPath)
         var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }
