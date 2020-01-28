@@ -3,7 +3,7 @@ import Foundation
 
 private let kNumTitleLines = 3
 
-public struct TextGroup: Codable, JSONDecodable, ConfigValidatable, Hashable {
+public struct TextGroup: KYDecodable, ConfigValidatable, Hashable {
 
     // MARK: - Properties
 

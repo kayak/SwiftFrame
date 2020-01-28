@@ -3,7 +3,7 @@ import Foundation
 
 let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
-public final class DeviceData: Decodable, JSONDecodable, ConfigValidatable {
+public final class DeviceData: KYDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -31,7 +31,7 @@ public final class DeviceData: Decodable, JSONDecodable, ConfigValidatable {
     public init(from json: JSONDictionary) throws {
         templateFilePath = try json.ky_decode(with: CodingKeys.templateFile)
         guard let rep = ImageLoader.loadRepresentation(at: templateFilePath.absoluteURL) else {
-            throw NSError(description: "Error while loading template image")
+            throw NSError(description: "Error while loading template image at path \(templateFilePath.absoluteString)")
         }
         templateImage = rep
         outputSuffix = try json.ky_decode(with: CodingKeys.outputSuffix)
@@ -42,6 +42,7 @@ public final class DeviceData: Decodable, JSONDecodable, ConfigValidatable {
         self.screenshotData = screenshotData.sorted { $0.zIndex < $1.zIndex }
 
         var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
+
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }

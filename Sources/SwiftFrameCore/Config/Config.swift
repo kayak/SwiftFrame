@@ -12,10 +12,10 @@ public protocol JSONDecodable {
 
 /// First key is locale, second is regular key in string file
 public typealias LocalizedStringFiles = [String : [String : String]]
-
 public typealias JSONDictionary = [String : Any]
+public typealias KYDecodable = Decodable & JSONDecodable
 
-public struct ConfigFile: Decodable, JSONDecodable, ConfigValidatable {
+public struct ConfigFile: KYDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
@@ -53,7 +53,7 @@ public struct ConfigFile: Decodable, JSONDecodable, ConfigValidatable {
         font = try json.ky_decode(with: CodingKeys.fontFile)
         textColor = try json.ky_decode(with: CodingKeys.textColor)
         titlesPath = try json.ky_decode(with: CodingKeys.titlesPath)
-        
+
         var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }

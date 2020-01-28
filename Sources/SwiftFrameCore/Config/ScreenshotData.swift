@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: Decodable, JSONDecodable, ConfigValidatable {
+public struct ScreenshotData: KYDecodable, ConfigValidatable, Equatable {
 
     // MARK: - Properties
 
@@ -43,13 +43,13 @@ public struct ScreenshotData: Decodable, JSONDecodable, ConfigValidatable {
         self.zIndex = try container.ky_decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
     }
 
-    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int) {
+    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int? = 0) {
         self.screenshotName = screenshotName
         self.bottomLeft = bottomLeft
         self.bottomRight = bottomRight
         self.topLeft = topLeft
         self.topRight = topRight
-        self.zIndex = zIndex
+        self.zIndex = zIndex ?? 0
     }
 
     // MARK: - Misc

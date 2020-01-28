@@ -16,6 +16,13 @@ public struct Point: Codable, Equatable {
         CGPoint(x: x, y: y)
     }
 
+    // MARK: - Init
+
+    public init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
+
     // MARK: - Coordinate space conversion
 
     public func convertToBottomLeftOrigin(with size: CGSize) -> Point {

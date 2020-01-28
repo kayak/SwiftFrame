@@ -4,13 +4,6 @@ import XCTest
 
 class ImageComposerTests: XCTestCase {
 
-    let goodTextData: [String : Any] = [
-        "titleIdentifier": "someID",
-        "textAlignment": NSTextAlignment.center,
-        "topLeft": Point(x: 10, y: 20),
-        "bottomRight": Point(x: 15, y: 5)
-    ]
-
     func testRenderTemplateFile() throws {
         let templateFile = makeImageRepresentationWithSize(CGSize(width: 100, height: 50))
         let composer = try ImageComposer(templateFile)
@@ -45,7 +38,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testCanRenderInContext() throws {
-        let textData = try TextData(from: goodTextData)
+        let textData = try TextData(from: TextDataContainer.goodData)
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))
@@ -58,7 +51,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testRenderDynamicTextSize() throws {
-        let textData = try TextData(from: goodTextData)
+        let textData = try TextData(from: TextDataContainer.goodData)
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))

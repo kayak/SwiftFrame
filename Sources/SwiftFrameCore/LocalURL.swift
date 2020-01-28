@@ -1,7 +1,7 @@
 import Foundation
 
 /// Wrapper struct to avoid some errors related to relative paths
-public struct LocalURL: Codable {
+public struct LocalURL: Decodable {
 
     // MARK: - Properties
 
@@ -17,6 +17,11 @@ public struct LocalURL: Codable {
     }
 
     // MARK: - Init
+
+    public init(path: String) {
+        rawPath = path
+        url = URL(fileURLWithPath: rawPath)
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
