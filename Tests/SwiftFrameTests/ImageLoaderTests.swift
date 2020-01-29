@@ -13,7 +13,7 @@ class ImageLoaderTests: XCTestCase {
         try ImageWriter().write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device")
         XCTAssertNoThrow(try ImageLoader().loadImage(atPath: "testing/en/en-testing_device.png"))
 
-        try clearTestingDirectory()
+        try TestingUtility.clearTestingDirectory()
     }
 
 }

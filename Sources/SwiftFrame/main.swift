@@ -18,7 +18,7 @@ do {
     let configURL = URL(fileURLWithPath: configPath)
     let data = try Data(contentsOf: configURL)
     
-    let config = try JSONDecoder().decode(ConfigFile.self, from: data)
+    let config = try JSONDecoder().decode(ConfigData.self, from: data)
     let verbose = options.verbose.isSpecified
 
     try config.validate()

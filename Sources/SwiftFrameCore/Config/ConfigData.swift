@@ -15,7 +15,7 @@ public typealias LocalizedStringFiles = [String : [String : String]]
 public typealias JSONDictionary = [String : Any]
 public typealias KYDecodable = Decodable & JSONDecodable
 
-public struct ConfigFile: KYDecodable, ConfigValidatable {
+public struct ConfigData: KYDecodable, ConfigValidatable {
 
     // MARK: - Properties
 
