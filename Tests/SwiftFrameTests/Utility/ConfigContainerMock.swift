@@ -15,12 +15,12 @@ protocol ConfigTestable {
     static func makeInvertedData() throws -> T
 }
 
-struct ConfigContainer: ConfigTestable {
+struct ConfigContainerMock: ConfigTestable {
 
     typealias T = ConfigData
 
     static var goodData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataContainer.makeGoodData() else {
+        guard let mockDeviceData = try? DeviceDataMock.makeGoodData() else {
             preconditionFailure("Constructing device data shouldnt fail here")
         }
 
@@ -36,7 +36,7 @@ struct ConfigContainer: ConfigTestable {
 
     static var badData: JSONDictionary {
         [
-            "deviceData": [DeviceDataContainer.badData],
+            "deviceData": [DeviceDataMock.badData],
             "titlesPath": LocalURL(path: "testing/strings/"),
             "maxFontSize": 200,
             "outputPaths": [LocalURL(path: "testing/output/")],
@@ -46,7 +46,7 @@ struct ConfigContainer: ConfigTestable {
     }
 
     static var invalidData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataContainer.makeInvalidData() else {
+        guard let mockDeviceData = try? DeviceDataMock.makeInvalidData() else {
             preconditionFailure("Constructing device data shouldnt fail here")
         }
 
@@ -61,7 +61,7 @@ struct ConfigContainer: ConfigTestable {
     }
 
     static var invertedData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataContainer.makeInvertedData() else {
+        guard let mockDeviceData = try? DeviceDataMock.makeInvertedData() else {
             preconditionFailure("Constructing device data shouldnt fail here")
         }
 

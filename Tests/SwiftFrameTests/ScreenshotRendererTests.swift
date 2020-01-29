@@ -9,7 +9,7 @@ class ScreenshotRendererTests: XCTestCase {
         let context = makeCGContext(size)
         let rep = makeImageRepresentationWithSize(size)
 
-        let mockScreenshotData = try ScreenshotDataContainer.makeGoodData()
+        let mockScreenshotData = try ScreenshotDataMock.makeGoodData()
 
         let renderer = ScreenshotRenderer()
         try renderer.render(

@@ -7,21 +7,21 @@ class DeviceDataTests: XCTestCase {
     func testGoodData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        XCTAssertNoThrow(try DeviceDataContainer.makeGoodData())
+        XCTAssertNoThrow(try DeviceDataMock.makeGoodData())
         try TestingUtility.clearTestingDirectory()
     }
 
     func testBadData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        XCTAssertThrowsError(try DeviceData(from: DeviceDataContainer.badData))
+        XCTAssertThrowsError(try DeviceData(from: DeviceDataMock.badData))
         try TestingUtility.clearTestingDirectory()
     }
 
     func testValidData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try DeviceDataContainer.makeGoodData()
+        let data = try DeviceDataMock.makeGoodData()
         XCTAssertNoThrow(try data.validate())
 
         try TestingUtility.clearTestingDirectory()
@@ -30,7 +30,7 @@ class DeviceDataTests: XCTestCase {
     func testInvalidData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try DeviceDataContainer.makeInvalidData()
+        let data = try DeviceDataMock.makeInvalidData()
         XCTAssertThrowsError(try data.validate())
 
         try TestingUtility.clearTestingDirectory()
@@ -39,7 +39,7 @@ class DeviceDataTests: XCTestCase {
     func testInvertedData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try DeviceDataContainer.makeInvertedData()
+        let data = try DeviceDataMock.makeInvertedData()
         XCTAssertNoThrow(try data.validate())
 
         try TestingUtility.clearTestingDirectory()

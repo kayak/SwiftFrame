@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 import SwiftFrameCore
 
-struct TextDataContainer: ConfigTestable {
+struct TextDataMock: ConfigTestable {
 
     typealias T = TextData
 

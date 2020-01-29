@@ -1,12 +1,12 @@
 import Foundation
 import SwiftFrameCore
 
-struct DeviceDataContainer: ConfigTestable {
+struct DeviceDataMock: ConfigTestable {
 
     typealias T = DeviceData
 
     static var goodData: JSONDictionary {
-        guard let mockTextData = try? TextDataContainer.makeGoodData(), let mockScreenshotData = try? ScreenshotDataContainer.makeGoodData() else {
+        guard let mockTextData = try? TextDataMock.makeGoodData(), let mockScreenshotData = try? ScreenshotDataMock.makeGoodData() else {
             preconditionFailure("Constructing text and screenshot data shouldnt fail")
         }
 
@@ -24,14 +24,14 @@ struct DeviceDataContainer: ConfigTestable {
         [
             "templateFile": LocalURL(path: "testing/templatefile-debug_device1.png"),
             "outputSuffix": "iPhone X",
-            "textData": TextDataContainer.badData,
-            "screenshotData": [ScreenshotDataContainer.badData],
+            "textData": TextDataMock.badData,
+            "screenshotData": [ScreenshotDataMock.badData],
             "screenshots": LocalURL(path: "testing/screenshots/")
         ]
     }
 
     static var invalidData: JSONDictionary {
-        guard let mockTextData = try? TextDataContainer.makeInvalidData(), let mockScreenshotData = try? ScreenshotDataContainer.makeGoodData() else {
+        guard let mockTextData = try? TextDataMock.makeInvalidData(), let mockScreenshotData = try? ScreenshotDataMock.makeGoodData() else {
             preconditionFailure("Constructing text and screenshot data shouldnt fail")
         }
 
@@ -46,7 +46,7 @@ struct DeviceDataContainer: ConfigTestable {
     }
 
     static var invertedData: JSONDictionary {
-        guard let mockTextData = try? TextDataContainer.makeInvertedData(), let mockScreenshotData = try? ScreenshotDataContainer.makeInvertedData() else {
+        guard let mockTextData = try? TextDataMock.makeInvertedData(), let mockScreenshotData = try? ScreenshotDataMock.makeInvertedData() else {
             preconditionFailure("Constructing text and screenshot data shouldnt fail")
         }
 

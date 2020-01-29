@@ -1,7 +1,7 @@
 import Foundation
 import SwiftFrameCore
 
-struct ScreenshotDataContainer: ConfigTestable {
+struct ScreenshotDataMock: ConfigTestable {
 
     typealias T = ScreenshotData
 
