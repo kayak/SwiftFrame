@@ -2,18 +2,18 @@
 
 SwiftFrame is a command line application for composing and laying out screenshots. Here's an screenshot from the example app.
 
-<img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" width="250">
+<img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" width="250" alignement="center">
 
 ## Installation
 ### Directly
-To build the project and install the CLI, run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`.
+To build the project and install the CLI, clone the repository and run the `install.sh` script. This will compile a binary and install it into `usr/local/bin/swiftframe`.
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
 $ mint install kayak/SwiftFrame
 ```
 
 ### Make
-Simply run `make` or `make all` inside the SwiftFrame directory. This will compile a binary and install it into `usr/local/bin/swiftframe`.
+Clone the repository and simply run `make` or `make all` inside the SwiftFrame directory. This will compile a binary and install it into `usr/local/bin/swiftframe`.
 
 ## Usage
 
