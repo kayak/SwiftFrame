@@ -40,16 +40,19 @@ struct TestingUtility {
     }
 
     static func clearTestingDirectory() throws {
-        try FileManager.default.removeItem(atPath: "testing")
+        if FileManager.default.fileExists(atPath: "testing") {
+            try FileManager.default.removeItem(atPath: "testing")
+        }
     }
 
     static func writeStringFiles(for locales: [String]) throws {
         let fileContent = StringFilesContainer.goodData.makeStringFileContent()
 
         try locales.forEach {
-            let filePath = URL(fileURLWithPath: "testing/strings/")
-            try FileManager.default.createDirectory(at: filePath, withIntermediateDirectories: true, attributes: nil)
-            try fileContent.write(to: filePath.appendingPathComponent("\($0).strings"), atomically: false, encoding: .utf8)
+            let filePath = URL(fileURLWithPath: "testing/strings/\($0).strings")
+            let data = try fileContent.ky_data(using: .utf8)
+
+            try data.ky_write(to: filePath)
         }
     }
 

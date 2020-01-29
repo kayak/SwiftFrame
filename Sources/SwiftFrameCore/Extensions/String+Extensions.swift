@@ -48,4 +48,11 @@ extension String {
         return String(format: "%\(width)-s", (self as NSString).utf8String!)
     }
 
+    public func ky_data(using encoding: String.Encoding, allowLossyConversion: Bool = false) throws -> Data {
+        guard let data = self.data(using: encoding, allowLossyConversion: allowLossyConversion) else {
+            throw NSError(description: "Could not create data from string")
+        }
+        return data
+    }
+
 }

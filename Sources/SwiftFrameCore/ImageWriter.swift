@@ -26,8 +26,7 @@ public final class ImageWriter {
             throw NSError(description: "Failed to convert composed image to PNG")
         }
 
-        try FileManager.default.createDirectory(at: directoryPath, withIntermediateDirectories: true, attributes: nil)
-        try data.write(to: directoryPath.appendingPathComponent(fileName))
+        try data.ky_write(to: directoryPath.appendingPathComponent(fileName))
     }
 
 }

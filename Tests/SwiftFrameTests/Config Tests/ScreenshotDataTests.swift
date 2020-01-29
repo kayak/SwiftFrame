@@ -5,34 +5,26 @@ import XCTest
 class ScreenshotDataTests: XCTestCase {
 
     func testGoodData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
         XCTAssertNoThrow(try ScreenshotDataMock.makeGoodData())
         try TestingUtility.clearTestingDirectory()
     }
 
     func testBadData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
         XCTAssertThrowsError(try ScreenshotData(from: ScreenshotDataMock.badData))
         try TestingUtility.clearTestingDirectory()
     }
 
     func testValidData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
         let data = try ScreenshotDataMock.makeGoodData()
-        XCTAssertNoThrow(try data.validate())
 
+        XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 
     func testInvertedData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
         let data = try ScreenshotDataMock.makeInvertedData()
-        XCTAssertNoThrow(try data.validate())
 
+        XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 

@@ -22,8 +22,8 @@ class DeviceDataTests: XCTestCase {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
         let data = try DeviceDataMock.makeGoodData()
-        XCTAssertNoThrow(try data.validate())
 
+        XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 
@@ -31,8 +31,8 @@ class DeviceDataTests: XCTestCase {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
         let data = try DeviceDataMock.makeInvalidData()
-        XCTAssertThrowsError(try data.validate())
 
+        XCTAssertThrowsError(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 
@@ -40,8 +40,8 @@ class DeviceDataTests: XCTestCase {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
         let data = try DeviceDataMock.makeInvertedData()
-        XCTAssertNoThrow(try data.validate())
 
+        XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 

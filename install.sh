@@ -8,6 +8,6 @@ swift build -c release
 cp -f .build/release/SwiftFrame /usr/local/bin/swiftframe
 rm -r .build/release
 
-echo "Installed swiftframe into /usr/locale/bin/swiftframe"
+echo "Installed swiftframe into /usr/local/bin/swiftframe"
 
 cd $CURRENT

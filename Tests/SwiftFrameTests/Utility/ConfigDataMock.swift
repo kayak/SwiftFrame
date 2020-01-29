@@ -15,7 +15,7 @@ protocol ConfigTestable {
     static func makeInvertedData() throws -> T
 }
 
-struct ConfigContainerMock: ConfigTestable {
+struct ConfigDataMock: ConfigTestable {
 
     typealias T = ConfigData
 
