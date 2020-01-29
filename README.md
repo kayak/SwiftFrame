@@ -2,7 +2,7 @@
 
 SwiftFrame is a command line application for composing and laying out screenshots. Here's an screenshot from the example app.
 
-<img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" width="250" alignement="center">
+<img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" width="250">
 
 ## Installation
 ### Directly
