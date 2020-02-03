@@ -6,14 +6,8 @@ public protocol ConfigValidatable {
     func printSummary(insetByTabs tabs: Int)
 }
 
-public protocol JSONDecodable {
-    init(from json: JSONDictionary) throws
-}
-
 /// First key is locale, second is regular key in string file
 public typealias LocalizedStringFiles = [String : [String : String]]
-public typealias JSONDictionary = [String : Any]
-public typealias KYDecodable = Decodable & JSONDecodable
 
 public struct ConfigData: Decodable, ConfigValidatable {
 
@@ -35,7 +29,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
-        case outputWholeImage = "alsoOutputWholeImage"
+        case outputWholeImage
         case deviceData
         case textGroups
         case titlesPath
@@ -45,12 +39,41 @@ public struct ConfigData: Decodable, ConfigValidatable {
         case textColorString = "textColor"
     }
 
+    // MARK: - Init
+
+    public init(
+        outputWholeImage: Bool = true,
+        textGroups: [TextGroup]?,
+        titlesPath: LocalURL,
+        maxFontSize: CGFloat,
+        outputPaths: [LocalURL],
+        fontPath: String,
+        textColorString: String,
+        deviceData: [DeviceData],
+        font: NSFont,
+        textColor: NSColor,
+        titles: LocalizedStringFiles = LocalizedStringFiles())
+    {
+        self.outputWholeImage = outputWholeImage
+        self.textGroups = textGroups
+        self.titlesPath = titlesPath
+        self.maxFontSize = maxFontSize
+        self.outputPaths = outputPaths
+        self.fontPath = fontPath
+        self.textColorString = textColorString
+        self.deviceData = deviceData
+        self.font = font
+        self.textColor = textColor
+        self.titles = titles
+    }
     // MARK: - Processing
 
     mutating public func process() throws {
         deviceData = try deviceData.map { try $0.makeProcessedData() }
 
-        font = try FontRegistry.shared.registerFont(atPath: fontPath)
+        if font == nil {
+            font = try FontRegistry.shared.registerFont(atPath: fontPath)
+        }
         textColor = try NSColor(hexString: textColorString)
 
         var parsedTitles = LocalizedStringFiles()

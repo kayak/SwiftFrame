@@ -4,24 +4,11 @@ import XCTest
 
 class ConfigDataTests: XCTestCase {
 
-    func testGoodData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
-        XCTAssertNoThrow(try ConfigDataMock.makeGoodData())
-        try TestingUtility.clearTestingDirectory()
-    }
-
-    func testBadData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
-        XCTAssertThrowsError(try ConfigData(from: ConfigDataMock.badData))
-        try TestingUtility.clearTestingDirectory()
-    }
-
     func testValidData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try ConfigDataMock.makeGoodData()
+        var data = ConfigData.goodData
+        try data.process()
 
         XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
@@ -30,7 +17,8 @@ class ConfigDataTests: XCTestCase {
     func testInvalidData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try ConfigDataMock.makeInvalidData()
+        var data = ConfigData.invalidData
+        try data.process()
 
         XCTAssertThrowsError(try data.validate())
         try TestingUtility.clearTestingDirectory()
@@ -39,9 +27,10 @@ class ConfigDataTests: XCTestCase {
     func testInvertedData() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()
 
-        let data = try ConfigDataMock.makeInvertedData()
+        var data = ConfigData.invertedData
+        try data.process()
 
-        XCTAssertNoThrow(try data.validate())
+        XCTAssertThrowsError(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 

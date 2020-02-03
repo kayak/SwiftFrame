@@ -38,7 +38,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testCanRenderInContext() throws {
-        let textData = try TextData(from: TextDataMock.goodData)
+        let textData = TextData.goodData
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))
@@ -51,7 +51,7 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testRenderDynamicTextSize() throws {
-        let textData = try TextData(from: TextDataMock.goodData)
+        let textData = TextData.goodData
 
         let size = CGSize(width: 100, height: 200)
         let composer = try ImageComposer(makeImageRepresentationWithSize(size))

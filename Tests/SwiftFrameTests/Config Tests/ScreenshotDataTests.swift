@@ -4,25 +4,15 @@ import XCTest
 
 class ScreenshotDataTests: XCTestCase {
 
-    func testGoodData() throws {
-        XCTAssertNoThrow(try ScreenshotDataMock.makeGoodData())
-        try TestingUtility.clearTestingDirectory()
-    }
-
-    func testBadData() throws {
-        XCTAssertThrowsError(try ScreenshotData(from: ScreenshotDataMock.badData))
-        try TestingUtility.clearTestingDirectory()
-    }
-
     func testValidData() throws {
-        let data = try ScreenshotDataMock.makeGoodData()
+        let data = ScreenshotData.goodData
 
         XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
     }
 
     func testInvertedData() throws {
-        let data = try ScreenshotDataMock.makeInvertedData()
+        let data = ScreenshotData.invertedData
 
         XCTAssertNoThrow(try data.validate())
         try TestingUtility.clearTestingDirectory()
@@ -38,8 +28,8 @@ class ScreenshotDataTests: XCTestCase {
             topRight: Point(x: 40, y: 10),
             zIndex: 3)
 
-        let convertedData = data.convertToBottomLeftOrigin(with: size)
-        XCTAssertEqual(convertedData.convertToBottomLeftOrigin(with: size), data)
+        let convertedData = data.makeProcessedData(originIsTopLeft: true, size: size)
+        XCTAssertEqual(convertedData.makeProcessedData(originIsTopLeft: true, size: size), data)
     }
 
 }

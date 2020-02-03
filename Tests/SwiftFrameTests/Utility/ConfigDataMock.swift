@@ -15,76 +15,45 @@ protocol ConfigTestable {
     static func makeInvertedData() throws -> T
 }
 
-struct ConfigDataMock: ConfigTestable {
+extension ConfigData {
 
-    typealias T = ConfigData
-
-    static var goodData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataMock.makeGoodData() else {
-            preconditionFailure("Constructing device data shouldnt fail here")
-        }
-
-        return [
-            "deviceData": [mockDeviceData],
-            "titlesPath": LocalURL(path: "testing/strings/"),
-            "maxFontSize": CGFloat(200.00),
-            "outputPaths": [LocalURL(path: "testing/output/")],
-            "fontFile": NSFont.systemFont(ofSize: 20),
-            "textColor": NSColor.red
-        ]
+    static var goodData: Self {
+        ConfigData(
+            textGroups: nil,
+            titlesPath: LocalURL(path: "testing/strings/"),
+            maxFontSize: 200,
+            outputPaths: [LocalURL(path: "testing/output/")],
+            fontPath: "",
+            textColorString: "#ff00ff",
+            deviceData: [DeviceData.goodData],
+            font: .systemFont(ofSize: 20),
+            textColor: .red)
     }
 
-    static var badData: JSONDictionary {
-        [
-            "deviceData": [DeviceDataMock.badData],
-            "titlesPath": LocalURL(path: "testing/strings/"),
-            "maxFontSize": 200,
-            "outputPaths": [LocalURL(path: "testing/output/")],
-            "fontFile": NSFont.systemFont(ofSize: 20),
-            "textColor": "#ff0000"
-        ]
+    static var invalidData: Self {
+        ConfigData(
+            textGroups: nil,
+            titlesPath: LocalURL(path: "testing/strings/"),
+            maxFontSize: 200,
+            outputPaths: [LocalURL(path: "testing/output/")],
+            fontPath: "",
+            textColorString: "#ff00ff",
+            deviceData: [DeviceData.invalidData],
+            font: .systemFont(ofSize: 20),
+            textColor: .red)
     }
 
-    static var invalidData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataMock.makeInvalidData() else {
-            preconditionFailure("Constructing device data shouldnt fail here")
-        }
-
-        return [
-            "deviceData": [mockDeviceData],
-            "titlesPath": LocalURL(path: "testing/strings/"),
-            "maxFontSize": CGFloat(200.00),
-            "outputPaths": [LocalURL(path: "testing/output/")],
-            "fontFile": NSFont.systemFont(ofSize: 20),
-            "textColor": NSColor.red
-        ]
-    }
-
-    static var invertedData: JSONDictionary {
-        guard let mockDeviceData = try? DeviceDataMock.makeInvertedData() else {
-            preconditionFailure("Constructing device data shouldnt fail here")
-        }
-
-        return [
-            "deviceData": [mockDeviceData],
-            "titlesPath": LocalURL(path: "testing/strings/"),
-            "maxFontSize": CGFloat(200.00),
-            "outputPaths": [LocalURL(path: "testing/output/")],
-            "fontFile": NSFont.systemFont(ofSize: 20),
-            "textColor": NSColor.red
-        ]
-    }
-
-    static func makeGoodData() throws -> ConfigData {
-        try ConfigData(from: goodData)
-    }
-
-    static func makeInvalidData() throws -> ConfigData {
-        try ConfigData(from: invalidData)
-    }
-
-    static func makeInvertedData() throws -> ConfigData {
-        try ConfigData(from: invertedData)
+    static var invertedData: Self {
+        ConfigData(
+            textGroups: nil,
+            titlesPath: LocalURL(path: "testing/strings/"),
+            maxFontSize: 200,
+            outputPaths: [LocalURL(path: "testing/output/")],
+            fontPath: "",
+            textColorString: "#ff00ff",
+            deviceData: [DeviceData.invertedData],
+            font: .systemFont(ofSize: 20),
+            textColor: .red)
     }
 
 }

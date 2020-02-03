@@ -21,6 +21,11 @@ extension NSTextAlignment: Codable {
         }
     }
 
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(cssName)
+    }
+
     var cssName: String {
         switch self {
         case .left:

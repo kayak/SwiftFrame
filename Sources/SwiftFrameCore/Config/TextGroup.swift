@@ -3,7 +3,7 @@ import Foundation
 
 private let kNumTitleLines = 3
 
-public struct TextGroup: KYDecodable, ConfigValidatable, Hashable {
+public struct TextGroup: Decodable, ConfigValidatable, Hashable {
 
     // MARK: - Properties
 
@@ -19,9 +19,9 @@ public struct TextGroup: KYDecodable, ConfigValidatable, Hashable {
 
     // MARK: - Init
 
-    public init(from json: JSONDictionary) throws {
-        identifier = try json.ky_decode(with: CodingKeys.identifier)
-        maxFontSize = try json.ky_decode(with: CodingKeys.maxFontSize)
+    public init(identifier: String, maxFontSize: CGFloat) {
+        self.identifier = identifier
+        self.maxFontSize = maxFontSize
     }
 
     // MARK: - ConfigValidatable

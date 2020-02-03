@@ -1,6 +1,8 @@
 import Foundation
 import SwiftFrameCore
 
+public typealias JSONDictionary = [String : Encodable]
+
 struct TestingUtility {
 
     static func writeMockScreenshot(locale: String, deviceSuffix: String) throws {

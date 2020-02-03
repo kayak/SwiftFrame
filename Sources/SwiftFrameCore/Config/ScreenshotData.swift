@@ -9,7 +9,11 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     public let bottomRight: Point
     public let topLeft: Point
     public let topRight: Point
-    public let zIndex: Int
+    private let z_Index: Int?
+
+    public var zIndex: Int {
+        z_Index ?? 0
+    }
 
     // MARK: - Coding Keys
 
@@ -19,7 +23,18 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
         case bottomRight
         case topLeft
         case topRight
-        case zIndex
+        case z_Index = "zIndex"
+    }
+
+    // MARK: - Init
+
+    public init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int? = nil) {
+        self.screenshotName = screenshotName
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.z_Index = zIndex ?? 0
     }
 
     // MARK: - Misc

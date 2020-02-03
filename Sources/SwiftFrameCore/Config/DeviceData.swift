@@ -28,6 +28,27 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case coordinateOriginIsTopLeft
     }
 
+    // MARK: - Init
+
+    public init(
+        outputSuffix: String,
+        templateImagePath: LocalURL,
+        screenshotsPath: LocalURL,
+        coordinateOriginIsTopLeft: Bool,
+        screenshots: [String : [String: NSBitmapImageRep]] = [String : [String: NSBitmapImageRep]](),
+        templateImage: NSBitmapImageRep? = nil,
+        screenshotData: [ScreenshotData] = [],
+        textData: [TextData] = [])
+    {
+        self.outputSuffix = outputSuffix
+        self.templateImagePath = templateImagePath
+        self.screenshotsPath = screenshotsPath
+        self.coordinateOriginIsTopLeft = coordinateOriginIsTopLeft
+        self.screenshots = screenshots
+        self.templateImage = templateImage
+        self.screenshotData = screenshotData
+        self.textData = textData
+    }
     // MARK: - Methods
 
     func makeProcessedData() throws -> DeviceData {

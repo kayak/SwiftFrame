@@ -38,6 +38,31 @@ public struct TextData: Decodable, ConfigValidatable {
         case groupIdentifier
     }
 
+    // MARK: - Init
+
+    public init(titleIdentifier: String,
+        textAlignment: NSTextAlignment,
+        maxFontSizeOverride: CGFloat? = nil,
+        customFontPath: String? = nil,
+        textColorOverrideString: String? = nil,
+        groupIdentifier: String? = nil,
+        topLeft: Point,
+        bottomRight: Point,
+        customFont: NSFont? = nil,
+        textColorOverride: NSColor? = nil)
+    {
+        self.titleIdentifier = titleIdentifier
+        self.textAlignment = textAlignment
+        self.maxFontSizeOverride = maxFontSizeOverride
+        self.customFontPath = customFontPath
+        self.textColorOverrideString = textColorOverrideString
+        self.groupIdentifier = groupIdentifier
+        self.topLeft = topLeft
+        self.bottomRight = bottomRight
+        self.customFont = customFont
+        self.textColorOverride = textColorOverride
+    }
+
     // MARK: - Misc
 
     public func makeProcessedData(originIsTopLeft: Bool, size: CGSize) throws -> TextData {
