@@ -24,7 +24,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 * `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots
 * `fontFile`: a path to a font file
 * `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
-* `alsoOutputWholeImage`: a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots.
+* `outputWholeImage`: a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots.
 * `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
   * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
   * `coordinatesOriginIsTopLeft`: **optional**, Boolean indicating whether the coordinates for screenshot corners and text titles are based on the top left corner instead of the bottom left one
