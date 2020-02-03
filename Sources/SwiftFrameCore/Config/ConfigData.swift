@@ -15,19 +15,22 @@ public typealias LocalizedStringFiles = [String : [String : String]]
 public typealias JSONDictionary = [String : Any]
 public typealias KYDecodable = Decodable & JSONDecodable
 
-public struct ConfigData: KYDecodable, ConfigValidatable {
+public struct ConfigData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
     public let outputWholeImage: Bool
-    public let deviceData: [DeviceData]
-    public let textGroups: [TextGroup]
+    public let textGroups: [TextGroup]?
     public let titlesPath: LocalURL
-    public let titles: LocalizedStringFiles
     public let maxFontSize: CGFloat
     public let outputPaths: [LocalURL]
-    public let font: NSFont
-    public let textColor: NSColor
+    public let fontPath: String
+    public let textColorString: String
+
+    public private(set) var deviceData: [DeviceData]
+    public private(set) var font: NSFont!
+    public private(set) var textColor: NSColor!
+    public private(set) var titles = LocalizedStringFiles()
 
     // MARK: - Coding Keys
 
@@ -38,21 +41,17 @@ public struct ConfigData: KYDecodable, ConfigValidatable {
         case titlesPath
         case maxFontSize
         case outputPaths
-        case fontFile
-        case textColor
+        case fontPath = "fontFile"
+        case textColorString = "textColor"
     }
 
-    // MARK: - Init
+    // MARK: - Processing
 
-    public init(from json: JSONDictionary) throws {
-        outputWholeImage = try json.ky_decodeIfPresent(with: CodingKeys.outputWholeImage) ?? false
-        deviceData = try json.ky_decode(with: CodingKeys.deviceData)
-        textGroups = try json.ky_decodeIfPresent(with: CodingKeys.textGroups) ?? []
-        maxFontSize = try json.ky_decode(with: CodingKeys.maxFontSize)
-        outputPaths = try json.ky_decode(with: CodingKeys.outputPaths)
-        font = try json.ky_decode(with: CodingKeys.fontFile)
-        textColor = try json.ky_decode(with: CodingKeys.textColor)
-        titlesPath = try json.ky_decode(with: CodingKeys.titlesPath)
+    mutating public func process() throws {
+        deviceData = try deviceData.map { try $0.makeProcessedData() }
+
+        font = try FontRegistry.shared.registerFont(atPath: fontPath)
+        textColor = try NSColor(hexString: textColorString)
 
         var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
@@ -63,29 +62,6 @@ public struct ConfigData: KYDecodable, ConfigValidatable {
         titles = parsedTitles
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        outputWholeImage = try container.ky_decodeIfPresent(Bool.self, forKey: .outputWholeImage) ?? false
-        deviceData = try container.ky_decode([DeviceData].self, forKey: .deviceData)
-        textGroups = try container.ky_decodeIfPresent([TextGroup].self, forKey: .textGroups) ?? []
-        maxFontSize = try container.ky_decode(CGFloat.self, forKey: .maxFontSize)
-        outputPaths = try container.ky_decode([LocalURL].self, forKey: .outputPaths)
-        titlesPath = try container.ky_decode(LocalURL.self, forKey: .titlesPath)
-
-        let fontPathString = try container.ky_decode(String.self, forKey: .fontFile)
-        self.font = try FontRegistry.shared.registerFont(atPath: fontPathString)
-
-        let colorHexString = try container.ky_decode(String.self, forKey: .textColor)
-        textColor = try NSColor(hexString: colorHexString)
-
-        var parsedTitles = LocalizedStringFiles()
-        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-            .filter { $0.pathExtension == "strings" }
-        textFiles.forEach { textFile in
-            parsedTitles[textFile.absoluteURL.fileName] = NSDictionary(contentsOf: textFile) as? [String: String]
-        }
-        titles = parsedTitles
-    }
 
     // MARK: - ConfigValidatable
 
@@ -113,9 +89,9 @@ public struct ConfigData: KYDecodable, ConfigValidatable {
             print("")
         }
 
-        if !textGroups.isEmpty {
+        if let groups = textGroups, !groups.isEmpty {
             print("Text groups:")
-            textGroups.forEach {
+            groups.forEach {
                 $0.printSummary(insetByTabs: tabs + 1)
                 print("")
             }

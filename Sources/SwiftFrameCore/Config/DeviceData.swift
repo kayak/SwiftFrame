@@ -3,95 +3,63 @@ import Foundation
 
 let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
 
-public final class DeviceData: KYDecodable, ConfigValidatable {
+public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
     public let outputSuffix: String
-    public let screenshots: [String : [String: NSBitmapImageRep]]
-    public let templateImage: NSBitmapImageRep
+    public let templateImagePath: LocalURL
+    private let screenshotsPath: LocalURL
+    private let coordinateOriginIsTopLeft: Bool
+
+    public private(set) var screenshots: [String : [String: NSBitmapImageRep]]!
+    public private(set) var templateImage: NSBitmapImageRep!
     public private(set) var screenshotData = [ScreenshotData]()
     public private(set) var textData = [TextData]()
-    private let screenshotsPath: LocalURL
-    private let templateFilePath: LocalURL
 
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case outputSuffix
-        case screenshots
-        case templateFile
+        case screenshotsPath = "screenshots"
+        case templateImagePath = "templateFile"
         case screenshotData
         case textData
-        case coordinatesOriginIsTopLeft
-    }
-
-    // MARK: - Init
-
-    public init(from json: JSONDictionary) throws {
-        templateFilePath = try json.ky_decode(with: CodingKeys.templateFile)
-        guard let rep = ImageLoader.loadRepresentation(at: templateFilePath.absoluteURL) else {
-            throw NSError(description: "Error while loading template image at path \(templateFilePath.absoluteString)")
-        }
-        templateImage = rep
-        outputSuffix = try json.ky_decode(with: CodingKeys.outputSuffix)
-        textData = try json.ky_decode(with: CodingKeys.textData)
-        screenshotsPath = try json.ky_decode(with: CodingKeys.screenshots)
-
-        let screenshotData: [ScreenshotData] = try json.ky_decode(with: CodingKeys.screenshotData)
-        self.screenshotData = screenshotData.sorted { $0.zIndex < $1.zIndex }
-
-        var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
-        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
-            let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
-            let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
-                let rep = ImageLoader.loadRepresentation(at: url)
-                dictionary[url.lastPathComponent] = rep
-            }
-            parsedScreenshots[folder.lastPathComponent] = imagesDictionary
-        }
-        screenshots = parsedScreenshots
-
-        if try json.ky_decode(with: CodingKeys.coordinatesOriginIsTopLeft) {
-            convertTextAndScreenshotData()
-        }
-    }
-
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        templateFilePath = try container.ky_decode(LocalURL.self, forKey: .templateFile)
-        guard let rep = ImageLoader.loadRepresentation(at: templateFilePath.absoluteURL) else {
-            throw NSError(description: "Error while loading template image")
-        }
-        templateImage = rep
-        outputSuffix = try container.ky_decode(String.self, forKey: .outputSuffix)
-        screenshotData = try container.ky_decode([ScreenshotData].self, forKey: .screenshotData).sorted { $0.zIndex < $1.zIndex }
-        textData = try container.ky_decode([TextData].self, forKey: .textData)
-        screenshotsPath = try container.ky_decode(LocalURL.self, forKey: .screenshots)
-
-        var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
-        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
-            let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
-            let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
-                let rep = ImageLoader.loadRepresentation(at: url)
-                dictionary[url.lastPathComponent] = rep
-            }
-            parsedScreenshots[folder.lastPathComponent] = imagesDictionary
-        }
-        screenshots = parsedScreenshots
-
-        if try container.ky_decode(Bool.self, forKey: .coordinatesOriginIsTopLeft) {
-            convertTextAndScreenshotData()
-        }
+        case coordinateOriginIsTopLeft
     }
 
     // MARK: - Methods
 
-    private func convertTextAndScreenshotData() {
-        textData = textData.map { $0.convertToBottomLeftOrigin(with: templateImage.size) }
-        screenshotData = screenshotData.map { $0.convertToBottomLeftOrigin(with: templateImage.size) }
+    func makeProcessedData() throws -> DeviceData {
+        guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
+            throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
+        }
+
+        var parsedScreenshots = [String : [String : NSBitmapImageRep]]()
+        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
+            let imageFiles = try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
+            let imagesDictionary = imageFiles.reduce(into: [String: NSBitmapImageRep]()) { dictionary, url in
+                let rep = ImageLoader.loadRepresentation(at: url)
+                dictionary[url.lastPathComponent] = rep
+            }
+            parsedScreenshots[folder.lastPathComponent] = imagesDictionary
+        }
+
+        let processedTextData = try textData.map { try $0.makeProcessedData(originIsTopLeft: coordinateOriginIsTopLeft, size: rep.size) }
+        let processedScreenshotData = screenshotData
+            .map { $0.makeProcessedData(originIsTopLeft: coordinateOriginIsTopLeft, size: rep.size)}
+            .sorted { $0.zIndex < $1.zIndex }
+
+        return DeviceData(
+            outputSuffix: outputSuffix,
+            templateImagePath: templateImagePath,
+            screenshotsPath: screenshotsPath,
+            coordinateOriginIsTopLeft: coordinateOriginIsTopLeft,
+            screenshots: parsedScreenshots,
+            templateImage: rep,
+            screenshotData: processedScreenshotData,
+            textData: processedTextData)
     }
 
     func groupTextData(with groups: [TextGroup]) -> [TextGroup: [TextData]] {
@@ -136,7 +104,7 @@ public final class DeviceData: KYDecodable, ConfigValidatable {
 
     public func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Template file path", value: templateFilePath.absoluteString, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.absoluteString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }

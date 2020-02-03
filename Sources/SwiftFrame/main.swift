@@ -18,9 +18,10 @@ do {
     let configURL = URL(fileURLWithPath: configPath)
     let data = try Data(contentsOf: configURL)
     
-    let config = try JSONDecoder().decode(ConfigData.self, from: data)
+    var config = try JSONDecoder().decode(ConfigData.self, from: data)
     let verbose = options.verbose.isSpecified
 
+    try config.process()
     try config.validate()
 
     if verbose {
@@ -64,13 +65,13 @@ do {
                 return (title, $0)
             }
 
-            let maxFontSizeByGroup = config.textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
+            let maxFontSizeByGroup = config.textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
                 let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
                 dictionary[group.identifier] = group.sharedFontSize(
                     with: strings,
                     globalFont: config.font,
                     globalMaxSize: config.maxFontSize)
-            }
+                } ?? [:]
 
             print("Rendering text titles")
 
@@ -138,5 +139,6 @@ do {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.
     // Interestingly, the same does not happen when building with Xcode directly.
     print(CommandLineFormatter.formatError("\(error.localizedDescription)"))
+    print(error)
     exit(1)
 }

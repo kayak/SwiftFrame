@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: KYDecodable, ConfigValidatable, Equatable {
+public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
 
     // MARK: - Properties
 
@@ -22,45 +22,15 @@ public struct ScreenshotData: KYDecodable, ConfigValidatable, Equatable {
         case zIndex
     }
 
-    // MARK: - Init
-
-    public init(from json: JSONDictionary) throws {
-        self.screenshotName = try json.ky_decode(with: CodingKeys.screenshotName)
-        self.bottomLeft = try json.ky_decode(with: CodingKeys.bottomLeft)
-        self.bottomRight = try json.ky_decode(with: CodingKeys.bottomRight)
-        self.topLeft = try json.ky_decode(with: CodingKeys.topLeft)
-        self.topRight = try json.ky_decode(with: CodingKeys.topRight)
-        self.zIndex = try json.ky_decodeIfPresent(with: CodingKeys.zIndex) ?? 0
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.screenshotName = try container.ky_decode(String.self, forKey: .screenshotName)
-        self.bottomLeft = try container.ky_decode(Point.self, forKey: .bottomLeft)
-        self.bottomRight = try container.ky_decode(Point.self, forKey: .bottomRight)
-        self.topLeft = try container.ky_decode(Point.self, forKey: .topLeft)
-        self.topRight = try container.ky_decode(Point.self, forKey: .topRight)
-        self.zIndex = try container.ky_decodeIfPresent(Int.self, forKey: .zIndex) ?? 0
-    }
-
-    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int? = 0) {
-        self.screenshotName = screenshotName
-        self.bottomLeft = bottomLeft
-        self.bottomRight = bottomRight
-        self.topLeft = topLeft
-        self.topRight = topRight
-        self.zIndex = zIndex ?? 0
-    }
-
     // MARK: - Misc
 
-    public func convertToBottomLeftOrigin(with size: CGSize) -> ScreenshotData {
+    public func makeProcessedData(originIsTopLeft: Bool, size: CGSize) -> ScreenshotData {
         return ScreenshotData(
             screenshotName: screenshotName,
-            bottomLeft: bottomLeft.convertToBottomLeftOrigin(with: size),
-            bottomRight: bottomRight.convertToBottomLeftOrigin(with: size),
-            topLeft: topLeft.convertToBottomLeftOrigin(with: size),
-            topRight: topRight.convertToBottomLeftOrigin(with: size),
+            bottomLeft: originIsTopLeft ? bottomLeft.convertToBottomLeftOrigin(with: size) : bottomLeft,
+            bottomRight: originIsTopLeft ? bottomRight.convertToBottomLeftOrigin(with: size) : bottomRight,
+            topLeft: originIsTopLeft ? topLeft.convertToBottomLeftOrigin(with: size) : topLeft,
+            topRight: originIsTopLeft ? topRight.convertToBottomLeftOrigin(with: size) : topRight,
             zIndex: zIndex)
     }
 
