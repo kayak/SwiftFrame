@@ -1,6 +1,6 @@
 # SwiftFrame
 
-SwiftFrame is a command line application for composing and laying out screenshots. Here's an screenshot from the example app.
+SwiftFrame is a command line application for composing and laying out screenshots. Here's a screenshot from the example app.
 
 <img src="Example/ExampleScreenshot.png" alt="Framed Screenshot" width="250">
 
