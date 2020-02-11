@@ -5,16 +5,18 @@ import XCTest
 class ImageComposerTests: XCTestCase {
 
     func testRenderTemplateFile() throws {
-        let templateFile = makeImageRepresentationWithSize(CGSize(width: 100, height: 50))
-        let composer = try ImageComposer(templateFile)
-        try composer.addTemplateImage()
+        let size = CGSize(width: 100, height: 50)
+        let templateFile = makeImageRepresentationWithSize(size)
+        let composer = try ImageComposer(canvasSize: size)
+        try composer.addTemplateImage(templateFile)
         XCTAssertNotNil(composer.renderFinalImage())
     }
 
     func testTemplateImageSlicesCorrectly() throws {
-        let templateFile = makeImageRepresentationWithSize(CGSize(width: 100, height: 50))
-        let composer = try ImageComposer(templateFile)
-        try composer.addTemplateImage()
+        let size = CGSize(width: 100, height: 50)
+        let templateFile = makeImageRepresentationWithSize(size)
+        let composer = try ImageComposer(canvasSize: size)
+        try composer.addTemplateImage(templateFile)
 
         guard let image = composer.renderFinalImage() else {
             throw NSError(description: "Rendered image was nil")
@@ -25,9 +27,10 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testTemplateImagesNotCorrectSize() throws {
-        let templateFile = makeImageRepresentationWithSize(CGSize(width: 100, height: 50))
-        let composer = try ImageComposer(templateFile)
-        try composer.addTemplateImage()
+        let size = CGSize(width: 100, height: 50)
+        let templateFile = makeImageRepresentationWithSize(size)
+        let composer = try ImageComposer(canvasSize: size)
+        try composer.addTemplateImage(templateFile)
 
         guard let image = composer.renderFinalImage() else {
             throw NSError(description: "Rendered image was nil")
@@ -41,7 +44,7 @@ class ImageComposerTests: XCTestCase {
         let textData = TextData.goodData
 
         let size = CGSize(width: 100, height: 200)
-        let composer = try ImageComposer(makeImageRepresentationWithSize(size))
+        let composer = try ImageComposer(canvasSize: size)
         XCTAssertNoThrow(try composer.add(
             title: "Some testing title",
             font: .systemFont(ofSize: 20),
@@ -51,10 +54,10 @@ class ImageComposerTests: XCTestCase {
     }
 
     func testRenderDynamicTextSize() throws {
-        let textData = TextData.goodData
+        let textData = TextData.invertedData
 
         let size = CGSize(width: 100, height: 200)
-        let composer = try ImageComposer(makeImageRepresentationWithSize(size))
+        let composer = try ImageComposer(canvasSize: size)
         XCTAssertNoThrow(try composer.add(
             title: "Some very long but interesting title",
             font: .systemFont(ofSize: 20),

@@ -4,6 +4,8 @@ import Foundation
 import SwiftFrameCore
 
 do {
+
+    // Read options and parse
     let options = CommandLineOptions()
     try options.parse(arguments: CommandLine.arguments)
 
@@ -12,6 +14,7 @@ do {
         exit(0)
     }
 
+    // Parse config data
     guard let configPath = options.configPath.arguments.first else {
         throw NSError(description: "Please specify a config file path")
     }
@@ -32,101 +35,10 @@ do {
 
     print("Parsed and validated config file\n")
 
+    // Run and measure elapsed time
     let start = CFAbsoluteTimeGetCurrent()
 
-    let writer = ImageWriter()
-
-    try config.deviceData.forEach { device in
-        try device.screenshots.forEach { locale, imageDict in
-
-            print("\(device.outputSuffix) - \(locale)".formattedUnderlined())
-
-            print("Rendering screenshots")
-
-            let composer = try ImageComposer(device.templateImage)
-
-            try device.screenshotData.forEach { data in
-                guard let image = imageDict[data.screenshotName] else {
-                    throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
-                }
-                try composer.add(screenshot: image, with: data)
-
-                if verbose {
-                    print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
-                }
-            }
-
-            try composer.addTemplateImage()
-
-            let constructedTitles: [AssociatedString] = try device.textData.map {
-                guard let title = config.titles[locale]?[$0.titleIdentifier] else {
-                    throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
-                }
-                return (title, $0)
-            }
-
-            let maxFontSizeByGroup = config.textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
-                let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
-                dictionary[group.identifier] = group.sharedFontSize(
-                    with: strings,
-                    globalFont: config.font,
-                    globalMaxSize: config.maxFontSize)
-                } ?? [:]
-
-            print("Rendering text titles")
-
-            try constructedTitles.forEach {
-                if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
-                    // Can use fixed font size since common maximum has already been calculated
-                    try composer.add(
-                        title: $0.string,
-                        font: $0.data.customFont ?? config.font,
-                        color: $0.data.textColorOverride ?? config.textColor,
-                        fixedFontSize: sharedSize,
-                        textData: $0.data)
-
-                    if verbose {
-                        print(
-                            "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
-                            insetByTabs: 1)
-                    }
-                } else {
-                    let renderedFontsize = try composer.add(
-                        title: $0.string,
-                        font: $0.data.customFont ?? config.font,
-                        color: $0.data.textColorOverride ?? config.textColor,
-                        maxFontSize: $0.data.maxFontSizeOverride ?? config.maxFontSize,
-                        textData: $0.data)
-
-                    if verbose {
-                        print(
-                            "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
-                            insetByTabs: 1)
-                    }
-                }
-            }
-
-            if let finalImage = composer.renderFinalImage() {
-                guard let size = imageDict.first?.value.nativeSize else {
-                    throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
-                }
-                let slices = composer.slice(image: finalImage, with: size)
-                try config.outputPaths.forEach { url in
-                    try slices.enumerated().forEach { (offset, image) in
-                        try writer.write(image, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix, index: offset)
-                    }
-
-                    if config.outputWholeImage {
-                        try writer.write(finalImage, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix + "-big")
-                    }
-                }
-            } else {
-                throw NSError(description: "Could not create final image")
-            }
-
-            print("Done\n")
-        }
-    }
+    try config.run(verbose)
 
     let diff = CFAbsoluteTimeGetCurrent() - start
     print("All done!".formattedGreen())

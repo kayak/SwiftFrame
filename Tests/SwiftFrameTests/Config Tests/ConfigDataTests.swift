@@ -24,14 +24,4 @@ class ConfigDataTests: XCTestCase {
         try TestingUtility.clearTestingDirectory()
     }
 
-    func testInvertedData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
-        var data = ConfigData.invertedData
-        try data.process()
-
-        XCTAssertThrowsError(try data.validate())
-        try TestingUtility.clearTestingDirectory()
-    }
-
 }

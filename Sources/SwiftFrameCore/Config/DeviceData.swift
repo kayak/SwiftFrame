@@ -10,7 +10,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
     public let outputSuffix: String
     public let templateImagePath: LocalURL
     private let screenshotsPath: LocalURL
-    private let coordinateOriginIsTopLeft: Bool
 
     public private(set) var screenshots: [String : [String: NSBitmapImageRep]]!
     public private(set) var templateImage: NSBitmapImageRep!
@@ -25,7 +24,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateImagePath = "templateFile"
         case screenshotData
         case textData
-        case coordinateOriginIsTopLeft
     }
 
     // MARK: - Init
@@ -34,7 +32,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
         outputSuffix: String,
         templateImagePath: LocalURL,
         screenshotsPath: LocalURL,
-        coordinateOriginIsTopLeft: Bool,
         screenshots: [String : [String: NSBitmapImageRep]] = [String : [String: NSBitmapImageRep]](),
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [],
@@ -43,7 +40,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
-        self.coordinateOriginIsTopLeft = coordinateOriginIsTopLeft
         self.screenshots = screenshots
         self.templateImage = templateImage
         self.screenshotData = screenshotData
@@ -67,16 +63,15 @@ public struct DeviceData: Decodable, ConfigValidatable {
             parsedScreenshots[folder.lastPathComponent] = imagesDictionary
         }
 
-        let processedTextData = try textData.map { try $0.makeProcessedData(originIsTopLeft: coordinateOriginIsTopLeft, size: rep.size) }
+        let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
         let processedScreenshotData = screenshotData
-            .map { $0.makeProcessedData(originIsTopLeft: coordinateOriginIsTopLeft, size: rep.size)}
+            .map { $0.makeProcessedData(size: rep.size)}
             .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
             outputSuffix: outputSuffix,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
-            coordinateOriginIsTopLeft: coordinateOriginIsTopLeft,
             screenshots: parsedScreenshots,
             templateImage: rep,
             screenshotData: processedScreenshotData,

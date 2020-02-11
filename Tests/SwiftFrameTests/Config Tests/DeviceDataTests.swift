@@ -22,13 +22,4 @@ class DeviceDataTests: XCTestCase {
         try TestingUtility.clearTestingDirectory()
     }
 
-    func testInvertedData() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots()
-
-        let data = try DeviceData.invertedData.makeProcessedData()
-
-        XCTAssertThrowsError(try data.validate())
-        try TestingUtility.clearTestingDirectory()
-    }
-
 }

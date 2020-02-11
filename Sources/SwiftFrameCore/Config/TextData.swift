@@ -17,7 +17,7 @@ public struct TextData: Decodable, ConfigValidatable {
     public let topLeft: Point
     public let bottomRight: Point
 
-    public private(set) var customFont: NSFont?
+    public private(set) var fontOverride: NSFont?
     public private(set) var textColorOverride: NSColor?
 
     var rect: NSRect {
@@ -28,13 +28,13 @@ public struct TextData: Decodable, ConfigValidatable {
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
-        case titleIdentifier
-        case textColorOverrideString = "textColorOverride"
+        case titleIdentifier = "identifier"
+        case textColorOverrideString = "colorOverride"
         case maxFontSizeOverride
         case customFontPath = "customFont"
         case topLeft
         case bottomRight
-        case textAlignment
+        case textAlignment = "alignment"
         case groupIdentifier
     }
 
@@ -59,15 +59,15 @@ public struct TextData: Decodable, ConfigValidatable {
         self.groupIdentifier = groupIdentifier
         self.topLeft = topLeft
         self.bottomRight = bottomRight
-        self.customFont = customFont
+        self.fontOverride = customFont
         self.textColorOverride = textColorOverride
     }
 
     // MARK: - Misc
 
-    public func makeProcessedData(originIsTopLeft: Bool, size: CGSize) throws -> TextData {
-        let processedTopLeft = originIsTopLeft ? topLeft.convertToBottomLeftOrigin(with: size) : topLeft
-        let processedBottomRight = originIsTopLeft ? bottomRight.convertToBottomLeftOrigin(with: size) : bottomRight
+    public func makeProcessedData(size: CGSize) throws -> TextData {
+        let processedTopLeft = topLeft.convertToBottomLeftOrigin(with: size)
+        let processedBottomRight = bottomRight.convertToBottomLeftOrigin(with: size)
 
         let colorOverride: NSColor?
         if let hex = textColorOverrideString {
@@ -109,7 +109,7 @@ public struct TextData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
 
-        if let fontName = customFont?.fontName {
+        if let fontName = fontOverride?.fontName {
             CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)
         }
 

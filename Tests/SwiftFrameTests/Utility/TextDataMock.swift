@@ -8,8 +8,8 @@ extension TextData {
         TextData(
             titleIdentifier: "someId",
             textAlignment: .center,
-            topLeft: Point(x: 10, y: 20),
-            bottomRight: Point(x: 15, y: 5))
+            topLeft: Point(x: 10, y: 5),
+            bottomRight: Point(x: 15, y: 20))
     }
 
     static var invalidData: Self {
@@ -24,8 +24,8 @@ extension TextData {
         TextData(
             titleIdentifier: "someId",
             textAlignment: .center,
-            topLeft: Point(x: 10, y: 5),
-            bottomRight: Point(x: 15, y: 20))
+            topLeft: Point(x: 10, y: 20),
+            bottomRight: Point(x: 15, y: 5))
     }
 
 }

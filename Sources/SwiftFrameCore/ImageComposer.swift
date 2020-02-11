@@ -9,14 +9,12 @@ public final class ImageComposer {
 
     public let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
-    private let templateImage: NSBitmapImageRep
     private let context: CGContext
 
     // MARK: - Init
 
-    public init(_ templateImage: NSBitmapImageRep) throws {
-        self.templateImage = templateImage
-        self.context = try ImageComposer.createContext(size: templateImage.nativeSize)
+    public init(canvasSize: CGSize) throws {
+        self.context = try ImageComposer.createContext(size: canvasSize)
     }
 
     // MARK: - Preparation
@@ -38,15 +36,50 @@ public final class ImageComposer {
 
     // MARK: - Composition
 
-    public func addTemplateImage() throws {
-        guard let templateImage = templateImage.cgImage else {
+    public func addTemplateImage(_ image: NSBitmapImageRep) throws {
+        guard let templateImage = image.cgImage else {
             throw NSError(description: "Could not render template image")
         }
 
         context.saveGState()
         defer { context.restoreGState() }
 
-        context.draw(templateImage, in: self.templateImage.nativeRect)
+        context.draw(templateImage, in: image.nativeRect)
+    }
+
+    // MARK: - Titles Rendering
+
+    func addStrings(_ associatedStrings: [AssociatedString], maxFontSizeByGroup: [String: CGFloat], font: NSFont, color: NSColor, maxFontSize: CGFloat) throws {
+        try associatedStrings.forEach {
+            if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
+                // Can use fixed font size since common maximum has already been calculated
+                try add(
+                    title: $0.string,
+                    font: $0.data.fontOverride ?? font,
+                    color: $0.data.textColorOverride ?? color,
+                    fixedFontSize: sharedSize,
+                    textData: $0.data)
+
+                if verbose {
+                    print(
+                        "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
+                        insetByTabs: 1)
+                }
+            } else {
+                let renderedFontsize = try add(
+                    title: $0.string,
+                    font: $0.data.fontOverride ?? font,
+                    color: $0.data.textColorOverride ?? color,
+                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
+                    textData: $0.data)
+
+                if verbose {
+                    print(
+                        "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
+                        insetByTabs: 1)
+                }
+            }
+        }
     }
 
     public func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {

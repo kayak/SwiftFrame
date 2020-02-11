@@ -6,6 +6,8 @@ public protocol ConfigValidatable {
     func printSummary(insetByTabs tabs: Int)
 }
 
+var verbose = false
+
 /// First key is locale, second is regular key in string file
 public typealias LocalizedStringFiles = [String : [String : String]]
 
@@ -15,7 +17,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
 
     public let outputWholeImage: Bool
     public let textGroups: [TextGroup]?
-    public let titlesPath: LocalURL
+    public let stringsPath: LocalURL
     public let maxFontSize: CGFloat
     public let outputPaths: [LocalURL]
     public let fontPath: String
@@ -32,7 +34,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
         case outputWholeImage
         case deviceData
         case textGroups
-        case titlesPath
+        case stringsPath
         case maxFontSize
         case outputPaths
         case fontPath = "fontFile"
@@ -44,7 +46,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
     public init(
         outputWholeImage: Bool = true,
         textGroups: [TextGroup]?,
-        titlesPath: LocalURL,
+        stringsPath: LocalURL,
         maxFontSize: CGFloat,
         outputPaths: [LocalURL],
         fontPath: String,
@@ -56,7 +58,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
     {
         self.outputWholeImage = outputWholeImage
         self.textGroups = textGroups
-        self.titlesPath = titlesPath
+        self.stringsPath = stringsPath
         self.maxFontSize = maxFontSize
         self.outputPaths = outputPaths
         self.fontPath = fontPath
@@ -66,6 +68,7 @@ public struct ConfigData: Decodable, ConfigValidatable {
         self.textColor = textColor
         self.titles = titles
     }
+
     // MARK: - Processing
 
     mutating public func process() throws {
@@ -77,14 +80,13 @@ public struct ConfigData: Decodable, ConfigValidatable {
         textColor = try NSColor(hexString: textColorString)
 
         var parsedTitles = LocalizedStringFiles()
-        let textFiles = try FileManager.default.contentsOfDirectory(at: titlesPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+        let textFiles = try FileManager.default.contentsOfDirectory(at: stringsPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
             .filter { $0.pathExtension == "strings" }
         textFiles.forEach { textFile in
             parsedTitles[textFile.absoluteURL.fileName] = NSDictionary(contentsOf: textFile) as? [String: String]
         }
         titles = parsedTitles
     }
-
 
     // MARK: - ConfigValidatable
 
@@ -124,4 +126,75 @@ public struct ConfigData: Decodable, ConfigValidatable {
 
         print("### Config Summary End")
     }
+
+    // MARK: - Screenshot Factory
+
+    public func run(_ _verbose: Bool) throws {
+        verbose = _verbose
+        let writer = ImageWriter()
+
+        try deviceData.forEach { device in
+            try device.screenshots.forEach { locale, imageDict in
+                print("\(device.outputSuffix) - \(locale)".formattedUnderlined())
+
+                guard let sliceSize = imageDict.first?.value.nativeSize else {
+                    throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
+                }
+
+                print("Rendering screenshots")
+
+                let composer = try ImageComposer(canvasSize: device.templateImage.nativeSize)
+
+                try device.screenshotData.forEach { data in
+                    guard let image = imageDict[data.screenshotName] else {
+                        throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
+                    }
+                    try composer.add(screenshot: image, with: data)
+
+                    if verbose {
+                        print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
+                    }
+                }
+
+                try composer.addTemplateImage(device.templateImage)
+
+                let constructedTitles: [AssociatedString] = try device.textData.map {
+                    guard let title = titles[locale]?[$0.titleIdentifier] else {
+                        throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
+                    }
+                    return (title, $0)
+                }
+
+                let maxFontSizeByGroup = textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
+                    let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
+                    dictionary[group.identifier] = group.sharedFontSize(
+                        with: strings,
+                        globalFont: font,
+                        globalMaxSize: maxFontSize)
+                    } ?? [:]
+
+                print("Rendering text titles")
+
+                try composer.addStrings(constructedTitles, maxFontSizeByGroup: maxFontSizeByGroup, font: font, color: textColor, maxFontSize: maxFontSize)
+
+                if let finalImage = composer.renderFinalImage() {
+                    let slices = composer.slice(image: finalImage, with: sliceSize)
+                    try outputPaths.forEach { url in
+                        try slices.enumerated().forEach { (offset, image) in
+                            try writer.write(image, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix, index: offset)
+                        }
+
+                        if outputWholeImage {
+                            try writer.write(finalImage, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix + "-big")
+                        }
+                    }
+                } else {
+                    throw NSError(description: "Could not create final image")
+                }
+
+                print("Done\n")
+            }
+        }
+    }
+
 }

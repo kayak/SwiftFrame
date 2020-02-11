@@ -14,8 +14,6 @@ let package = Package(
     targets: [
         .target(name: "SwiftFrame", dependencies: ["SwiftFrameCore"]),
         .target(name: "SwiftFrameCore"),
-        .testTarget(
-            name: "SwiftFrameTests",
-            dependencies: ["SwiftFrameCore"]),
+        .testTarget(name: "SwiftFrameTests", dependencies: ["SwiftFrameCore"]),
     ]
 )

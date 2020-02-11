@@ -39,13 +39,13 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
 
     // MARK: - Misc
 
-    public func makeProcessedData(originIsTopLeft: Bool, size: CGSize) -> ScreenshotData {
+    public func makeProcessedData(size: CGSize) -> ScreenshotData {
         return ScreenshotData(
             screenshotName: screenshotName,
-            bottomLeft: originIsTopLeft ? bottomLeft.convertToBottomLeftOrigin(with: size) : bottomLeft,
-            bottomRight: originIsTopLeft ? bottomRight.convertToBottomLeftOrigin(with: size) : bottomRight,
-            topLeft: originIsTopLeft ? topLeft.convertToBottomLeftOrigin(with: size) : topLeft,
-            topRight: originIsTopLeft ? topRight.convertToBottomLeftOrigin(with: size) : topRight,
+            bottomLeft: bottomLeft.convertToBottomLeftOrigin(with: size),
+            bottomRight: bottomRight.convertToBottomLeftOrigin(with: size),
+            topLeft: topLeft.convertToBottomLeftOrigin(with: size),
+            topRight: topRight.convertToBottomLeftOrigin(with: size),
             zIndex: zIndex)
     }
 
