@@ -131,7 +131,6 @@ public struct ConfigData: Decodable, ConfigValidatable {
 
     public func run(_ _verbose: Bool) throws {
         verbose = _verbose
-        let writer = ImageWriter()
 
         try deviceData.forEach { device in
             try device.screenshots.forEach { locale, imageDict in
@@ -144,57 +143,43 @@ public struct ConfigData: Decodable, ConfigValidatable {
                 print("Rendering screenshots")
 
                 let composer = try ImageComposer(canvasSize: device.templateImage.nativeSize)
-
-                try device.screenshotData.forEach { data in
-                    guard let image = imageDict[data.screenshotName] else {
-                        throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
-                    }
-                    try composer.add(screenshot: image, with: data)
-
-                    if verbose {
-                        print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
-                    }
-                }
-
+                try composer.add(screenshots: imageDict, with: device.screenshotData, for: locale)
                 try composer.addTemplateImage(device.templateImage)
-
-                let constructedTitles: [AssociatedString] = try device.textData.map {
-                    guard let title = titles[locale]?[$0.titleIdentifier] else {
-                        throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
-                    }
-                    return (title, $0)
-                }
-
-                let maxFontSizeByGroup = textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
-                    let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
-                    dictionary[group.identifier] = group.sharedFontSize(
-                        with: strings,
-                        globalFont: font,
-                        globalMaxSize: maxFontSize)
-                    } ?? [:]
 
                 print("Rendering text titles")
 
-                try composer.addStrings(constructedTitles, maxFontSizeByGroup: maxFontSizeByGroup, font: font, color: textColor, maxFontSize: maxFontSize)
+                let processedStrings = try makeAssociatedStrings(for: device, locale: locale)
+                try composer.addStrings(
+                    processedStrings.strings,
+                    maxFontSizeByGroup: processedStrings.fontSizes,
+                    font: font,
+                    color: textColor,
+                    maxFontSize: maxFontSize)
 
-                if let finalImage = composer.renderFinalImage() {
-                    let slices = composer.slice(image: finalImage, with: sliceSize)
-                    try outputPaths.forEach { url in
-                        try slices.enumerated().forEach { (offset, image) in
-                            try writer.write(image, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix, index: offset)
-                        }
-
-                        if outputWholeImage {
-                            try writer.write(finalImage, to: url.absoluteString, locale: locale, deviceID: device.outputSuffix + "-big")
-                        }
-                    }
-                } else {
-                    throw NSError(description: "Could not create final image")
-                }
+                try composer.finish(with: outputPaths, sliceSize: sliceSize, outputWholeImage: outputWholeImage, locale: locale, suffix: device.outputSuffix)
 
                 print("Done\n")
             }
         }
+    }
+
+    private func makeAssociatedStrings(for device: DeviceData, locale: String) throws -> (strings: [AssociatedString], fontSizes: [String: CGFloat]) {
+        let constructedTitles: [AssociatedString] = try device.textData.map {
+            guard let title = titles[locale]?[$0.titleIdentifier] else {
+                throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
+            }
+            return (title, $0)
+        }
+
+        let maxFontSizeByGroup = textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
+            let strings = constructedTitles.filter({ $0.data.groupIdentifier == group.identifier })
+            dictionary[group.identifier] = group.sharedFontSize(
+                with: strings,
+                globalFont: font,
+                globalMaxSize: maxFontSize)
+            } ?? [:]
+
+        return (strings: constructedTitles, fontSizes: maxFontSizeByGroup)
     }
 
 }

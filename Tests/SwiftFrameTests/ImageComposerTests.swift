@@ -22,7 +22,7 @@ class ImageComposerTests: XCTestCase {
             throw NSError(description: "Rendered image was nil")
         }
 
-        let slices = composer.slice(image: image, with: NSSize(width: 20, height: 50))
+        let slices = composer.sliceImage(image, with: NSSize(width: 20, height: 50))
         XCTAssertEqual(slices.count, 5)
     }
 
@@ -36,34 +36,22 @@ class ImageComposerTests: XCTestCase {
             throw NSError(description: "Rendered image was nil")
         }
 
-        let slices = composer.slice(image: image, with: NSSize(width: 30, height: 50))
+        let slices = composer.sliceImage(image, with: NSSize(width: 30, height: 50))
         XCTAssert(slices.isEmpty)
     }
 
     func testCanRenderInContext() throws {
-        let textData = TextData.goodData
-
         let size = CGSize(width: 100, height: 200)
+        let textData = try TextData.goodData.makeProcessedData(size: size)
+
         let composer = try ImageComposer(canvasSize: size)
-        XCTAssertNoThrow(try composer.add(
-            title: "Some testing title",
+        let strings: [AssociatedString] = [(string: "Some testing title", data: textData)]
+        XCTAssertNoThrow(try composer.addStrings(
+            strings,
+            maxFontSizeByGroup: [:],
             font: .systemFont(ofSize: 20),
             color: .red,
-            fixedFontSize: 30,
-            textData: textData))
-    }
-
-    func testRenderDynamicTextSize() throws {
-        let textData = TextData.invertedData
-
-        let size = CGSize(width: 100, height: 200)
-        let composer = try ImageComposer(canvasSize: size)
-        XCTAssertNoThrow(try composer.add(
-            title: "Some very long but interesting title",
-            font: .systemFont(ofSize: 20),
-            color: .red,
-            maxFontSize: 4,
-            textData: textData))
+            maxFontSize: 30))
     }
 
 }

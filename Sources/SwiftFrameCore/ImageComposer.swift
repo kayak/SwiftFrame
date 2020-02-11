@@ -9,6 +9,7 @@ public final class ImageComposer {
 
     public let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
+    private let imageWriter = ImageWriter()
     private let context: CGContext
 
     // MARK: - Init
@@ -82,7 +83,7 @@ public final class ImageComposer {
         }
     }
 
-    public func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
+    private func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
         let fontSize = try textRenderer.maximumFontSizeThatFits(
             string: title,
             font: font,
@@ -94,9 +95,24 @@ public final class ImageComposer {
         return fontSize
     }
 
-    public func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) throws {
+    private func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) throws {
         let adaptedFont = font.toFont(ofSize: fixedFontSize)
         try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
+    }
+
+    // MARK: - Screenshots Rendering
+
+    public func add(screenshots: [String: NSBitmapImageRep], with screenshotData: [ScreenshotData], for locale: String) throws {
+        try screenshotData.forEach { data in
+            guard let image = screenshots[data.screenshotName] else {
+                throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
+            }
+            try add(screenshot: image, with: data)
+
+            if verbose {
+                print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
+            }
+        }
     }
 
     public func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
@@ -105,11 +121,23 @@ public final class ImageComposer {
 
     // MARK: - Exporting
 
+    public func finish(with outputPaths: [LocalURL], sliceSize: CGSize, outputWholeImage: Bool, locale: String, suffix: String) throws {
+        guard let finalImage = renderFinalImage() else {
+            throw NSError(description: "Could not render output image")
+        }
+        let slices = sliceImage(finalImage, with: sliceSize)
+        try write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
+
+        if outputWholeImage {
+            try outputPaths.forEach { try imageWriter.write(finalImage, to: $0.absoluteURL, fileName: "\(locale)-\(suffix)-big.png") }
+        }
+    }
+
     public func renderFinalImage() -> CGImage? {
         context.makeImage()
     }
 
-    public func slice(image: CGImage, with size: NSSize) -> [CGImage] {
+    public func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
         guard CGFloat(image.width).truncatingRemainder(dividingBy: size.width) == 0 else {
             print("Image width is not a multiple in width of desired size")
             return []
@@ -122,6 +150,14 @@ public final class ImageComposer {
             croppedImages.append(image.cropping(to: rect))
         }
         return croppedImages.compactMap { $0 }
+    }
+
+    public func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String) throws {
+        try outputPaths.forEach { url in
+            try images.enumerated().forEach { tuple in
+                try imageWriter.write(tuple.element, to: url.absoluteString, locale: locale, deviceID: suffix, index: tuple.offset)
+            }
+        }
     }
 
 }
