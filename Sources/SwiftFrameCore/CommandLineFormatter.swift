@@ -16,7 +16,10 @@ public final class CommandLineFormatter {
         return tabsString + formattedString
     }
 
-    public class func printKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) {
+    public class func printKeyValue(_ key: String, value: Any?, insetBy tabs: Int = 0) {
+        guard let value = value else {
+            return
+        }
         print(CommandLineFormatter.formatKeyValue(key, value: value, insetBy: tabs))
     }
 

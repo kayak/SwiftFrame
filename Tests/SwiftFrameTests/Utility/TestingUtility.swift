@@ -1,5 +1,5 @@
 import Foundation
-import SwiftFrameCore
+@testable import SwiftFrameCore
 
 public typealias JSONDictionary = [String : Encodable]
 

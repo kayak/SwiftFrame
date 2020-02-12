@@ -7,13 +7,21 @@ final class FontRegistry {
 
     static var shared = FontRegistry()
 
-    private var registeredFontPaths = [String]()
+    private var registeredFontPaths = [String: String]()
 
     // MARK: - Font Handling
 
-    /// Registers the font file at the specified path and returns the font name argument that needs to be passed
-    /// into `NSFont` for instantiating it
-    func registerFont(atPath path: String) throws -> String {
+    /// Registers the font at the specified path if source is a file rather than `NSFont`
+    func registerFont(from source: FontSource) throws -> NSFont {
+        switch source {
+        case let .nsFont(font):
+            return font
+        case let .filePath(path):
+            return try registerFont(atPath: path)
+        }
+    }
+
+    private func registerFont(atPath path: String, with size: CGFloat = 20) throws -> NSFont {
         guard FileManager.default.fileExists(atPath: path) else {
             throw NSError(description: "Font file at \(path) does not exist")
         }
@@ -23,24 +31,25 @@ final class FontRegistry {
             error?.release()
         }
 
-        if !registeredFontPaths.contains(path) {
+        let fontName: String
+        if let registeredFont = registeredFontPaths[url.absoluteString] {
+            fontName = registeredFont
+        } else {
             if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
                 throw NSError(description: error?.takeRetainedValue().localizedDescription ?? "Failed to load font file at \(url.absoluteString)")
             }
-            registeredFontPaths.append(path)
+            let newFontName = try getFontName(from: url)
+            registeredFontPaths[url.absoluteString] = newFontName
+            fontName = newFontName
         }
-        return try fontName(from: url)
-    }
 
-    func registerFont(atPath path: String, with size: CGFloat = 20) throws -> NSFont {
-        let fontName = try registerFont(atPath: path)
         guard let font = NSFont(name: fontName, size: size) else {
             throw NSError(description: "Failed to load title font with name \(fontName)")
         }
         return font
     }
 
-    private func fontName(from url: URL) throws -> String {
+    private func getFontName(from url: URL) throws -> String {
         guard let descriptors = (CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor]) else {
             throw NSError(description: "Failed to load font descriptors from file at \(url.absoluteString)")
         }

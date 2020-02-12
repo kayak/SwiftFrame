@@ -18,34 +18,10 @@ do {
     guard let configPath = options.configPath.arguments.first else {
         throw NSError(description: "Please specify a config file path")
     }
-    let configURL = URL(fileURLWithPath: configPath)
-    let data = try Data(contentsOf: configURL)
-    
-    var config = try JSONDecoder().decode(ConfigData.self, from: data)
-    let verbose = options.verbose.isSpecified
 
-    try config.process()
-    try config.validate()
-
-    if verbose {
-        config.printSummary(insetByTabs: 0)
-        print("Press return key to continue")
-        _ = readLine()
-    }
-
-    print("Parsed and validated config file\n")
-
-    // Run and measure elapsed time
-    let start = CFAbsoluteTimeGetCurrent()
-
-    try config.run(verbose)
-
-    let diff = CFAbsoluteTimeGetCurrent() - start
-    print("All done!".formattedGreen())
-
-    if verbose {
-        print("Rendered and sliced screenshots in \(String(format: "%.2f", diff)) seconds")
-    }
+    let processor = try ConfigProcessor(filePath: configPath, verbose: options.verbose.isSpecified)
+    try processor.validate()
+    try processor.run()
 
 } catch let error as NSError {
     // The cast to `NSError` is mandatory here or otherwise the program will die with a segfault when built through `xcodebuild`.

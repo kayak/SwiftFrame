@@ -5,7 +5,7 @@ final class ScreenshotRenderer {
 
     // MARK: - Screenshot Rendering
 
-    public func render(screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: CGContext) throws {
+    func render(screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: CGContext) throws {
         let cgImage = try renderScreenshot(screenshot, with: data)
         let rect = calculateRect(for: data)
 

@@ -7,8 +7,8 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
 
     // MARK: - Properties
 
-    public let identifier: String
-    public let maxFontSize: CGFloat
+    let identifier: String
+    let maxFontSize: CGFloat
 
     // MARK: - CodingKeys
 
@@ -17,18 +17,11 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
         case maxFontSize
     }
 
-    // MARK: - Init
-
-    public init(identifier: String, maxFontSize: CGFloat) {
-        self.identifier = identifier
-        self.maxFontSize = maxFontSize
-    }
-
     // MARK: - ConfigValidatable
 
-    public func validate() throws {}
+    func validate() throws {}
 
-    public func printSummary(insetByTabs tabs: Int) {
+    func printSummary(insetByTabs tabs: Int) {
         print("Text group: \(identifier)", insetByTabs: tabs)
         CommandLineFormatter.printKeyValue("Identifier", value: identifier, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Max font size", value: maxFontSize, insetBy: tabs + 1)
@@ -36,13 +29,13 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
 
     // MARK: - Misc
 
-    public func sharedFontSize(with strings: [AssociatedString], globalFont: NSFont, globalMaxSize: CGFloat) -> CGFloat {
+    func sharedFontSize(with strings: [AssociatedString], globalFont: NSFont, globalMaxSize: CGFloat) -> CGFloat {
         let textRenderer = TextRenderer()
         let maxFontSizes: [CGFloat] = strings.compactMap {
             do {
                 return try textRenderer.maximumFontSizeThatFits(
                     string: $0.string,
-                    font: $0.data.fontOverride ?? globalFont,
+                    font: $0.data.fontOverride?.makeFont() ?? globalFont,
                     alignment: $0.data.textAlignment,
                     maxSize: $0.data.maxFontSizeOverride ?? globalMaxSize,
                     size: $0.data.rect.size)

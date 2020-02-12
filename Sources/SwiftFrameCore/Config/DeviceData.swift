@@ -1,20 +1,20 @@
 import AppKit
 import Foundation
 
-let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
-
 public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
-    public let outputSuffix: String
-    public let templateImagePath: LocalURL
+    private let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
+
+    let outputSuffix: String
+    let templateImagePath: LocalURL
     private let screenshotsPath: LocalURL
 
-    public private(set) var screenshots: [String : [String: NSBitmapImageRep]]!
-    public private(set) var templateImage: NSBitmapImageRep!
-    public private(set) var screenshotData = [ScreenshotData]()
-    public private(set) var textData = [TextData]()
+    internal private(set) var screenshots: [String: [String: NSBitmapImageRep]]!
+    internal private(set) var templateImage: NSBitmapImageRep!
+    internal private(set) var screenshotData = [ScreenshotData]()
+    internal private(set) var textData = [TextData]()
 
     // MARK: - Coding Keys
 
@@ -28,14 +28,14 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Init
 
-    public init(
+    internal init(
         outputSuffix: String,
         templateImagePath: LocalURL,
         screenshotsPath: LocalURL,
-        screenshots: [String : [String: NSBitmapImageRep]] = [String : [String: NSBitmapImageRep]](),
+        screenshots: [String : [String : NSBitmapImageRep]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
-        screenshotData: [ScreenshotData] = [],
-        textData: [TextData] = [])
+        screenshotData: [ScreenshotData] = [ScreenshotData](),
+        textData: [TextData] = [TextData]())
     {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
@@ -45,6 +45,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.screenshotData = screenshotData
         self.textData = textData
     }
+
     // MARK: - Methods
 
     func makeProcessedData() throws -> DeviceData {
@@ -78,22 +79,9 @@ public struct DeviceData: Decodable, ConfigValidatable {
             textData: processedTextData)
     }
 
-    func groupTextData(with groups: [TextGroup]) -> [TextGroup: [TextData]] {
-        var dict = [TextGroup: [TextData]]()
-        groups.forEach { group in
-            dict[group] = textData.filter { $0.groupIdentifier == group.identifier }
-        }
-        return dict
-    }
-
-    func collectFrames(for textGroup: TextGroup) -> [NSRect] {
-        return textData.filter { $0.groupIdentifier == textGroup.identifier }.map { $0.rect }
-    }
-
     // MARK: - ConfigValidatable
 
-    public func validate() throws {
-        // TODO: Validate screenshot size compared to template file
+    func validate() throws {
         try screenshots.forEach { localeDict in
             guard let first = localeDict.value.first?.value else {
                 return
@@ -102,6 +90,13 @@ public struct DeviceData: Decodable, ConfigValidatable {
                 if $0.value.nativeSize != first.nativeSize {
                     throw NSError(description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"")
                 }
+            }
+        }
+
+        // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
+        if let screenshotSize = screenshots.first?.value.first?.value.nativeSize {
+            guard templateImage.nativeSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00 else {
+                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
             }
         }
 
@@ -118,11 +113,12 @@ public struct DeviceData: Decodable, ConfigValidatable {
         }
     }
 
-    public func printSummary(insetByTabs tabs: Int) {
+    func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.absoluteString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }
+
 }

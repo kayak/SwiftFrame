@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public extension Data {
+extension Data {
 
     func ky_write(to url: URL, options: Data.WritingOptions = []) throws {
         guard url.isFileURL else {

@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public struct Point: Codable, Equatable {
+struct Point: Codable, Equatable {
 
     // MARK: - Properties
 
@@ -18,7 +18,7 @@ public struct Point: Codable, Equatable {
 
     // MARK: - Init
 
-    public init(x: Int, y: Int) {
+    init(x: Int, y: Int) {
         self.x = x
         self.y = y
     }

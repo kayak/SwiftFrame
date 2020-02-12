@@ -1,33 +1,31 @@
 import AppKit
 import Foundation
-import SwiftFrameCore
+@testable import SwiftFrameCore
 
 extension ConfigData {
 
     static var goodData: Self {
         ConfigData(
+            outputWholeImage: true,
             textGroups: nil,
             stringsPath: LocalURL(path: "testing/strings/"),
             maxFontSize: 200,
             outputPaths: [LocalURL(path: "testing/output/")],
-            fontPath: "",
-            textColorString: "#ff00ff",
-            deviceData: [DeviceData.goodData],
-            font: .systemFont(ofSize: 20),
-            textColor: .red)
+            fontSource: .nsFont(.systemFont(ofSize: 20)),
+            textColorSource: try! ColorSource(hexString: "#ff00ff"),
+            deviceData: [DeviceData.goodData])
     }
 
     static var invalidData: Self {
         ConfigData(
+            outputWholeImage: true,
             textGroups: nil,
             stringsPath: LocalURL(path: "testing/strings/"),
             maxFontSize: 200,
             outputPaths: [LocalURL(path: "testing/output/")],
-            fontPath: "",
-            textColorString: "#ff00ff",
-            deviceData: [DeviceData.invalidData],
-            font: .systemFont(ofSize: 20),
-            textColor: .red)
+            fontSource: .nsFont(.systemFont(ofSize: 20)),
+            textColorSource: try! ColorSource(hexString: "#ff00ff"),
+            deviceData: [DeviceData.invalidData])
     }
 
 }

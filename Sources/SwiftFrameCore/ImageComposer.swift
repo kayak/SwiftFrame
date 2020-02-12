@@ -3,19 +3,21 @@ import Foundation
 import CoreGraphics
 import CoreImage
 
-public final class ImageComposer {
+final class ImageComposer {
 
     // MARK: - Properties
 
-    public let textRenderer = TextRenderer()
+    private let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
-    private let imageWriter = ImageWriter()
-    private let context: CGContext
+    private let verbose: Bool
+
+    let context: CGContext
 
     // MARK: - Init
 
-    public init(canvasSize: CGSize) throws {
+    init(canvasSize: CGSize, verbose: Bool) throws {
         self.context = try ImageComposer.createContext(size: canvasSize)
+        self.verbose = verbose
     }
 
     // MARK: - Preparation
@@ -37,7 +39,7 @@ public final class ImageComposer {
 
     // MARK: - Composition
 
-    public func addTemplateImage(_ image: NSBitmapImageRep) throws {
+    func addTemplateImage(_ image: NSBitmapImageRep) throws {
         guard let templateImage = image.cgImage else {
             throw NSError(description: "Could not render template image")
         }
@@ -52,11 +54,11 @@ public final class ImageComposer {
 
     func addStrings(_ associatedStrings: [AssociatedString], maxFontSizeByGroup: [String: CGFloat], font: NSFont, color: NSColor, maxFontSize: CGFloat) throws {
         try associatedStrings.forEach {
-            if let sharedSize = maxFontSizeByGroup[safe: $0.data.groupIdentifier] {
+            if let sharedSize = $0.data.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
                 // Can use fixed font size since common maximum has already been calculated
                 try add(
                     title: $0.string,
-                    font: $0.data.fontOverride ?? font,
+                    font: $0.data.fontOverride?.makeFont() ?? font,
                     color: $0.data.textColorOverride ?? color,
                     fixedFontSize: sharedSize,
                     textData: $0.data)
@@ -69,7 +71,7 @@ public final class ImageComposer {
             } else {
                 let renderedFontsize = try add(
                     title: $0.string,
-                    font: $0.data.fontOverride ?? font,
+                    font: $0.data.fontOverride?.makeFont() ?? font,
                     color: $0.data.textColorOverride ?? color,
                     maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
                     textData: $0.data)
@@ -102,7 +104,7 @@ public final class ImageComposer {
 
     // MARK: - Screenshots Rendering
 
-    public func add(screenshots: [String: NSBitmapImageRep], with screenshotData: [ScreenshotData], for locale: String) throws {
+    func add(screenshots: [String: NSBitmapImageRep], with screenshotData: [ScreenshotData], for locale: String) throws {
         try screenshotData.forEach { data in
             guard let image = screenshots[data.screenshotName] else {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
@@ -115,49 +117,8 @@ public final class ImageComposer {
         }
     }
 
-    public func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
+    func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
         try screenshotRenderer.render(screenshot: screenshot, with: data, in: context)
-    }
-
-    // MARK: - Exporting
-
-    public func finish(with outputPaths: [LocalURL], sliceSize: CGSize, outputWholeImage: Bool, locale: String, suffix: String) throws {
-        guard let finalImage = renderFinalImage() else {
-            throw NSError(description: "Could not render output image")
-        }
-        let slices = sliceImage(finalImage, with: sliceSize)
-        try write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
-
-        if outputWholeImage {
-            try outputPaths.forEach { try imageWriter.write(finalImage, to: $0.absoluteURL, fileName: "\(locale)-\(suffix)-big.png") }
-        }
-    }
-
-    public func renderFinalImage() -> CGImage? {
-        context.makeImage()
-    }
-
-    public func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
-        guard CGFloat(image.width).truncatingRemainder(dividingBy: size.width) == 0 else {
-            print("Image width is not a multiple in width of desired size")
-            return []
-        }
-        let numberOfSlices = image.width / Int(size.width)
-        var croppedImages = [CGImage?]()
-
-        for i in 0..<numberOfSlices {
-            let rect = CGRect(x: size.width * CGFloat(i), y: 0, width: size.width, height: size.height)
-            croppedImages.append(image.cropping(to: rect))
-        }
-        return croppedImages.compactMap { $0 }
-    }
-
-    public func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String) throws {
-        try outputPaths.forEach { url in
-            try images.enumerated().forEach { tuple in
-                try imageWriter.write(tuple.element, to: url.absoluteString, locale: locale, deviceID: suffix, index: tuple.offset)
-            }
-        }
     }
 
 }

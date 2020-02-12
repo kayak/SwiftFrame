@@ -1,5 +1,5 @@
 import Foundation
-import SwiftFrameCore
+@testable import SwiftFrameCore
 
 extension ScreenshotData {
 
@@ -9,7 +9,8 @@ extension ScreenshotData {
             bottomLeft: Point(x: 10, y: 10),
             bottomRight: Point(x: 40, y: 10),
             topLeft: Point(x: 10, y: 200),
-            topRight: Point(x: 40, y: 200))
+            topRight: Point(x: 40, y: 200),
+            _zIndex: 1)
     }
 
 }

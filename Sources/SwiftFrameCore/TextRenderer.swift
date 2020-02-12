@@ -1,9 +1,9 @@
 import AppKit
 import Foundation
 
-private let kMinFontSize: CGFloat = 1
+final class TextRenderer {
 
-public final class TextRenderer {
+    private let kMinFontSize: CGFloat = 1
 
     // MARK: - Frame Rendering
 

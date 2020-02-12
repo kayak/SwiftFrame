@@ -1,24 +1,23 @@
 import AppKit
 import Foundation
 
-public typealias AssociatedString = (string: String, data: TextData)
+typealias AssociatedString = (string: String, data: TextData)
 
-public struct TextData: Decodable, ConfigValidatable {
+struct TextData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
-    public let titleIdentifier: String
-    public let textAlignment: NSTextAlignment
+    let titleIdentifier: String
+    let textAlignment: NSTextAlignment
     /// Text group will be prioritized over this, if specified
-    public let maxFontSizeOverride: CGFloat?
-    public let customFontPath: String?
-    public let textColorOverrideString: String?
-    public let groupIdentifier: String?
-    public let topLeft: Point
-    public let bottomRight: Point
+    let maxFontSizeOverride: CGFloat?
+    let fontOverride: FontSource?
+    let textColorOverrideString: String?
+    let groupIdentifier: String?
+    let topLeft: Point
+    let bottomRight: Point
 
-    public private(set) var fontOverride: NSFont?
-    public private(set) var textColorOverride: NSColor?
+    internal private(set) var textColorOverride: NSColor?
 
     var rect: NSRect {
         let origin = CGPoint(x: topLeft.x, y: bottomRight.y)
@@ -31,7 +30,7 @@ public struct TextData: Decodable, ConfigValidatable {
         case titleIdentifier = "identifier"
         case textColorOverrideString = "colorOverride"
         case maxFontSizeOverride
-        case customFontPath = "customFont"
+        case fontOverride = "customFontPath"
         case topLeft
         case bottomRight
         case textAlignment = "alignment"
@@ -40,76 +39,62 @@ public struct TextData: Decodable, ConfigValidatable {
 
     // MARK: - Init
 
-    public init(titleIdentifier: String,
+    internal init(
+        titleIdentifier: String,
         textAlignment: NSTextAlignment,
-        maxFontSizeOverride: CGFloat? = nil,
-        customFontPath: String? = nil,
-        textColorOverrideString: String? = nil,
-        groupIdentifier: String? = nil,
+        maxFontSizeOverride: CGFloat?,
+        fontOverride: FontSource?,
+        textColorOverrideString: String?,
+        groupIdentifier: String?,
         topLeft: Point,
         bottomRight: Point,
-        customFont: NSFont? = nil,
         textColorOverride: NSColor? = nil)
     {
         self.titleIdentifier = titleIdentifier
         self.textAlignment = textAlignment
         self.maxFontSizeOverride = maxFontSizeOverride
-        self.customFontPath = customFontPath
+        self.fontOverride = fontOverride
         self.textColorOverrideString = textColorOverrideString
         self.groupIdentifier = groupIdentifier
         self.topLeft = topLeft
         self.bottomRight = bottomRight
-        self.fontOverride = customFont
         self.textColorOverride = textColorOverride
     }
 
     // MARK: - Misc
 
-    public func makeProcessedData(size: CGSize) throws -> TextData {
+    func makeProcessedData(size: CGSize) throws -> TextData {
         let processedTopLeft = topLeft.convertToBottomLeftOrigin(with: size)
         let processedBottomRight = bottomRight.convertToBottomLeftOrigin(with: size)
-
-        let colorOverride: NSColor?
-        if let hex = textColorOverrideString {
-            colorOverride = try NSColor(hexString: hex)
-        } else {
-            colorOverride = nil
-        }
-
-        let font: NSFont?
-        if let fontPath = customFontPath {
-            font = try FontRegistry.shared.registerFont(atPath: fontPath)
-        } else {
-            font = nil
-        }
+        let colorOverride = try textColorOverrideString.flatMap { try NSColor(hexString: $0) }
+        _ = try fontOverride?.makeFont()
 
         return TextData(
             titleIdentifier: titleIdentifier,
             textAlignment: textAlignment,
             maxFontSizeOverride: maxFontSizeOverride,
-            customFontPath: customFontPath,
+            fontOverride: fontOverride,
             textColorOverrideString: textColorOverrideString,
             groupIdentifier: groupIdentifier,
             topLeft: processedTopLeft,
             bottomRight: processedBottomRight,
-            customFont: font,
             textColorOverride: colorOverride)
     }
 
     // MARK: - ConfigValidatable
 
-    public func validate() throws {
-        if (topLeft.x >= bottomRight.x) || (topLeft.y <= bottomRight.y) {
-            throw NSError(description: "Bad text bounds - topLeft: \(topLeft) and bottomRight: \(bottomRight)")
+    func validate() throws {
+        guard (topLeft.x < bottomRight.x) && (topLeft.y > bottomRight.y) else {
+            throw NSError(description: "Bad text bounds - topLeft: \(topLeft) and bottomRight: \(bottomRight), identifier: \(titleIdentifier)")
         }
     }
 
-    public func printSummary(insetByTabs tabs: Int) {
+    func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Text ID", value: titleIdentifier, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
 
-        if let fontName = fontOverride?.fontName {
+        if let fontName = try? fontOverride?.makeFont().fontName {
             CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)
         }
 
