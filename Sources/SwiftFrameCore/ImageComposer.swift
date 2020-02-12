@@ -104,9 +104,9 @@ final class ImageComposer {
 
     // MARK: - Screenshots Rendering
 
-    func add(screenshots: [String: NSBitmapImageRep], with screenshotData: [ScreenshotData], for locale: String) throws {
+    func add(screenshots: [String: URL], with screenshotData: [ScreenshotData], for locale: String) throws {
         try screenshotData.forEach { data in
-            guard let image = screenshots[data.screenshotName] else {
+            guard let image = screenshots[data.screenshotName]?.bitmapImageRep else {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
             }
             try add(screenshot: image, with: data)

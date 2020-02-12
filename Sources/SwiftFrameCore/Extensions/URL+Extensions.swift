@@ -9,6 +9,10 @@ extension URL {
         return components.joined(separator: ".")
     }
 
+    var bitmapImageRep: NSBitmapImageRep? {
+        ImageLoader.loadRepresentation(at: self)
+    }
+
     var subDirectories: [URL] {
         guard hasDirectoryPath else {
             return []

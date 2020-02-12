@@ -59,6 +59,7 @@ struct ConfigData: Decodable, ConfigValidatable {
         guard !deviceData.isEmpty else {
             throw NSError(description: "No screenshot data was supplied")
         }
+
         try deviceData.forEach { try $0.validate() }
     }
 

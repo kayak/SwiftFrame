@@ -45,11 +45,13 @@ public class ConfigProcessor {
             try device.screenshots.forEach { locale, imageDict in
                 print("\(device.outputSuffix) - \(locale)".formattedUnderlined())
 
-                guard let sliceSize = imageDict.first?.value.nativeSize else {
+                guard let sliceSize = imageDict.first?.value.bitmapImageRep?.nativeSize else {
                     throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
                 }
 
                 print("Rendering screenshots")
+
+                let compositionStart = CFAbsoluteTimeGetCurrent()
 
                 let composer = try ImageComposer(canvasSize: device.templateImage.nativeSize, verbose: verbose)
                 try composer.add(screenshots: imageDict, with: device.screenshotData, for: locale)
@@ -65,6 +67,8 @@ public class ConfigProcessor {
                     color: data.textColorSource.color,
                     maxFontSize: data.maxFontSize)
 
+                let compositionFinish = CFAbsoluteTimeGetCurrent()
+
                 try imageWriter.finish(
                     context: composer.context,
                     with: data.outputPaths,
@@ -73,6 +77,13 @@ public class ConfigProcessor {
                     locale: locale,
                     suffix: device.outputSuffix)
 
+                let compositionDuration = compositionFinish - compositionStart
+                let writeDuration = CFAbsoluteTimeGetCurrent() - compositionFinish
+
+                if verbose {
+                    print("Composed screenshots and titles in \(String(format: "%.3f", compositionDuration)) seconds")
+                    print("Rendered, sliced and wrote screenshots to disk in \(String(format: "%.3f", writeDuration)) seconds")
+                }
                 print("Done\n")
             }
         }
@@ -81,7 +92,7 @@ public class ConfigProcessor {
         print("All done!".formattedGreen())
 
         if verbose {
-            print("Rendered and sliced screenshots in \(String(format: "%.2f", diff)) seconds")
+            print("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
         }
     }
 

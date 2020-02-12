@@ -14,10 +14,26 @@ public final class ImageWriter {
             throw NSError(description: "Could not render output image")
         }
         let slices = sliceImage(finalImage, with: sliceSize)
-        try write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
+
+        // Writing images asynchronously gave a big performance boost, what a surprise
+        DispatchQueue(label: "slice_queue").async {
+            do {
+                try self.write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
+            } catch let error {
+                print(error.localizedDescription.formattedRed())
+                exit(1)
+            }
+        }
 
         if outputWholeImage {
-            try outputPaths.forEach { try write(finalImage, to: $0.absoluteURL, fileName: "\(locale)-\(suffix)-big.png") }
+            DispatchQueue(label: "big_image_queue").async {
+                do {
+                    try outputPaths.forEach { try self.write(finalImage, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big.png") }
+                } catch let error {
+                    print(error.localizedDescription.formattedRed())
+                    exit(1)
+                }
+            }
         }
     }
 
