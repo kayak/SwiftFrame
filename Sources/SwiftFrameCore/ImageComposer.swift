@@ -3,13 +3,13 @@ import Foundation
 import CoreGraphics
 import CoreImage
 
-final class ImageComposer {
+final class ImageComposer: VerbosePrintable {
 
     // MARK: - Properties
 
     private let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
-    private let verbose: Bool
+    var verbose: Bool
 
     let context: CGContext
 
@@ -63,11 +63,9 @@ final class ImageComposer {
                     fixedFontSize: sharedSize,
                     textData: $0.data)
 
-                if verbose {
-                    print(
-                        "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
-                        insetByTabs: 1)
-                }
+                printVerbose(
+                    "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
+                    insetByTabs: 1)
             } else {
                 let renderedFontsize = try add(
                     title: $0.string,
@@ -76,11 +74,9 @@ final class ImageComposer {
                     maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
                     textData: $0.data)
 
-                if verbose {
-                    print(
-                        "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
-                        insetByTabs: 1)
-                }
+                printVerbose(
+                    "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
+                    insetByTabs: 1)
             }
         }
     }
@@ -111,9 +107,7 @@ final class ImageComposer {
             }
             try add(screenshot: image, with: data)
 
-            if verbose {
-                print("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
-            }
+            printVerbose("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
         }
     }
 

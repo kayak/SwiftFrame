@@ -27,6 +27,8 @@ public final class CommandLineFormatter {
 
 public func print(_ any: Any..., insetByTabs tabs: Int) {
     let tabsString = String(repeating: " ", count: 4 * tabs)
-    let arguments = any.map { String(describing: $0) }.joined(separator: " ")
+    let arguments = any.count == 1
+        ? String(describing: any[0])
+        : any.map { String(describing: $0) }.joined(separator: " ")
     Swift.print(tabsString + arguments)
 }

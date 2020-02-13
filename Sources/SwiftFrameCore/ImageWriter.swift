@@ -3,22 +3,43 @@ import Foundation
 
 public final class ImageWriter {
 
+    // MARK: - Workgroup
+
+    private let workGroup = DispatchGroup()
+
     // MARK: - Init
 
     public init() {}
 
     // MARK: - Exporting
 
-    func finish(context: CGContext, with outputPaths: [LocalURL], sliceSize: CGSize, outputWholeImage: Bool, locale: String, suffix: String) throws {
+    func finish(
+        context: CGContext,
+        with outputPaths: [LocalURL],
+        sliceSize: CGSize,
+        outputWholeImage: Bool,
+        locale: String,
+        suffix: String,
+        completion: @escaping (DispatchTimeoutResult) throws -> Void) throws
+    {
         guard let finalImage = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
         let slices = sliceImage(finalImage, with: sliceSize)
+        var slicesFinished = false
+        var bigImageFinished = !outputWholeImage
+
+        workGroup.enter()
 
         // Writing images asynchronously gave a big performance boost, what a surprise
-        DispatchQueue(label: "slice_queue").async {
+        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
+        DispatchQueue(label: "slice_queue").async { [weak self] in
             do {
-                try self.write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
+                try self?.write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
+                slicesFinished = true
+                if slicesFinished && bigImageFinished {
+                    self?.workGroup.leave()
+                }
             } catch let error {
                 print(error.localizedDescription.formattedRed())
                 exit(1)
@@ -26,15 +47,22 @@ public final class ImageWriter {
         }
 
         if outputWholeImage {
-            DispatchQueue(label: "big_image_queue").async {
+            DispatchQueue(label: "big_image_queue").async { [weak self] in
                 do {
-                    try outputPaths.forEach { try self.write(finalImage, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big.png") }
+                    try outputPaths.forEach { try self?.write(finalImage, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big.png") }
+                    bigImageFinished = true
+                    if slicesFinished && bigImageFinished {
+                        self?.workGroup.leave()
+                    }
                 } catch let error {
                     print(error.localizedDescription.formattedRed())
                     exit(1)
                 }
             }
         }
+
+        let result = workGroup.wait(timeout: .now() + 5.00)
+        try completion(result)
     }
 
     func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
@@ -52,6 +80,8 @@ public final class ImageWriter {
         return croppedImages.compactMap { $0 }
     }
 
+    // MARK: - Writing Images
+
     func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String) throws {
         try outputPaths.forEach { url in
             try images.enumerated().forEach { tuple in
@@ -59,8 +89,6 @@ public final class ImageWriter {
             }
         }
     }
-
-    // MARK: - Writing Images
 
     func write(_ image: CGImage, to directoryPath: String, locale: String, deviceID: String, index: Int? = nil) throws {
         let fileName: String

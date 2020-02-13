@@ -60,6 +60,16 @@ struct ConfigData: Decodable, ConfigValidatable {
             throw NSError(description: "No screenshot data was supplied")
         }
 
+        guard !outputPaths.isEmpty else {
+            throw NSError(description: "No output paths were specified")
+        }
+
+        try outputPaths.forEach {
+            guard FileManager.default.ky_isWritableDirectory(atPath: $0.absoluteString) else {
+                throw NSError(description: "The specified path \($0.absoluteString) is a file")
+            }
+        }
+
         try deviceData.forEach { try $0.validate() }
     }
 
