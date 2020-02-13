@@ -7,12 +7,25 @@ final class FontRegistry {
 
     static var shared = FontRegistry()
 
+    private let queue = DispatchQueue(label: "font_registry_queue")
     private var registeredFontPaths = [String: String]()
 
     // MARK: - Font Handling
 
+    func makeAttributedString(from data: Data) -> NSMutableAttributedString? {
+        queue.sync {
+            try? NSMutableAttributedString(html: stringData, documentAttributes: nil)
+        }
+    }
+
     /// Registers the font at the specified path if source is a file rather than `NSFont`
     func registerFont(from source: FontSource) throws -> NSFont {
+        try queue.sync {
+            try threadSafeRegisterFont(from: source)
+        }
+    }
+
+    private func threadSafeRegisterFont(from source: FontSource) throws -> NSFont {
         switch source {
         case let .nsFont(font):
             return font

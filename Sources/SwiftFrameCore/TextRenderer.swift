@@ -96,3 +96,41 @@ final class TextRenderer {
     }
 
 }
+
+class ThreadSafe<T> {
+
+    private var _value: T
+    private let queue: DispatchQueue
+
+    init(label: String, value: T) {
+        _value = value
+        queue = DispatchQueue(label: label)
+    }
+
+    var value: T {
+        queue.sync { _value }
+    }
+
+}
+
+@propertyWrapper struct ThreadSafe<T> {
+
+    private var _value: T
+    private let queue: DispatchQueue
+
+    init(initialValue: T, queue: DispatchQueue) {
+        self._value = initialValue
+        self.queue = queue
+    }
+
+    var wrappedValue: T {
+        get {
+            queue.sync { _value }
+        }
+        set {
+            queue.sync { _value = newValue }
+        }
+    }
+
+}
+

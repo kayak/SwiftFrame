@@ -4,6 +4,7 @@ import Foundation
 import SwiftFrameCore
 
 do {
+    print("programm startin...")
 
     // Read options and parse
     let options = CommandLineOptions()

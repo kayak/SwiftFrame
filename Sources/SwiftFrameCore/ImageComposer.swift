@@ -54,7 +54,6 @@ final class ImageComposer: VerbosePrintable {
 
     func addStrings(_ associatedStrings: [AssociatedString], maxFontSizeByGroup: [String: CGFloat], font: NSFont, color: NSColor, maxFontSize: CGFloat) throws {
         try associatedStrings.forEach {
-            print("we ended up here")
             if let sharedSize = $0.data.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
                 // Can use fixed font size since common maximum has already been calculated
                 try add(
@@ -68,11 +67,18 @@ final class ImageComposer: VerbosePrintable {
                     "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
                     insetByTabs: 1)
             } else {
-                let renderedFontsize = try add(
+                let renderedFontsize = 100 //try add(
+//                    title: $0.string,
+//                    font: $0.data.fontOverride?.makeFont() ?? font,
+//                    color: $0.data.textColorOverride ?? color,
+//                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
+//                    textData: $0.data)
+
+                try add(
                     title: $0.string,
                     font: $0.data.fontOverride?.makeFont() ?? font,
                     color: $0.data.textColorOverride ?? color,
-                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
+                    fixedFontSize: 100,
                     textData: $0.data)
 
                 printVerbose(
@@ -80,8 +86,6 @@ final class ImageComposer: VerbosePrintable {
                     insetByTabs: 1)
             }
         }
-
-        print("end of strings body")
     }
 
     private func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {

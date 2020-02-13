@@ -108,7 +108,6 @@ public class ConfigProcessor: VerbosePrintable {
 
             let processedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
 
-            print("made processed strings")
             try composer.addStrings(
                 processedStrings.strings,
                 maxFontSizeByGroup: processedStrings.fontSizes,
