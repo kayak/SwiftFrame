@@ -11,7 +11,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     let templateImagePath: LocalURL
     private let screenshotsPath: LocalURL
 
-    internal private(set) var screenshots: [String: [String: URL]]!
+    internal private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
     internal private(set) var templateImage: NSBitmapImageRep!
     internal private(set) var screenshotData = [ScreenshotData]()
     internal private(set) var textData = [TextData]()
@@ -32,7 +32,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         outputSuffix: String,
         templateImagePath: LocalURL,
         screenshotsPath: LocalURL,
-        screenshots: [String : [String : URL]]? = nil,
+        screenshotsGroupedByLocale: [String : [String : URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
         textData: [TextData] = [TextData]())
@@ -40,7 +40,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
-        self.screenshots = screenshots
+        self.screenshotsGroupedByLocale = screenshotsGroupedByLocale
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
@@ -71,7 +71,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             outputSuffix: outputSuffix,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
-            screenshots: parsedScreenshots,
+            screenshotsGroupedByLocale: parsedScreenshots,
             templateImage: rep,
             screenshotData: processedScreenshotData,
             textData: processedTextData)
@@ -80,7 +80,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     // MARK: - ConfigValidatable
 
     func validate() throws {
-        try screenshots.forEach { localeDict in
+        try screenshotsGroupedByLocale.forEach { localeDict in
             guard let first = localeDict.value.first?.value else {
                 return
             }
@@ -92,7 +92,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         }
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
-        if let screenshotSize = screenshots.first?.value.first?.value.bitmapImageRep?.nativeSize {
+        if let screenshotSize = screenshotsGroupedByLocale.first?.value.first?.value.bitmapImageRep?.nativeSize {
             guard templateImage.nativeSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00 else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
             }
@@ -102,7 +102,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         try textData.forEach { try $0.validate() }
 
         let screenshotNames = screenshotData.map { $0.screenshotName }
-        try screenshots.forEach { localeDict in
+        try screenshotsGroupedByLocale.forEach { localeDict in
             try screenshotNames.forEach { name in
                 if localeDict.value[name] == nil {
                     throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \"\(name)\"")
@@ -114,7 +114,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.absoluteString, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshots.count, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshotsGroupedByLocale.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }
