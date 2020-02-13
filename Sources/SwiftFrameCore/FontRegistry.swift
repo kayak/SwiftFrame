@@ -14,23 +14,19 @@ final class FontRegistry {
 
     func makeAttributedString(from data: Data) -> NSMutableAttributedString? {
         queue.sync {
-            try? NSMutableAttributedString(html: stringData, documentAttributes: nil)
+            NSMutableAttributedString(html: data, documentAttributes: nil)
         }
     }
 
     /// Registers the font at the specified path if source is a file rather than `NSFont`
     func registerFont(from source: FontSource) throws -> NSFont {
         try queue.sync {
-            try threadSafeRegisterFont(from: source)
-        }
-    }
-
-    private func threadSafeRegisterFont(from source: FontSource) throws -> NSFont {
-        switch source {
-        case let .nsFont(font):
-            return font
-        case let .filePath(path):
-            return try registerFont(atPath: path)
+            switch source {
+            case let .nsFont(font):
+                return font
+            case let .filePath(path):
+                return try registerFont(atPath: path)
+            }
         }
     }
 

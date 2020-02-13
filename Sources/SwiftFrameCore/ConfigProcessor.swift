@@ -73,7 +73,7 @@ public class ConfigProcessor: VerbosePrintable {
 
         data.deviceData.enumerated().forEach {
             let deviceData = $0.element
-            DispatchQueue(label: deviceData.outputSuffix + "-\($0.offset)-queue").async { [weak self] in
+            DispatchQueue(label: deviceData.outputSuffix + "-\($0.offset)-queue").sync { [weak self] in
                 do {
                     try self?.process(deviceData: deviceData, completion: resultCompletion)
                 } catch let error {
