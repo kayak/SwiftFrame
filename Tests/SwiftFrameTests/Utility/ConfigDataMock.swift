@@ -26,7 +26,7 @@ extension ConfigData {
             outputPaths: [LocalURL(path: "testing/output/")],
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
-            outputFormat: .jpeg,
+            outputFormat: .png,
             deviceData: [DeviceData.invalidData])
     }
 
