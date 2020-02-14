@@ -21,7 +21,6 @@ public class RunLoopSemaphore {
     }
 
     public func wait(timeout: DispatchTime? = nil) {
-        //ky_assert(Thread.current.isMainThread)
         if let timeout = timeout {
             DispatchQueue.main.asyncAfter(deadline: timeout) { [weak self] in
                 self?.signal()
