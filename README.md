@@ -20,6 +20,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 * `maxFontSize`: the maximum font point size to use. SwiftFrame will be always try to render the text at the largest point size that fits within the bounding rectangle. If the determined point size is larger than `maxFontSize`, the latter will be used
 * `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots. This is an array in case you want to render the files into multiple directories at the same time. (Note: screenshots will be placed into subfolders organised by locale within these paths)
 * `fontFile`: a path to a font file
+* `format`: the output format of the screenshots, can be `png`, `jpeg` or `jpg`
 * `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
 * `outputWholeImage`: a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
 * `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
