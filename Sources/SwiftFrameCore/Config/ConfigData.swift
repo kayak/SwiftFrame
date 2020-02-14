@@ -20,6 +20,7 @@ struct ConfigData: Decodable, ConfigValidatable {
     let outputPaths: [LocalURL]
     let fontSource: FontSource
     let textColorSource: ColorSource
+    let outputFormat: NSBitmapImageRep.FileType
 
     internal private(set) var deviceData: [DeviceData]
     internal private(set) var titles = LocalizedStringFiles()
@@ -35,14 +36,13 @@ struct ConfigData: Decodable, ConfigValidatable {
         case outputPaths
         case fontSource = "fontFile"
         case textColorSource = "textColor"
+        case outputFormat = "format"
     }
 
     // MARK: - Processing
 
     mutating public func process() throws {
         deviceData = try deviceData.map { try $0.makeProcessedData() }
-
-        _ = try fontSource.makeFont()
 
         var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.contentsOfDirectory(at: stringsPath.absoluteURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])

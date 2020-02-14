@@ -67,7 +67,6 @@ struct TextData: Decodable, ConfigValidatable {
         let processedTopLeft = topLeft.convertToBottomLeftOrigin(with: size)
         let processedBottomRight = bottomRight.convertToBottomLeftOrigin(with: size)
         let colorOverride = try textColorOverrideString.flatMap { try NSColor(hexString: $0) }
-        _ = try fontOverride?.makeFont()
 
         return TextData(
             titleIdentifier: titleIdentifier,

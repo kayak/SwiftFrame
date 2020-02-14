@@ -13,6 +13,7 @@ extension ConfigData {
             outputPaths: [LocalURL(path: "testing/output/")],
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
+            outputFormat: .png,
             deviceData: [DeviceData.goodData])
     }
 
@@ -25,6 +26,7 @@ extension ConfigData {
             outputPaths: [LocalURL(path: "testing/output/")],
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
+            outputFormat: .jpeg,
             deviceData: [DeviceData.invalidData])
     }
 

@@ -13,3 +13,37 @@ extension NSBitmapImageRep {
     }
 
 }
+
+extension NSBitmapImageRep.FileType: Decodable {
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let format = try container.decode(String.self)
+        switch format {
+        case "png":
+            self = .png
+        case "jpeg", "jpg":
+            self = .jpeg
+        default:
+            throw NSError(description: "Invalid output file format specified")
+        }
+    }
+
+    var fileExtension: String {
+        switch self {
+        case .png:
+            return "png"
+        case .jpeg:
+            return "jpg"
+        case .jpeg2000:
+            return "j2p"
+        case .tiff:
+            return "tiff"
+        case .gif:
+            return "gif"
+        case .bmp:
+            return "bmp"
+        }
+    }
+
+}

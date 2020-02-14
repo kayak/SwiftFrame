@@ -44,7 +44,7 @@ class ImageComposerTests: XCTestCase {
         let size = CGSize(width: 100, height: 200)
         let textData = try TextData.goodData.makeProcessedData(size: size)
 
-        let composer = try ImageComposer(canvasSize: size, verbose: false)
+        let composer = try ImageComposer(canvasSize: size)
         let strings: [AssociatedString] = [(string: "Some testing title", data: textData)]
         XCTAssertNoThrow(try composer.addStrings(
             strings,

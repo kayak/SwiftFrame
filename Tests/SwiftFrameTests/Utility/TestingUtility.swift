@@ -12,7 +12,7 @@ struct TestingUtility {
         }
 
         let url = URL(fileURLWithPath: "testing/screenshots/").appendingPathComponent(locale)
-        try ImageWriter.write(cgImage, to: url, fileName: deviceSuffix + ".png")
+        try ImageWriter.write(cgImage, to: url, fileName: deviceSuffix + ".png", format: .png)
     }
 
     static func writeMockTemplateFile(deviceSuffix: String) throws {
@@ -22,7 +22,7 @@ struct TestingUtility {
         }
 
         let url = URL(fileURLWithPath: "testing/")
-        try ImageWriter.write(cgImage, to: url, fileName: "templatefile-\(deviceSuffix).png")
+        try ImageWriter.write(cgImage, to: url, fileName: "templatefile-\(deviceSuffix).png", format: .png)
     }
 
     static func setupMockDirectoryWithScreenshots() throws {

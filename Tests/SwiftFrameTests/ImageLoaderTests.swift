@@ -10,7 +10,7 @@ class ImageLoaderTests: XCTestCase {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }
 
-        try ImageWriter.write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device")
+        try ImageWriter.write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device", format: .png)
         XCTAssertNoThrow(try ImageLoader().loadImage(atPath: "testing/en/en-testing_device.png"))
 
         try TestingUtility.clearTestingDirectory()

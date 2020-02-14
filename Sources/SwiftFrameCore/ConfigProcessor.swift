@@ -1,19 +1,6 @@
 import Foundation
 
-protocol VerbosePrintable {
-    var verbose: Bool { get }
-}
-
-extension VerbosePrintable {
-    func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
-        if verbose {
-            let formattedArgs = args.map { String(describing: $0) }.joined(separator: " ")
-            print(formattedArgs, insetByTabs: tabs)
-        }
-    }
-}
-
-public class ConfigProcessor: VerbosePrintable {
+public class ConfigProcessor {
 
     // MARK: - Properties
 
@@ -48,63 +35,47 @@ public class ConfigProcessor: VerbosePrintable {
             _ = readLine()
         }
 
-        print("Parsed and validated config file\n")
+        print("Parsed and validated config file\nRendering...\n")
 
         var fileWriteFinishers = 0
         let requiredFileWrites = data.deviceData.count * data.titles.count
 
-        let workGroup = DispatchGroup()
-        workGroup.enter()
+        let semaphore = RunLoopSemaphore()
 
-        let resultCompletion: (DispatchTimeoutResult) throws -> Void = {
-            switch $0 {
-            case .success:
-                fileWriteFinishers += 1
-                print("success, \(fileWriteFinishers)/\(requiredFileWrites)")
-                if fileWriteFinishers == requiredFileWrites {
-                    workGroup.leave()
-                }
-            case .timedOut:
-                throw NSError(description: "Image writing timed out")
+        let resultCompletion: () throws -> Void = {
+            fileWriteFinishers += 1
+            if fileWriteFinishers == requiredFileWrites {
+                DispatchQueue.main.sync { semaphore.signal() }
             }
         }
 
         let start = CFAbsoluteTimeGetCurrent()
 
-        data.deviceData.enumerated().forEach {
-            let deviceData = $0.element
-            DispatchQueue(label: deviceData.outputSuffix + "-\($0.offset)-queue").sync { [weak self] in
-                do {
+        DispatchQueue.global().ky_asyncThrowing { [weak self] in
+            self?.data.deviceData.enumerated().forEach {
+                let deviceData = $0.element
+                DispatchQueue(label: "\($0.offset)_\($0.element.outputSuffix)_queue").ky_asyncThrowing {
                     try self?.process(deviceData: deviceData, completion: resultCompletion)
-                } catch let error {
-                    print(error.localizedDescription.formattedRed())
-                    exit(1)
                 }
             }
         }
 
-        workGroup.wait()
-        let diff = CFAbsoluteTimeGetCurrent() - start
-        print("All done!".formattedGreen())
+        semaphore.wait(timeout: .now() + 100.00)
 
+        print("All done!".formattedGreen())
+        let diff = CFAbsoluteTimeGetCurrent() - start
         printVerbose("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
     }
 
-    private func process(deviceData: DeviceData, completion: @escaping (DispatchTimeoutResult) throws -> Void) throws {
+    private func process(deviceData: DeviceData, completion: @escaping () throws -> Void) throws {
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
-            print("\(deviceData.outputSuffix) - \(locale)".formattedUnderlined())
-
             guard let sliceSize = imageDict.first?.value.bitmapImageRep?.nativeSize else {
                 throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
             }
 
-            print("Rendering screenshots")
-
-            let composer = try ImageComposer(canvasSize: deviceData.templateImage.nativeSize, verbose: verbose)
+            let composer = try ImageComposer(canvasSize: deviceData.templateImage.nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
             try composer.addTemplateImage(deviceData.templateImage)
-
-            print("Rendering text titles")
 
             let processedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
 
@@ -115,7 +86,7 @@ public class ConfigProcessor: VerbosePrintable {
                 color: data.textColorSource.color,
                 maxFontSize: data.maxFontSize)
 
-            print("Writing images asynchronously...\n")
+            printVerbose("Writing images for device \"\(deviceData.outputSuffix)\" for locale \"\(locale)\" asynchronously...")
 
             try ImageWriter.finish(
                 context: composer.context,
@@ -124,7 +95,15 @@ public class ConfigProcessor: VerbosePrintable {
                 outputWholeImage: data.outputWholeImage,
                 locale: locale,
                 suffix: deviceData.outputSuffix,
+                format: data.outputFormat,
                 completion: completion)
+        }
+    }
+
+    func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
+        if verbose {
+            let formattedArgs = args.map { String(describing: $0) }.joined(separator: " ")
+            print(formattedArgs, insetByTabs: tabs)
         }
     }
 

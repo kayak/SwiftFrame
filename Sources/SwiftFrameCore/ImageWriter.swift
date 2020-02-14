@@ -1,6 +1,8 @@
 import AppKit
 import Foundation
 
+typealias FileFormat = NSBitmapImageRep.FileType
+
 public final class ImageWriter {
 
     // MARK: - Exporting
@@ -12,18 +14,22 @@ public final class ImageWriter {
         outputWholeImage: Bool,
         locale: String,
         suffix: String,
-        completion: @escaping (DispatchTimeoutResult) throws -> Void) throws
+        format: FileFormat,
+        completion: @escaping () throws -> Void) throws
     {
         guard let finalImage = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
-        DispatchQueue(label: "image_writer_queue").async {
-            do {
-                try finishAsync(image: finalImage, with: outputPaths, sliceSize: sliceSize, outputWholeImage: outputWholeImage, locale: locale, suffix: suffix, completion: completion)
-            } catch let error {
-                print(error.localizedDescription.formattedRed())
-                exit(1)
-            }
+        DispatchQueue.global().ky_asyncThrowing {
+            try finishAsync(
+                image: finalImage,
+                with: outputPaths,
+                sliceSize: sliceSize,
+                outputWholeImage: outputWholeImage,
+                locale: locale,
+                suffix: suffix,
+                format: format,
+                completion: completion)
         }
     }
 
@@ -34,7 +40,8 @@ public final class ImageWriter {
         outputWholeImage: Bool,
         locale: String,
         suffix: String,
-        completion: @escaping (DispatchTimeoutResult) throws -> Void) throws
+        format: FileFormat,
+        completion: @escaping () throws -> Void) throws
     {
         let slices = sliceImage(image, with: sliceSize)
         var slicesFinished = false
@@ -45,36 +52,28 @@ public final class ImageWriter {
 
         // Writing images asynchronously gave a big performance boost, what a surprise
         // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
-        DispatchQueue(label: "slice_queue").async {
-            do {
-                try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix)
-                slicesFinished = true
-                if slicesFinished && bigImageFinished {
-                    workGroup.leave()
-                }
-            } catch let error {
-                print(error.localizedDescription.formattedRed())
-                exit(1)
+        DispatchQueue.global().ky_asyncThrowing {
+            try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
+            slicesFinished = true
+            if slicesFinished && bigImageFinished {
+                workGroup.leave()
             }
         }
 
         if outputWholeImage {
-            DispatchQueue(label: "big_image_queue").async {
-                do {
-                    try outputPaths.forEach { try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big.png") }
-                    bigImageFinished = true
-                    if slicesFinished && bigImageFinished {
-                        workGroup.leave()
-                    }
-                } catch let error {
-                    print(error.localizedDescription.formattedRed())
-                    exit(1)
+            DispatchQueue.global().ky_asyncThrowing {
+                try outputPaths.forEach {
+                    try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
+                }
+                bigImageFinished = true
+                if slicesFinished && bigImageFinished {
+                    workGroup.leave()
                 }
             }
         }
 
-        let result = workGroup.wait(timeout: .now() + 5.00)
-        try completion(result)
+        _ = workGroup.wait(timeout: .now() + 5.00)
+        try completion()
     }
 
     static func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
@@ -94,32 +93,35 @@ public final class ImageWriter {
 
     // MARK: - Writing Images
 
-    static func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String) throws {
+    static func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String, format: FileFormat) throws {
         try outputPaths.forEach { url in
             try images.enumerated().forEach { tuple in
-                try write(tuple.element, to: url.absoluteString, locale: locale, deviceID: suffix, index: tuple.offset)
+                try write(tuple.element, to: url.absoluteString, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
             }
         }
     }
 
-    static func write(_ image: CGImage, to directoryPath: String, locale: String, deviceID: String, index: Int? = nil) throws {
+    static func write(_ image: CGImage, to directoryPath: String, locale: String, deviceID: String, index: Int? = nil, format: FileFormat) throws {
         let fileName: String
         if let index = index {
-            fileName = "\(locale)-\(deviceID)-\(index).png"
+            fileName = "\(locale)-\(deviceID)-\(index)"
         } else {
-            fileName = "\(locale)-\(deviceID).png"
+            fileName = "\(locale)-\(deviceID)"
         }
         let directory = URL(fileURLWithPath: directoryPath).appendingPathComponent(locale)
-        try write(image, to: directory, fileName: fileName)
+        try write(image, to: directory, fileName: fileName, format: format)
     }
 
-    static func write(_ image: CGImage, to directoryPath: URL, fileName: String) throws {
+    static func write(_ image: CGImage, to directoryPath: URL, fileName: String, format: FileFormat) throws {
         let rep = NSBitmapImageRep(cgImage: image)
-        guard let data = rep.representation(using: .png, properties: [:]) else {
+        guard let data = rep.representation(using: format, properties: [:]) else {
             throw NSError(description: "Failed to convert composed image to PNG")
         }
 
-        try data.ky_write(to: directoryPath.appendingPathComponent(fileName))
+        let targetURL = directoryPath
+            .appendingPathComponent(fileName)
+            .appendingPathExtension(format.fileExtension)
+        try data.ky_write(to: targetURL, options: .atomicWrite)
     }
 
 }

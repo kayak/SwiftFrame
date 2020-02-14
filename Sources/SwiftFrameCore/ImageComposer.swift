@@ -3,21 +3,19 @@ import Foundation
 import CoreGraphics
 import CoreImage
 
-final class ImageComposer: VerbosePrintable {
+final class ImageComposer {
 
     // MARK: - Properties
 
     private let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
-    var verbose: Bool
 
     let context: CGContext
 
     // MARK: - Init
 
-    init(canvasSize: CGSize, verbose: Bool) throws {
+    init(canvasSize: CGSize) throws {
         self.context = try ImageComposer.createContext(size: canvasSize)
-        self.verbose = verbose
     }
 
     // MARK: - Preparation
@@ -62,33 +60,18 @@ final class ImageComposer: VerbosePrintable {
                     color: $0.data.textColorOverride ?? color,
                     fixedFontSize: sharedSize,
                     textData: $0.data)
-
-                printVerbose(
-                    "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(sharedSize))".formattedGreen(),
-                    insetByTabs: 1)
             } else {
-                let renderedFontsize = 100 //try add(
-//                    title: $0.string,
-//                    font: $0.data.fontOverride?.makeFont() ?? font,
-//                    color: $0.data.textColorOverride ?? color,
-//                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
-//                    textData: $0.data)
-
                 try add(
                     title: $0.string,
                     font: $0.data.fontOverride?.makeFont() ?? font,
                     color: $0.data.textColorOverride ?? color,
-                    fixedFontSize: 100,
+                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
                     textData: $0.data)
-
-                printVerbose(
-                    "Rendered title with identifier \"\($0.data.titleIdentifier)\" with font size \(Int(renderedFontsize))".formattedGreen(),
-                    insetByTabs: 1)
             }
         }
     }
 
-    private func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
+    @discardableResult private func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
         let fontSize = try textRenderer.maximumFontSizeThatFits(
             string: title,
             font: font,
@@ -113,8 +96,6 @@ final class ImageComposer: VerbosePrintable {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
             }
             try add(screenshot: image, with: data)
-
-            printVerbose("Rendered screenshot \(data.screenshotName)".formattedGreen(), insetByTabs: 1)
         }
     }
 

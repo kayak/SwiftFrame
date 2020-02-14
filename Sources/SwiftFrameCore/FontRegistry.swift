@@ -7,26 +7,27 @@ final class FontRegistry {
 
     static var shared = FontRegistry()
 
-    private let queue = DispatchQueue(label: "font_registry_queue")
     private var registeredFontPaths = [String: String]()
 
     // MARK: - Font Handling
 
+    // We have to parse and create the attributed string on the main thread since it uses WebKit as per this SO answer:
+    // https://stackoverflow.com/questions/4217820/convert-html-to-nsattributedstring-in-ios/34190968#34190968
     func makeAttributedString(from data: Data) -> NSMutableAttributedString? {
-        queue.sync {
-            NSMutableAttributedString(html: data, documentAttributes: nil)
+        if !Thread.isMainThread {
+            return DispatchQueue.main.sync { makeAttributedString(from: data) }
         }
+
+        return NSMutableAttributedString(html: data, documentAttributes: nil)
     }
 
     /// Registers the font at the specified path if source is a file rather than `NSFont`
-    func registerFont(from source: FontSource) throws -> NSFont {
-        try queue.sync {
-            switch source {
-            case let .nsFont(font):
-                return font
-            case let .filePath(path):
-                return try registerFont(atPath: path)
-            }
+    @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
+        switch source {
+        case let .nsFont(font):
+            return font
+        case let .filePath(path):
+            return try registerFont(atPath: path)
         }
     }
 
@@ -63,6 +64,8 @@ final class FontRegistry {
             throw NSError(description: "Failed to load font descriptors from file at \(url.absoluteString)")
         }
 
+        // If we're dealing with a ttc file, it can contain multiple weights and font styles. If we arbitrarily choose the first descriptor in the file,
+        // we could end up with the bold version of the font for example which would then kill of any <b> tags in the string files
         let descriptor: CTFontDescriptor? = descriptors.count > 1
             ? descriptors.first(where: { CTFontDescriptorCopyAttribute($0, kCTFontStyleNameAttribute) as? String == "Regular" }) ?? descriptors.first
             : descriptors.first

@@ -16,6 +16,7 @@ extension FontSource: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self = .filePath(try container.decode(String.self))
+        _ = try FontRegistry.shared.registerFont(from: self)
     }
     
 }

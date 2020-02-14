@@ -75,7 +75,7 @@ final class TextRenderer {
 
     private func makeAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white, alignment: NSTextAlignment) throws -> NSAttributedString {
         let htmlString = makeHTMLFormattedString(for: htmlString, font: font, color: color)
-        guard let stringData = htmlString.data(using: .utf8), let attributedString = try FontRegistry.shared.makeAttributedString(from: stringData) else {
+        guard let stringData = htmlString.data(using: .utf8), let attributedString = FontRegistry.shared.makeAttributedString(from: stringData) else {
             throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
         }
         attributedString.setAlignment(alignment, range: NSRange(location: 0, length: attributedString.length))
