@@ -43,6 +43,8 @@ extension NSBitmapImageRep.FileType: Decodable {
             return "gif"
         case .bmp:
             return "bmp"
+        @unknown default:
+            return "png"
         }
     }
 

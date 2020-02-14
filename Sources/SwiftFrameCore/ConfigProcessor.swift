@@ -51,10 +51,10 @@ public class ConfigProcessor {
 
         let start = CFAbsoluteTimeGetCurrent()
 
-        DispatchQueue.global().ky_asyncThrowing { [weak self] in
+        DispatchQueue.global().async { [weak self] in
             self?.data.deviceData.enumerated().forEach {
                 let deviceData = $0.element
-                DispatchQueue(label: "\($0.offset)_\($0.element.outputSuffix)_queue").ky_asyncThrowing {
+                DispatchQueue.global().ky_asyncThrowing {
                     try self?.process(deviceData: deviceData, completion: resultCompletion)
                 }
             }
