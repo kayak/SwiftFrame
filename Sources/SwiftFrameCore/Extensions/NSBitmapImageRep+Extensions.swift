@@ -14,6 +14,8 @@ extension NSBitmapImageRep {
 
 }
 
+typealias FileFormat = NSBitmapImageRep.FileType
+
 extension NSBitmapImageRep.FileType: Decodable {
 
     public init(from decoder: Decoder) throws {

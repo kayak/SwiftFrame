@@ -20,7 +20,7 @@ struct ConfigData: Decodable, ConfigValidatable {
     let outputPaths: [LocalURL]
     let fontSource: FontSource
     let textColorSource: ColorSource
-    let outputFormat: NSBitmapImageRep.FileType
+    let outputFormat: FileFormat
 
     internal private(set) var deviceData: [DeviceData]
     internal private(set) var titles = LocalizedStringFiles()

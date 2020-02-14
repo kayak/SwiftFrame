@@ -1,8 +1,6 @@
 import AppKit
 import Foundation
 
-typealias FileFormat = NSBitmapImageRep.FileType
-
 public final class ImageWriter {
 
     // MARK: - Exporting
@@ -17,63 +15,42 @@ public final class ImageWriter {
         format: FileFormat,
         completion: @escaping () throws -> Void) throws
     {
-        guard let finalImage = context.makeImage() else {
+        guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
         DispatchQueue.global().ky_asyncThrowing {
-            try finishAsync(
-                image: finalImage,
-                with: outputPaths,
-                sliceSize: sliceSize,
-                outputWholeImage: outputWholeImage,
-                locale: locale,
-                suffix: suffix,
-                format: format,
-                completion: completion)
-        }
-    }
+            let slices = sliceImage(image, with: sliceSize)
+            var slicesFinished = false
+            var bigImageFinished = !outputWholeImage
 
-    private static func finishAsync(
-        image: CGImage,
-        with outputPaths: [LocalURL],
-        sliceSize: CGSize,
-        outputWholeImage: Bool,
-        locale: String,
-        suffix: String,
-        format: FileFormat,
-        completion: @escaping () throws -> Void) throws
-    {
-        let slices = sliceImage(image, with: sliceSize)
-        var slicesFinished = false
-        var bigImageFinished = !outputWholeImage
+            let workGroup = DispatchGroup()
+            workGroup.enter()
 
-        let workGroup = DispatchGroup()
-        workGroup.enter()
-
-        // Writing images asynchronously gave a big performance boost, what a surprise
-        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
-        DispatchQueue.global().ky_asyncThrowing {
-            try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
-            slicesFinished = true
-            if slicesFinished && bigImageFinished {
-                workGroup.leave()
-            }
-        }
-
-        if outputWholeImage {
+            // Writing images asynchronously gave a big performance boost, what a surprise
+            // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
             DispatchQueue.global().ky_asyncThrowing {
-                try outputPaths.forEach {
-                    try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
-                }
-                bigImageFinished = true
+                try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
+                slicesFinished = true
                 if slicesFinished && bigImageFinished {
                     workGroup.leave()
                 }
             }
-        }
 
-        _ = workGroup.wait(timeout: .now() + 5.00)
-        try completion()
+            if outputWholeImage {
+                DispatchQueue.global().ky_asyncThrowing {
+                    try outputPaths.forEach {
+                        try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
+                    }
+                    bigImageFinished = true
+                    if slicesFinished && bigImageFinished {
+                        workGroup.leave()
+                    }
+                }
+            }
+
+            _ = workGroup.wait(timeout: .now() + 5.00)
+            try completion()
+        }
     }
 
     static func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
