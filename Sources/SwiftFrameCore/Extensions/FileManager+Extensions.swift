@@ -8,12 +8,24 @@ extension FileManager {
         guard let permissions = try? attributesOfItem(atPath: url.path)[.posixPermissions] as? Int16 else {
             return ky_isWritableDirectory(atPath: url.deletingLastPathComponent().path)
         }
-        return permissions == 493 && url.pathExtension.isEmpty
+
+        return getPosixPermissionsForUser(permissions)?.canWrite ?? false
     }
 
     func filesAtPath(_ url: URL, with pathExtension: String, skipsHiddenFiles: Bool = true) throws -> [URL] {
         return try contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: skipsHiddenFiles ? [.skipsHiddenFiles] : [])
             .filter { $0.pathExtension == pathExtension }
+    }
+
+    private func getPosixPermissionsForUser(_ permissions: Int16) -> PosixGroup? {
+        let octalString = String(permissions, radix: 0o10)
+        guard let octalInt = Int16(octalString) else {
+            return nil
+        }
+
+        let remainder = octalInt % 100
+        let userPermissionCode = (octalInt - remainder) / 100
+        return PosixGroup(octalCode: userPermissionCode)
     }
 
 }

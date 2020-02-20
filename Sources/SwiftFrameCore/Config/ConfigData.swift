@@ -46,7 +46,7 @@ struct ConfigData: Decodable, ConfigValidatable {
 
         let textFiles = try FileManager.default.filesAtPath(stringsPath.absoluteURL, with: "strings")
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
-        titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.absoluteURL.fileName }), strings))
+        titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
 
     // MARK: - ConfigValidatable
