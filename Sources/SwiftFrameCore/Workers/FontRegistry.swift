@@ -36,7 +36,7 @@ final class FontRegistry {
             throw NSError(description: "Font file at \(path) does not exist")
         }
         let url = URL(fileURLWithPath: path)
-        var error: Unmanaged<CFError>? = nil
+        var error: Unmanaged<CFError>?
         defer {
             error?.release()
         }

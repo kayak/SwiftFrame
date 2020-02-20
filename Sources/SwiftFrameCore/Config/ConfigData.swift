@@ -7,7 +7,7 @@ protocol ConfigValidatable {
 }
 
 /// First key is locale, second is regular key in string file
-typealias LocalizedStringFiles = [String : [String : String]]
+typealias LocalizedStringFiles = [String: [String: String]]
 
 struct ConfigData: Decodable, ConfigValidatable {
 

@@ -18,5 +18,5 @@ extension FontSource: Decodable {
         self = .filePath(try container.decode(String.self))
         _ = try FontRegistry.shared.registerFont(from: self)
     }
-    
+
 }

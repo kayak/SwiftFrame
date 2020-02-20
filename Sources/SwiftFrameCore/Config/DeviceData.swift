@@ -5,7 +5,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
-    private let kScreenshotExtensions = Set<String>(arrayLiteral: "png", "jpg", "jpeg")
+    private let kScreenshotExtensions = Set(["png", "jpg", "jpeg"])
 
     let outputSuffix: String
     let templateImagePath: LocalURL
@@ -32,11 +32,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
         outputSuffix: String,
         templateImagePath: LocalURL,
         screenshotsPath: LocalURL,
-        screenshotsGroupedByLocale: [String : [String : URL]]? = nil,
+        screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
-        textData: [TextData] = [TextData]())
-    {
+        textData: [TextData] = [TextData]()) {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
@@ -53,7 +52,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
-        var parsedScreenshots = [String : [String : URL]]()
+        var parsedScreenshots = [String: [String: URL]]()
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])

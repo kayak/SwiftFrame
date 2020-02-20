@@ -23,7 +23,7 @@ extension NSColor {
         var b: CGFloat = 0
         getRed(&r, green: &g, blue: &b, alpha: nil)
         let hex = (Int(r * 255) << 16) + (Int(g * 255) << 8) + Int(b * 255)
-        return String(format:"#%02lx%02lx%02lx", (hex >> 16) & 0xff, (hex >> 8) & 0xff, hex & 0xff)
+        return String(format: "#%02lx%02lx%02lx", (hex >> 16) & 0xff, (hex >> 8) & 0xff, hex & 0xff)
     }
 
 }

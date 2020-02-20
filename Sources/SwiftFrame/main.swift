@@ -5,7 +5,6 @@ import SwiftFrameCore
 
 do {
 
-    // Read options and parse
     let options = CommandLineOptions()
     try options.parse(arguments: CommandLine.arguments)
 

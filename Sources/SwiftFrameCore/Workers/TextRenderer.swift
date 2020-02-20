@@ -88,7 +88,7 @@ final class TextRenderer {
         let attributes = [
             "font-family: \(font.fontName)",
             "font-size: \(Int(font.pointSize))",
-            "color: \(colorHexString)",
+            "color: \(colorHexString)"
         ]
 
         let constructedAttributes = attributes.joined(separator: "; ")
@@ -117,4 +117,3 @@ final class TextRenderer {
     }
 
 }
-

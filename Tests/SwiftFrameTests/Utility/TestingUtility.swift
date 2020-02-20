@@ -1,7 +1,7 @@
 import Foundation
 @testable import SwiftFrameCore
 
-public typealias JSONDictionary = [String : Encodable]
+public typealias JSONDictionary = [String: Encodable]
 
 struct TestingUtility {
 
@@ -73,4 +73,3 @@ extension Dictionary where Value == String, Key == String {
     }
 
 }
-

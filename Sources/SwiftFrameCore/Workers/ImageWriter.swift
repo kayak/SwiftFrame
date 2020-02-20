@@ -13,8 +13,7 @@ public final class ImageWriter {
         locale: String,
         suffix: String,
         format: FileFormat,
-        completion: @escaping () throws -> Void) throws
-    {
+        completion: @escaping () throws -> Void) throws {
         guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
