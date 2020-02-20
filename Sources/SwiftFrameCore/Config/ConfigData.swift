@@ -60,12 +60,6 @@ struct ConfigData: Decodable, ConfigValidatable {
             throw NSError(description: "No output paths were specified")
         }
 
-        try outputPaths.forEach {
-            guard FileManager.default.ky_isWritableDirectory(atPath: $0.path) else {
-                throw NSError(description: "The specified path \($0.path) is a file or a non-writable directory")
-            }
-        }
-
         try deviceData.forEach { try $0.validate() }
     }
 
