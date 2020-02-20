@@ -92,7 +92,7 @@ struct TextData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
 
-        if let fontName = try? fontOverride?.makeFont().fontName {
+        if let fontName = try? fontOverride?.font().fontName {
             CommandLineFormatter.printKeyValue("Custom font", value: fontName, insetBy: tabs + 1)
         }
 

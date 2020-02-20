@@ -35,7 +35,7 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
             do {
                 return try textRenderer.maximumFontSizeThatFits(
                     string: $0.string,
-                    font: $0.data.fontOverride?.makeFont() ?? globalFont,
+                    font: $0.data.fontOverride?.font() ?? globalFont,
                     alignment: $0.data.textAlignment,
                     maxSize: $0.data.maxFontSizeOverride ?? globalMaxSize,
                     size: $0.data.rect.size)

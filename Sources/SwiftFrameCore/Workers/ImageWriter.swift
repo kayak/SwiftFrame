@@ -7,7 +7,7 @@ public final class ImageWriter {
 
     static func finish(
         context: CGContext,
-        with outputPaths: [LocalURL],
+        with outputPaths: [FileURL],
         sliceSize: CGSize,
         outputWholeImage: Bool,
         locale: String,
@@ -69,10 +69,10 @@ public final class ImageWriter {
 
     // MARK: - Writing Images
 
-    static func write(images: [CGImage], to outputPaths: [LocalURL], locale: String, suffix: String, format: FileFormat) throws {
+    static func write(images: [CGImage], to outputPaths: [FileURL], locale: String, suffix: String, format: FileFormat) throws {
         try outputPaths.forEach { url in
             try images.enumerated().forEach { tuple in
-                try write(tuple.element, to: url.absoluteString, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
+                try write(tuple.element, to: url.absoluteURL.path, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
             }
         }
     }

@@ -56,14 +56,14 @@ final class ImageComposer {
                 // Can use fixed font size since common maximum has already been calculated
                 try add(
                     title: $0.string,
-                    font: $0.data.fontOverride?.makeFont() ?? font,
+                    font: $0.data.fontOverride?.font() ?? font,
                     color: $0.data.textColorOverride ?? color,
                     fixedFontSize: sharedSize,
                     textData: $0.data)
             } else {
                 try add(
                     title: $0.string,
-                    font: $0.data.fontOverride?.makeFont() ?? font,
+                    font: $0.data.fontOverride?.font() ?? font,
                     color: $0.data.textColorOverride ?? color,
                     maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
                     textData: $0.data)

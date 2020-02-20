@@ -6,8 +6,8 @@ extension DeviceData {
     static var goodData: Self {
         DeviceData(
             outputSuffix: "iPhone X",
-            templateImagePath: LocalURL(path: "testing/templatefile-debug_device1.png"),
-            screenshotsPath: LocalURL(path: "testing/screenshots/"),
+            templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+            screenshotsPath: FileURL(path: "testing/screenshots/"),
             screenshotData: [ScreenshotData.goodData],
             textData: [TextData.goodData])
     }
@@ -15,8 +15,8 @@ extension DeviceData {
     static var invalidData: Self {
         DeviceData(
             outputSuffix: "iPhone X",
-            templateImagePath: LocalURL(path: "testing/templatefile-debug_device1.png"),
-            screenshotsPath: LocalURL(path: "testing/screenshots/"),
+            templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+            screenshotsPath: FileURL(path: "testing/screenshots/"),
             screenshotData: [ScreenshotData.goodData],
             textData: [TextData.invalidData])
     }

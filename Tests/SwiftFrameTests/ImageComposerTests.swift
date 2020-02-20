@@ -4,41 +4,27 @@ import XCTest
 
 class ImageComposerTests: XCTestCase {
 
-//    func testRenderTemplateFile() throws {
-//        let size = CGSize(width: 100, height: 50)
-//        let templateFile = makeImageRepresentationWithSize(size)
-//        let composer = try ImageComposer(canvasSize: size, verbose: false)
-//        try composer.addTemplateImage(templateFile)
-//        XCTAssertNotNil(composer.renderFinalImage())
-//    }
-//
-//    func testTemplateImageSlicesCorrectly() throws {
-//        let size = CGSize(width: 100, height: 50)
-//        let templateFile = makeImageRepresentationWithSize(size)
-//        let composer = try ImageComposer(canvasSize: size, verbose: false)
-//        try composer.addTemplateImage(templateFile)
-//
-//        guard let image = composer.renderFinalImage() else {
-//            throw NSError(description: "Rendered image was nil")
-//        }
-//
-//        let slices = composer.sliceImage(image, with: NSSize(width: 20, height: 50))
-//        XCTAssertEqual(slices.count, 5)
-//    }
-//
-//    func testTemplateImagesNotCorrectSize() throws {
-//        let size = CGSize(width: 100, height: 50)
-//        let templateFile = makeImageRepresentationWithSize(size)
-//        let composer = try ImageComposer(canvasSize: size, verbose: false)
-//        try composer.addTemplateImage(templateFile)
-//
-//        guard let image = composer.renderFinalImage() else {
-//            throw NSError(description: "Rendered image was nil")
-//        }
-//
-//        let slices = composer.sliceImage(image, with: NSSize(width: 30, height: 50))
-//        XCTAssert(slices.isEmpty)
-//    }
+    func testRenderTemplateFile() throws {
+        let size = CGSize(width: 100, height: 50)
+        let templateFile = makeImageRepresentationWithSize(size)
+        let composer = try ImageComposer(canvasSize: size)
+        try composer.addTemplateImage(templateFile)
+        XCTAssertNotNil(composer.context.makeImage())
+    }
+
+    func testTemplateImageSlicesCorrectly() throws {
+        let size = CGSize(width: 100, height: 50)
+        let templateFile = makeImageRepresentationWithSize(size)
+        let composer = try ImageComposer(canvasSize: size)
+        try composer.addTemplateImage(templateFile)
+
+        guard let image = composer.context.makeImage() else {
+            throw NSError(description: "Rendered image was nil")
+        }
+
+        let slices = ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50))
+        XCTAssertEqual(slices.count, 5)
+    }
 
     func testCanRenderInContext() throws {
         let size = CGSize(width: 100, height: 200)

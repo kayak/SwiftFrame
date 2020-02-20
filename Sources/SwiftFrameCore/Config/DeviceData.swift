@@ -8,11 +8,11 @@ public struct DeviceData: Decodable, ConfigValidatable {
     private let kScreenshotExtensions = Set(["png", "jpg", "jpeg"])
 
     let outputSuffix: String
-    let templateImagePath: LocalURL
-    private let screenshotsPath: LocalURL
+    let templateImagePath: FileURL
+    private let screenshotsPath: FileURL
 
     internal private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
-    internal private(set) var templateImage: NSBitmapImageRep!
+    internal private(set) var templateImage: NSBitmapImageRep?
     internal private(set) var screenshotData = [ScreenshotData]()
     internal private(set) var textData = [TextData]()
 
@@ -30,8 +30,8 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     internal init(
         outputSuffix: String,
-        templateImagePath: LocalURL,
-        screenshotsPath: LocalURL,
+        templateImagePath: FileURL,
+        screenshotsPath: FileURL,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
@@ -92,7 +92,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
         if let screenshotSize = screenshotsGroupedByLocale.first?.value.first?.value.bitmapImageRep?.nativeSize {
-            guard templateImage.nativeSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00 else {
+            guard
+                let templateImageSize = templateImage?.nativeSize,
+                templateImageSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00
+            else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
             }
         }

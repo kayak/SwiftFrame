@@ -2,7 +2,7 @@ import Foundation
 
 extension FileManager {
 
-    // We could use `Filemanager.default.isWritableFile` here but that will return false in any case when
+    // We could use `FileManager.default.isWritableFile` here but that will return false in any case when
     // the target directory does not exist yet
     @discardableResult func ky_isWritableDirectory(atPath path: String) -> Bool {
         let url = URL(fileURLWithPath: path)
@@ -19,6 +19,11 @@ extension FileManager {
         } catch {
             return false
         }
+    }
+
+    func filesAtPath(_ url: URL, with pathExtension: String, skipsHiddenFiles: Bool = true) throws -> [URL] {
+        return try contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: skipsHiddenFiles ? [.skipsHiddenFiles] : [])
+            .filter { $0.pathExtension == pathExtension }
     }
 
 }

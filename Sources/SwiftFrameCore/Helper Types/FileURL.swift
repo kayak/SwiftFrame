@@ -1,11 +1,10 @@
 import Foundation
 
 /// Wrapper struct to avoid some errors related to relative paths
-struct LocalURL: Decodable {
+struct FileURL: Decodable {
 
     // MARK: - Properties
 
-    let rawPath: String
     private let url: URL
 
     var absoluteURL: URL {
@@ -19,13 +18,12 @@ struct LocalURL: Decodable {
     // MARK: - Init
 
     init(path: String) {
-        rawPath = path
-        url = URL(fileURLWithPath: rawPath)
+        url = URL(fileURLWithPath: path)
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        rawPath = try container.decode(String.self)
+        let rawPath = try container.decode(String.self)
         url = URL(fileURLWithPath: rawPath)
     }
 

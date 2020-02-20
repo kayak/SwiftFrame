@@ -8,9 +8,9 @@ extension ConfigData {
         ConfigData(
             outputWholeImage: true,
             textGroups: nil,
-            stringsPath: LocalURL(path: "testing/strings/"),
+            stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
-            outputPaths: [LocalURL(path: "testing/output/")],
+            outputPaths: [FileURL(path: "testing/output/")],
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,
@@ -21,9 +21,9 @@ extension ConfigData {
         ConfigData(
             outputWholeImage: true,
             textGroups: nil,
-            stringsPath: LocalURL(path: "testing/strings/"),
+            stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
-            outputPaths: [LocalURL(path: "testing/output/")],
+            outputPaths: [FileURL(path: "testing/output/")],
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,

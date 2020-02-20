@@ -69,20 +69,23 @@ public class ConfigProcessor {
 
     private func process(deviceData: DeviceData, completion: @escaping () throws -> Void) throws {
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
+            guard let templateImage = deviceData.templateImage else { throw NSError(description: "No template image found") }
+
             guard let sliceSize = imageDict.first?.value.bitmapImageRep?.nativeSize else {
                 throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
             }
 
-            let composer = try ImageComposer(canvasSize: deviceData.templateImage.nativeSize)
+            let composer = try ImageComposer(canvasSize: templateImage.nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
-            try composer.addTemplateImage(deviceData.templateImage)
+            try composer.addTemplateImage(templateImage)
 
-            let processedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
+            let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
+            let fontSizesByGroup = try data.makeSharedFontSizes(for: associatedStrings)
 
             try composer.addStrings(
-                processedStrings.strings,
-                maxFontSizeByGroup: processedStrings.fontSizes,
-                font: data.fontSource.makeFont(),
+                associatedStrings,
+                maxFontSizeByGroup: fontSizesByGroup,
+                font: data.fontSource.font(),
                 color: data.textColorSource.color,
                 maxFontSize: data.maxFontSize)
 
