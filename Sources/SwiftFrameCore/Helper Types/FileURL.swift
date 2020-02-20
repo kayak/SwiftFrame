@@ -15,6 +15,10 @@ struct FileURL: Decodable {
         url.absoluteString
     }
 
+    var path: String {
+        url.path
+    }
+
     // MARK: - Init
 
     init(path: String) {

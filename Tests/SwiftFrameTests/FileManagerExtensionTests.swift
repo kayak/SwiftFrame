@@ -8,12 +8,4 @@ class FileManagerExtensionTests: XCTestCase {
         XCTAssertTrue(FileManager.default.ky_isWritableDirectory(atPath: "testing/some/deep/directory"))
     }
 
-    func testNonWritableFile() {
-        XCTAssertFalse(FileManager.default.ky_isWritableDirectory(atPath: "testing/some/deep/directory.txt"))
-    }
-
-    func testDirectoryWithPathExtension() {
-        XCTAssertTrue(FileManager.default.ky_isWritableDirectory(atPath: "testing/some/deep/directory.txt/"))
-    }
-
 }

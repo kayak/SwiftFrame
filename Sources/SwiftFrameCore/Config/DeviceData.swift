@@ -115,7 +115,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.absoluteString, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshotsGroupedByLocale.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }

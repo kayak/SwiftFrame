@@ -44,12 +44,9 @@ struct ConfigData: Decodable, ConfigValidatable {
     mutating public func process() throws {
         deviceData = try deviceData.map { try $0.makeProcessedData() }
 
-        var parsedTitles = LocalizedStringFiles()
         let textFiles = try FileManager.default.filesAtPath(stringsPath.absoluteURL, with: "strings")
-        textFiles.forEach { textFile in
-            parsedTitles[textFile.absoluteURL.fileName] = NSDictionary(contentsOf: textFile) as? [String: String]
-        }
-        titles = parsedTitles
+        let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
+        titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.absoluteURL.fileName }), strings))
     }
 
     // MARK: - ConfigValidatable
@@ -64,8 +61,8 @@ struct ConfigData: Decodable, ConfigValidatable {
         }
 
         try outputPaths.forEach {
-            guard FileManager.default.ky_isWritableDirectory(atPath: $0.absoluteString) else {
-                throw NSError(description: "The specified path \($0.absoluteString) is a file")
+            guard FileManager.default.ky_isWritableDirectory(atPath: $0.path) else {
+                throw NSError(description: "The specified path \($0.path) is a file or a non-writable directory")
             }
         }
 
@@ -81,7 +78,7 @@ struct ConfigData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
 
         print("Output paths:", insetByTabs: tabs)
-        outputPaths.forEach { print($0.absoluteString.formattedGreen(), insetByTabs: tabs + 1) }
+        outputPaths.forEach { print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
 
         print("Device data:", insetByTabs: tabs)
         deviceData.forEach {

@@ -72,7 +72,7 @@ public final class ImageWriter {
     static func write(images: [CGImage], to outputPaths: [FileURL], locale: String, suffix: String, format: FileFormat) throws {
         try outputPaths.forEach { url in
             try images.enumerated().forEach { tuple in
-                try write(tuple.element, to: url.absoluteURL.path, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
+                try write(tuple.element, to: url.path, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
             }
         }
     }
