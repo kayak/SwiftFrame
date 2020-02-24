@@ -3,7 +3,8 @@ import Foundation
 
 final class TextRenderer {
 
-    private let kMinFontSize: CGFloat = 1
+    private let ky_MinFontSize: CGFloat = 1
+    private let ky_pointSizeTolerance: CGFloat = 1e-7
 
     // MARK: - Frame Rendering
 
@@ -32,8 +33,9 @@ final class TextRenderer {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: kMinFontSize, maxSize: maxSize, size: size)
-        return min(calculatedFontSize.rounded(.down), maxSize)
+        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: ky_MinFontSize, maxSize: maxSize, size: size)
+        // Subtract some small number to make absolutely sure text will be rendered completely
+        return min(calculatedFontSize.rounded(.down) - ky_pointSizeTolerance, maxSize)
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
@@ -45,7 +47,7 @@ final class TextRenderer {
 
         // if the search range is smaller than 1e-5 of a font size we stop
         // returning either side of min or max depending on the state
-        guard abs(maxSize - minSize) > 1e-5 else {
+        guard abs(maxSize - minSize) > ky_pointSizeTolerance else {
             let maxSizeString = try makeAttributedString(for: string, font: adaptedFont.ky_toFont(ofSize: maxSize), alignment: alignment)
             if formattedString(maxSizeString, fitsIntoRect: size) {
                 return maxSize
@@ -93,27 +95,6 @@ final class TextRenderer {
 
         let constructedAttributes = attributes.joined(separator: "; ")
         return String(format: "<span style=\"%@\">%@</span>", constructedAttributes, text)
-    }
-
-}
-
-@propertyWrapper struct ThreadSafe<T> {
-
-    private var _value: T
-    private let queue: DispatchQueue
-
-    init(initialValue: T, queue: DispatchQueue) {
-        self._value = initialValue
-        self.queue = queue
-    }
-
-    var wrappedValue: T {
-        get {
-            queue.sync { _value }
-        }
-        set {
-            queue.sync { _value = newValue }
-        }
     }
 
 }
