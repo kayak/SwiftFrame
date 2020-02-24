@@ -44,7 +44,7 @@ struct ConfigData: Decodable, ConfigValidatable {
     mutating public func process() throws {
         deviceData = try deviceData.map { try $0.makeProcessedData() }
 
-        let textFiles = try FileManager.default.filesAtPath(stringsPath.absoluteURL, with: "strings")
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings")
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
@@ -107,7 +107,7 @@ struct ConfigData: Decodable, ConfigValidatable {
     func makeSharedFontSizes(for associatedStrings: [AssociatedString]) throws -> [String: CGFloat] {
         return try textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
             let strings = associatedStrings.filter({ $0.data.groupIdentifier == group.identifier })
-            dictionary[group.identifier] = group.sharedFontSize(
+            dictionary[group.identifier] = try group.sharedFontSize(
                 with: strings,
                 globalFont: try fontSource.font(),
                 globalMaxSize: maxFontSize)

@@ -9,32 +9,17 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     let bottomRight: Point
     let topLeft: Point
     let topRight: Point
-    private let _zIndex: Int?
-
-    public var zIndex: Int {
-        _zIndex ?? 0
-    }
-
-    // MARK: - Coding Keys
-
-    enum CodingKeys: String, CodingKey {
-        case screenshotName
-        case bottomLeft
-        case bottomRight
-        case topLeft
-        case topRight
-        case _zIndex = "zIndex"
-    }
+    let zIndex: Int?
 
     // MARK: - Init
 
-    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, _zIndex: Int?) {
+    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int?) {
         self.screenshotName = screenshotName
         self.bottomLeft = bottomLeft
         self.bottomRight = bottomRight
         self.topLeft = topLeft
         self.topRight = topRight
-        self._zIndex = _zIndex
+        self.zIndex = zIndex
     }
 
     // MARK: - Misc
@@ -42,11 +27,11 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     func makeProcessedData(size: CGSize) -> ScreenshotData {
         return ScreenshotData(
             screenshotName: screenshotName,
-            bottomLeft: bottomLeft.convertToBottomLeftOrigin(with: size),
-            bottomRight: bottomRight.convertToBottomLeftOrigin(with: size),
-            topLeft: topLeft.convertToBottomLeftOrigin(with: size),
-            topRight: topRight.convertToBottomLeftOrigin(with: size),
-            _zIndex: _zIndex)
+            bottomLeft: bottomLeft.convertingToBottomLeftOrigin(with: size),
+            bottomRight: bottomRight.convertingToBottomLeftOrigin(with: size),
+            topLeft: topLeft.convertingToBottomLeftOrigin(with: size),
+            topRight: topRight.convertingToBottomLeftOrigin(with: size),
+            zIndex: zIndex)
     }
 
     // MARK: - ConfigValidatable

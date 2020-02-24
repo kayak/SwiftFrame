@@ -8,7 +8,7 @@ struct TextData: Decodable, ConfigValidatable {
     // MARK: - Properties
 
     let titleIdentifier: String
-    let textAlignment: NSTextAlignment
+    let textAlignment: TextAlignment
     /// Text group will be prioritized over this, if specified
     let maxFontSizeOverride: CGFloat?
     let fontOverride: FontSource?
@@ -41,14 +41,15 @@ struct TextData: Decodable, ConfigValidatable {
 
     internal init(
         titleIdentifier: String,
-        textAlignment: NSTextAlignment,
+        textAlignment: TextAlignment,
         maxFontSizeOverride: CGFloat?,
         fontOverride: FontSource?,
         textColorOverrideString: String?,
         groupIdentifier: String?,
         topLeft: Point,
         bottomRight: Point,
-        textColorOverride: NSColor? = nil) {
+        textColorOverride: NSColor? = nil)
+    {
         self.titleIdentifier = titleIdentifier
         self.textAlignment = textAlignment
         self.maxFontSizeOverride = maxFontSizeOverride
@@ -63,8 +64,8 @@ struct TextData: Decodable, ConfigValidatable {
     // MARK: - Misc
 
     func makeProcessedData(size: CGSize) throws -> TextData {
-        let processedTopLeft = topLeft.convertToBottomLeftOrigin(with: size)
-        let processedBottomRight = bottomRight.convertToBottomLeftOrigin(with: size)
+        let processedTopLeft = topLeft.convertingToBottomLeftOrigin(with: size)
+        let processedBottomRight = bottomRight.convertingToBottomLeftOrigin(with: size)
         let colorOverride = try textColorOverrideString.flatMap { try NSColor(hexString: $0) }
 
         return TextData(
@@ -101,7 +102,7 @@ struct TextData: Decodable, ConfigValidatable {
         }
 
         if let textColorOverride = textColorOverride {
-            CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.hexString, insetBy: tabs + 1)
+            CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.ky_hexString, insetBy: tabs + 1)
         }
     }
 }

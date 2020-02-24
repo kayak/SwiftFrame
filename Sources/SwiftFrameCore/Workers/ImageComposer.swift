@@ -45,7 +45,7 @@ final class ImageComposer {
         context.saveGState()
         defer { context.restoreGState() }
 
-        context.draw(templateImage, in: image.nativeRect)
+        context.draw(templateImage, in: image.ky_nativeRect)
     }
 
     // MARK: - Titles Rendering
@@ -78,13 +78,13 @@ final class ImageComposer {
             alignment: textData.textAlignment,
             maxSize: maxFontSize,
             size: textData.rect.size)
-        let adaptedFont = font.toFont(ofSize: fontSize)
+        let adaptedFont = font.ky_toFont(ofSize: fontSize)
         try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
         return fontSize
     }
 
     private func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) throws {
-        let adaptedFont = font.toFont(ofSize: fixedFontSize)
+        let adaptedFont = font.ky_toFont(ofSize: fixedFontSize)
         try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
@@ -92,7 +92,7 @@ final class ImageComposer {
 
     func add(screenshots: [String: URL], with screenshotData: [ScreenshotData], for locale: String) throws {
         try screenshotData.forEach { data in
-            guard let image = screenshots[data.screenshotName]?.bitmapImageRep else {
+            guard let image = NSBitmapImageRep.ky_loadFromURL(screenshots[data.screenshotName]) else {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
             }
             try add(screenshot: image, with: data)

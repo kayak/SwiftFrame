@@ -4,12 +4,19 @@ extension NSBitmapImageRep {
 
     /// When dealing with screenshots from an iOS device for example, the size returned by the `size` property
     /// is scaled down by the UIKit scale of the device. You can use this property to get the actual pixel size
-    var nativeSize: NSSize {
+    var ky_nativeSize: NSSize {
         NSSize(width: pixelsWide, height: pixelsHigh)
     }
 
-    var nativeRect: NSRect {
-        NSRect(origin: .zero, size: nativeSize)
+    var ky_nativeRect: NSRect {
+        NSRect(origin: .zero, size: ky_nativeSize)
+    }
+
+    static func ky_loadFromURL(_ url: URL?) -> NSBitmapImageRep? {
+        guard let url = url else {
+            return nil
+        }
+        return ImageLoader.loadRepresentation(at: url)
     }
 
 }
@@ -37,15 +44,7 @@ extension NSBitmapImageRep.FileType: Decodable {
             return "png"
         case .jpeg:
             return "jpg"
-        case .jpeg2000:
-            return "j2p"
-        case .tiff:
-            return "tiff"
-        case .gif:
-            return "gif"
-        case .bmp:
-            return "bmp"
-        @unknown default:
+        default:
             return "png"
         }
     }

@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 public class ConfigProcessor {
@@ -54,7 +55,7 @@ public class ConfigProcessor {
         DispatchQueue.global().async { [weak self] in
             self?.data.deviceData.enumerated().forEach {
                 let deviceData = $0.element
-                DispatchQueue.global().ky_asyncThrowing {
+                DispatchQueue.global().ky_asyncOrExit {
                     try self?.process(deviceData: deviceData, completion: resultCompletion)
                 }
             }
@@ -71,11 +72,11 @@ public class ConfigProcessor {
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
             guard let templateImage = deviceData.templateImage else { throw NSError(description: "No template image found") }
 
-            guard let sliceSize = imageDict.first?.value.bitmapImageRep?.nativeSize else {
+            guard let sliceSize = NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
                 throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
             }
 
-            let composer = try ImageComposer(canvasSize: templateImage.nativeSize)
+            let composer = try ImageComposer(canvasSize: templateImage.ky_nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
             try composer.addTemplateImage(templateImage)
 

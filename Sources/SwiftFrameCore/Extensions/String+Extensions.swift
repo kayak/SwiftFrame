@@ -11,13 +11,9 @@ extension String {
         "\u{001B}[0;31m" + self + "\u{001B}[0;39m"
     }
 
-    public func formattedUnderlined() -> String {
-        "\u{001b}[4m" + self + "\u{001B}[0;39m"
-    }
-
     /// Breaks the receiver on the specified delimiter to form lines of the given length. The line length
     /// cannot be guaranteed and may be exceeded if the receiver doesn't allow otherwise.
-    func toFuzzyLines(ofLength lineLength: Int, breakingOn delimiter: String) -> [String] {
+    func ky_toFuzzyLines(ofLength lineLength: Int, breakingOn delimiter: String) -> [String] {
         var buffer = self
         var lines = [String]()
         while !buffer.isEmpty {
@@ -48,8 +44,8 @@ extension String {
         return String(format: "%\(width)-s", (self as NSString).utf8String!)
     }
 
-    public func ky_data(using encoding: String.Encoding, allowLossyConversion: Bool = false) throws -> Data {
-        guard let data = self.data(using: encoding, allowLossyConversion: allowLossyConversion) else {
+    public func ky_data(using encoding: String.Encoding) throws -> Data {
+        guard let data = self.data(using: encoding, allowLossyConversion: false) else {
             throw NSError(description: "Could not create data from string")
         }
         return data

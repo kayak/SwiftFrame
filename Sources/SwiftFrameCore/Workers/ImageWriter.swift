@@ -17,7 +17,7 @@ public final class ImageWriter {
         guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
-        DispatchQueue.global().ky_asyncThrowing {
+        DispatchQueue.global().ky_asyncOrExit {
             let slices = sliceImage(image, with: sliceSize)
             var slicesFinished = false
             var bigImageFinished = !outputWholeImage
@@ -27,7 +27,7 @@ public final class ImageWriter {
 
             // Writing images asynchronously gave a big performance boost, what a surprise
             // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
-            DispatchQueue.global().ky_asyncThrowing {
+            DispatchQueue.global().ky_asyncOrExit {
                 try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
                 slicesFinished = true
                 if slicesFinished && bigImageFinished {
@@ -36,7 +36,7 @@ public final class ImageWriter {
             }
 
             if outputWholeImage {
-                DispatchQueue.global().ky_asyncThrowing {
+                DispatchQueue.global().ky_asyncOrExit {
                     try outputPaths.forEach {
                         try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
                     }

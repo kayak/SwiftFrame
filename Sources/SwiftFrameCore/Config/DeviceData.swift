@@ -64,7 +64,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
         let processedScreenshotData = screenshotData
             .map { $0.makeProcessedData(size: rep.size)}
-            .sorted { $0.zIndex < $1.zIndex }
+            .sorted { $0.zIndex ?? 0 < $1.zIndex ?? 0 }
 
         return DeviceData(
             outputSuffix: outputSuffix,
@@ -84,16 +84,16 @@ public struct DeviceData: Decodable, ConfigValidatable {
                 return
             }
             try localeDict.value.forEach {
-                if $0.value.bitmapImageRep?.nativeSize != first.bitmapImageRep?.nativeSize {
+                if NSBitmapImageRep.ky_loadFromURL($0.value)?.ky_nativeSize != NSBitmapImageRep.ky_loadFromURL(first)?.ky_nativeSize {
                     throw NSError(description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"")
                 }
             }
         }
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
-        if let screenshotSize = screenshotsGroupedByLocale.first?.value.first?.value.bitmapImageRep?.nativeSize {
+        if let screenshotSize = NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
             guard
-                let templateImageSize = templateImage?.nativeSize,
+                let templateImageSize = templateImage?.ky_nativeSize,
                 templateImageSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00
             else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")

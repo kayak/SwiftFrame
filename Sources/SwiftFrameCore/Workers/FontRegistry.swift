@@ -12,16 +12,6 @@ final class FontRegistry {
 
     // MARK: - Font Handling
 
-    // We have to parse and create the attributed string on the main thread since it uses WebKit according to this SO answer:
-    // https://stackoverflow.com/questions/4217820/convert-html-to-nsattributedstring-in-ios/34190968#34190968
-    func makeAttributedString(from data: Data) -> NSMutableAttributedString? {
-        if !Thread.isMainThread {
-            return DispatchQueue.main.sync { makeAttributedString(from: data) }
-        }
-
-        return NSMutableAttributedString(html: data, documentAttributes: nil)
-    }
-
     /// Registers the font at the specified path if source is a file rather than `NSFont`
     @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
         switch source {
