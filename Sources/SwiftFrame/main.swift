@@ -5,20 +5,9 @@ import SwiftFrameCore
 
 do {
 
-    let options = CommandLineOptions()
-    try options.parse(arguments: CommandLine.arguments)
+    let parseResult = try CommandParser.parse(CommandLine.arguments)
 
-    guard !options.help.isSpecified else {
-        print(options.summarizeUsage())
-        exit(0)
-    }
-
-    // Parse config data
-    guard let configPath = options.configPath.arguments.first else {
-        throw NSError(description: "Please specify a config file path")
-    }
-
-    let processor = try ConfigProcessor(filePath: configPath, verbose: options.verbose.isSpecified)
+    let processor = try ConfigProcessor(filePath: parseResult.path, verbose: parseResult.verbose)
     try processor.validate()
     try processor.run()
 

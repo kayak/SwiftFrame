@@ -11,9 +11,12 @@ let package = Package(
     products: [
         .executable(name: "swiftframe", targets: ["SwiftFrame"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-package-manager", .revision("swift-5.1.4-RELEASE"))
+    ],
     targets: [
         .target(name: "SwiftFrame", dependencies: ["SwiftFrameCore"]),
-        .target(name: "SwiftFrameCore"),
+        .target(name: "SwiftFrameCore", dependencies: ["SPMUtility"]),
         .testTarget(name: "SwiftFrameTests", dependencies: ["SwiftFrameCore"])
     ]
 )
