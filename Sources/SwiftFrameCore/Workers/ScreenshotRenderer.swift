@@ -10,9 +10,8 @@ final class ScreenshotRenderer {
         let rect = calculateRect(for: data)
 
         context.saveGState()
-        defer { context.restoreGState() }
-
         context.draw(cgImage, in: rect)
+        context.restoreGState()
     }
 
     private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData) throws -> CGImage {

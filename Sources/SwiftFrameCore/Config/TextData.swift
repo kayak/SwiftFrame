@@ -64,8 +64,8 @@ struct TextData: Decodable, ConfigValidatable {
     // MARK: - Misc
 
     func makeProcessedData(size: CGSize) throws -> TextData {
-        let processedTopLeft = topLeft.convertingToBottomLeftOrigin(with: size)
-        let processedBottomRight = bottomRight.convertingToBottomLeftOrigin(with: size)
+        let processedTopLeft = topLeft.convertingToBottomLeftOrigin(withSize: size)
+        let processedBottomRight = bottomRight.convertingToBottomLeftOrigin(withSize: size)
         let colorOverride = try textColorOverrideString.flatMap { try NSColor(hexString: $0) }
 
         return TextData(

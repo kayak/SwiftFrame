@@ -27,10 +27,10 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     func makeProcessedData(size: CGSize) -> ScreenshotData {
         return ScreenshotData(
             screenshotName: screenshotName,
-            bottomLeft: bottomLeft.convertingToBottomLeftOrigin(with: size),
-            bottomRight: bottomRight.convertingToBottomLeftOrigin(with: size),
-            topLeft: topLeft.convertingToBottomLeftOrigin(with: size),
-            topRight: topRight.convertingToBottomLeftOrigin(with: size),
+            bottomLeft: bottomLeft.convertingToBottomLeftOrigin(withSize: size),
+            bottomRight: bottomRight.convertingToBottomLeftOrigin(withSize: size),
+            topLeft: topLeft.convertingToBottomLeftOrigin(withSize: size),
+            topRight: topRight.convertingToBottomLeftOrigin(withSize: size),
             zIndex: zIndex)
     }
 

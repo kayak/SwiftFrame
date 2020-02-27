@@ -13,12 +13,13 @@ public final class ImageWriter {
         locale: String,
         suffix: String,
         format: FileFormat,
-        completion: @escaping () throws -> Void) throws {
+        completion: @escaping () throws -> Void) throws
+    {
         guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
         DispatchQueue.global().ky_asyncOrExit {
-            let slices = sliceImage(image, with: sliceSize)
+            let slices = try sliceImage(image, with: sliceSize)
             var slicesFinished = false
             var bigImageFinished = !outputWholeImage
 
@@ -47,24 +48,24 @@ public final class ImageWriter {
                 }
             }
 
-            _ = workGroup.wait(timeout: .now() + 5.00)
+            workGroup.wait()
             try completion()
         }
     }
 
-    static func sliceImage(_ image: CGImage, with size: CGSize) -> [CGImage] {
-        guard CGFloat(image.width).truncatingRemainder(dividingBy: size.width) == 0 else {
-            print("Image width is not a multiple in width of desired size")
-            return []
-        }
+    static func sliceImage(_ image: CGImage, with size: CGSize) throws -> [CGImage] {
         let numberOfSlices = image.width / Int(size.width)
-        var croppedImages = [CGImage?]()
+        var croppedImages = [CGImage]()
 
         for i in 0..<numberOfSlices {
             let rect = CGRect(x: size.width * CGFloat(i), y: 0, width: size.width, height: size.height)
-            croppedImages.append(image.cropping(to: rect))
+            croppedImages.ky_appendIfNotNil(image.cropping(to: rect))
         }
-        return croppedImages.compactMap { $0 }
+
+        guard croppedImages.count == numberOfSlices else {
+            throw NSError(description: "Actual number of cropped images was smaller than target number")
+        }
+        return croppedImages
     }
 
     // MARK: - Writing Images
@@ -98,6 +99,16 @@ public final class ImageWriter {
             .appendingPathComponent(fileName)
             .appendingPathExtension(format.fileExtension)
         try data.ky_write(to: targetURL, options: .atomicWrite)
+    }
+
+}
+
+fileprivate extension Array {
+
+    mutating func ky_appendIfNotNil(_ newElement: Element?) {
+        if let newElement = newElement {
+            append(newElement)
+        }
     }
 
 }

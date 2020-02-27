@@ -22,7 +22,7 @@ class ImageComposerTests: XCTestCase {
             throw NSError(description: "Rendered image was nil")
         }
 
-        let slices = ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50))
+        let slices = try ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50))
         XCTAssertEqual(slices.count, 5)
     }
 

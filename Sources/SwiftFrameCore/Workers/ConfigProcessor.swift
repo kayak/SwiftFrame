@@ -6,7 +6,7 @@ public class ConfigProcessor {
     // MARK: - Properties
 
     private var data: ConfigData
-    var verbose: Bool
+    let verbose: Bool
 
     // MARK: - Init
 
@@ -36,11 +36,21 @@ public class ConfigProcessor {
             _ = readLine()
         }
 
-        print("Parsed and validated config file\nRendering...\n")
+        print("Parsed and validated config file")
+
+        if data.clearDirectoriesFirst {
+            print("Clearing Output Directories")
+            try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
+        }
+
+        print("Rendering...\n")
 
         var fileWriteFinishers = 0
         let requiredFileWrites = data.deviceData.count * data.titles.count
 
+        // We need a special semaphore here, since the creation of the attributed strings has to happen
+        // on the main thread and anything else can happen asynchronously but we still want to finish
+        // execution only when everything has finished
         let semaphore = RunLoopSemaphore()
 
         let resultCompletion: () throws -> Void = {
@@ -52,20 +62,18 @@ public class ConfigProcessor {
 
         let start = CFAbsoluteTimeGetCurrent()
 
-        DispatchQueue.global().async { [weak self] in
-            self?.data.deviceData.enumerated().forEach {
-                let deviceData = $0.element
-                DispatchQueue.global().ky_asyncOrExit {
-                    try self?.process(deviceData: deviceData, completion: resultCompletion)
-                }
+        data.deviceData.enumerated().forEach {
+            let deviceData = $0.element
+            DispatchQueue.global().ky_asyncOrExit { [weak self] in
+                try self?.process(deviceData: deviceData, completion: resultCompletion)
             }
         }
 
-        semaphore.wait(timeout: .now() + 100.00)
+        semaphore.wait()
 
         print("All done!".formattedGreen())
         let diff = CFAbsoluteTimeGetCurrent() - start
-        printVerbose("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
+        print("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
     }
 
     private func process(deviceData: DeviceData, completion: @escaping () throws -> Void) throws {

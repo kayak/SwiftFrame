@@ -56,7 +56,7 @@ final class FontRegistry {
         }
 
         // If we're dealing with a ttc file, it can contain multiple weights and font styles. If we arbitrarily choose the first descriptor in the file,
-        // we could end up with the bold version of the font for example which would then kill of any <b> tags in the string files
+        // we could end up with the bold version of the font for example which would then kill off any <b> tags in the string files
         let descriptor: CTFontDescriptor? = descriptors.count > 1
             ? descriptors.first(where: { CTFontDescriptorCopyAttribute($0, kCTFontStyleNameAttribute) as? String == "Regular" }) ?? descriptors.first
             : descriptors.first

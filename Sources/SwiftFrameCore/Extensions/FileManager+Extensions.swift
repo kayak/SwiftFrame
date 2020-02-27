@@ -13,4 +13,16 @@ extension FileManager {
         return urls.filter { $0.hasDirectoryPath }
     }
 
+    func ky_clearDirectories(_ urls: [FileURL], localeFolders: [String]) throws {
+        try urls.forEach { url in
+            let mappedURLs = localeFolders.map { url.absoluteURL.appendingPathComponent($0) }
+            try mappedURLs.forEach {
+                let contents = try contentsOfDirectory(at: $0, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                try contents.forEach {
+                    try removeItem(at: $0)
+                }
+            }
+        }
+    }
+
 }

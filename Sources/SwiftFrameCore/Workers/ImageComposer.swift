@@ -5,6 +5,13 @@ import CoreImage
 
 final class ImageComposer {
 
+    // MARK: - Nested Type
+
+    enum FontMode {
+        case dynamic(maxSize: CGFloat)
+        case fixed(pointSize: CGFloat)
+    }
+
     // MARK: - Properties
 
     private let textRenderer = TextRenderer()
@@ -43,48 +50,45 @@ final class ImageComposer {
         }
 
         context.saveGState()
-        defer { context.restoreGState() }
-
         context.draw(templateImage, in: image.ky_nativeRect)
+        context.restoreGState()
     }
 
     // MARK: - Titles Rendering
 
     func addStrings(_ associatedStrings: [AssociatedString], maxFontSizeByGroup: [String: CGFloat], font: NSFont, color: NSColor, maxFontSize: CGFloat) throws {
         try associatedStrings.forEach {
+            let fontMode: FontMode
             if let sharedSize = $0.data.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
                 // Can use fixed font size since common maximum has already been calculated
-                try add(
-                    title: $0.string,
-                    font: $0.data.fontOverride?.font() ?? font,
-                    color: $0.data.textColorOverride ?? color,
-                    fixedFontSize: sharedSize,
-                    textData: $0.data)
+                fontMode = .fixed(pointSize: sharedSize)
             } else {
-                try add(
-                    title: $0.string,
-                    font: $0.data.fontOverride?.font() ?? font,
-                    color: $0.data.textColorOverride ?? color,
-                    maxFontSize: $0.data.maxFontSizeOverride ?? maxFontSize,
-                    textData: $0.data)
+                fontMode = .dynamic(maxSize: $0.data.maxFontSizeOverride ?? maxFontSize)
             }
+
+            try add(
+                title: $0.string,
+                font: $0.data.fontOverride?.font() ?? font,
+                color: $0.data.textColorOverride ?? color,
+                fontMode: fontMode,
+                textData: $0.data)
         }
     }
 
-    @discardableResult private func add(title: String, font: NSFont, color: NSColor, maxFontSize: CGFloat, textData: TextData) throws -> CGFloat {
-        let fontSize = try textRenderer.maximumFontSizeThatFits(
-            string: title,
-            font: font,
-            alignment: textData.textAlignment,
-            maxSize: maxFontSize,
-            size: textData.rect.size)
+    private func add(title: String, font: NSFont, color: NSColor, fontMode: FontMode, textData: TextData) throws {
+        let fontSize: CGFloat
+        switch fontMode {
+        case let .dynamic(maxSize: maxSize):
+            fontSize = try textRenderer.maximumFontSizeThatFits(
+                string: title,
+                font: font,
+                alignment: textData.textAlignment,
+                maxSize: maxSize,
+                size: textData.rect.size)
+        case let .fixed(pointSize: size):
+            fontSize = size
+        }
         let adaptedFont = font.ky_toFont(ofSize: fontSize)
-        try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
-        return fontSize
-    }
-
-    private func add(title: String, font: NSFont, color: NSColor, fixedFontSize: CGFloat, textData: TextData) throws {
-        let adaptedFont = font.ky_toFont(ofSize: fixedFontSize)
         try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
@@ -95,12 +99,8 @@ final class ImageComposer {
             guard let image = NSBitmapImageRep.ky_loadFromURL(screenshots[data.screenshotName]) else {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
             }
-            try add(screenshot: image, with: data)
+            try screenshotRenderer.render(screenshot: image, with: data, in: context)
         }
-    }
-
-    func add(screenshot: NSBitmapImageRep, with data: ScreenshotData) throws {
-        try screenshotRenderer.render(screenshot: screenshot, with: data, in: context)
     }
 
 }

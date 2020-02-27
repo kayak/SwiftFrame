@@ -18,7 +18,7 @@ struct Point: Codable, Equatable {
 
     // MARK: - Coordinate space conversion
 
-    public func convertingToBottomLeftOrigin(with size: CGSize) -> Point {
+    public func convertingToBottomLeftOrigin(withSize size: CGSize) -> Point {
         let newY = Int(size.height) - y
         return Point(x: x, y: newY)
     }
