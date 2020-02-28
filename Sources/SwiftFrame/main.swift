@@ -5,9 +5,9 @@ import SwiftFrameCore
 
 do {
 
-    let parseResult = try CommandParser.parse(CommandLine.arguments)
+    let parseResult = try CommandParser().parse(CommandLine.arguments)
 
-    let processor = try ConfigProcessor(filePath: parseResult.path, verbose: parseResult.verbose)
+    let processor = try ConfigProcessor(filePath: parseResult.path, verbose: parseResult.verbose, format: parseResult.format)
     try processor.validate()
     try processor.run()
 
