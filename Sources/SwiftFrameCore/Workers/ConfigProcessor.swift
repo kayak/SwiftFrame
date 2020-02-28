@@ -11,24 +11,10 @@ public class ConfigProcessor {
 
     // MARK: - Init
 
-    public init(filePath: String, verbose: Bool, format: CommandParser.Result.ConfigFormat) throws {
+    public init(filePath: String, verbose: Bool) throws {
         let configURL = URL(fileURLWithPath: filePath)
-        let bytes = try Data(contentsOf: configURL)
-
-        data = try ConfigProcessor.parseConfigFrom(from: bytes, format: format)
+        data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
-    }
-
-    private static func parseConfigFrom(from bytes: Data, format: CommandParser.Result.ConfigFormat) throws -> ConfigData {
-        switch format {
-        case .json:
-            return try JSONDecoder().decode(ConfigData.self, from: bytes)
-        case .yaml:
-            guard let yamlString = String(data: bytes, encoding: .utf8) else {
-                throw NSError(description: "Specified config file was not a text file")
-            }
-            return try YAMLDecoder().decode(ConfigData.self, from: yamlString)
-        }
     }
 
     // MARK: - Methods
@@ -128,7 +114,7 @@ public class ConfigProcessor {
     func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
         if verbose {
             let formattedArgs = args.map { String(describing: $0) }.joined(separator: " ")
-            print(formattedArgs, insetByTabs: tabs)
+            ky_print(formattedArgs, insetByTabs: tabs)
         }
     }
 

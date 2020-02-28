@@ -3,8 +3,8 @@ import Foundation
 
 final class TextRenderer {
 
-    private let ky_MinFontSize: CGFloat = 1
-    private let ky_pointSizeTolerance: CGFloat = 1e-7
+    private let minFontSize: CGFloat = 1
+    static let pointSizeTolerance: CGFloat = 1e-7
 
     // MARK: - Frame Rendering
 
@@ -12,10 +12,9 @@ final class TextRenderer {
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
-        defer { context.restoreGState() }
-
         let frame = makeFrame(from: attributedString, in: rect)
         CTFrameDraw(frame, context)
+        context.restoreGState()
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
@@ -33,9 +32,9 @@ final class TextRenderer {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: ky_MinFontSize, maxSize: maxSize, size: size)
+        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: minFontSize, maxSize: maxSize, size: size)
         // Subtract some small number to make absolutely sure text will be rendered completely
-        return min(calculatedFontSize.rounded(.down) - ky_pointSizeTolerance, maxSize)
+        return min(calculatedFontSize.rounded(.down) - TextRenderer.pointSizeTolerance, maxSize)
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
@@ -47,7 +46,7 @@ final class TextRenderer {
 
         // if the search range is smaller than 1e-5 of a font size we stop
         // returning either side of min or max depending on the state
-        guard abs(maxSize - minSize) > ky_pointSizeTolerance else {
+        guard abs(maxSize - minSize) > TextRenderer.pointSizeTolerance else {
             let maxSizeString = try makeAttributedString(for: string, font: adaptedFont.ky_toFont(ofSize: maxSize), alignment: alignment)
             if formattedString(maxSizeString, fitsIntoRect: size) {
                 return maxSize
@@ -77,7 +76,7 @@ final class TextRenderer {
 
     private func makeAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white, alignment: TextAlignment) throws -> NSAttributedString {
         let htmlString = makeHTMLFormattedString(for: htmlString, font: font, color: color)
-        guard let stringData = htmlString.data(using: .utf8), let attributedString = NSMutableAttributedString.ky_makeFromData(stringData) else {
+        guard let stringData = htmlString.data(using: .utf8), let attributedString = NSMutableAttributedString.ky_makeFromHTMLData(stringData) else {
             throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
         }
         attributedString.setAlignment(alignment.nsAlignment, range: NSRange(location: 0, length: attributedString.length))

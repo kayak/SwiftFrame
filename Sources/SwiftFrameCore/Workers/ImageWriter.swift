@@ -41,7 +41,7 @@ public final class ImageWriter {
         }
 
         workGroup.wait()
-        workGroup.ky_notifyOrDie(queue: .global()) {
+        workGroup.ky_notifyOrExit(queue: .global()) {
             try completion()
         }
     }

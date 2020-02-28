@@ -5,22 +5,13 @@ import Yams
 public class CommandParser {
 
     public struct Result {
-
-        public enum ConfigFormat {
-            case json
-            case yaml
-        }
-
         public let verbose: Bool
         public let path: String
-        public let format: ConfigFormat
-
     }
 
     private let parser: ArgumentParser
     private let configFlag: OptionArgument<String>
     private let verboseFlag: OptionArgument<Bool>
-    private let configFormatFlag: OptionArgument<String>
 
     public init() {
         parser = ArgumentParser(
@@ -40,12 +31,6 @@ public class CommandParser {
             kind: Bool.self,
             usage: "Prints additional information and lets you verify the config file before rendering",
             completion: .unspecified)
-        configFormatFlag = parser.add(
-            option: "--format",
-            shortName: "-f",
-            kind: String.self,
-            usage: "Specifies the format of the config file. \"json\" or \"yaml\" are allowed",
-            completion: .unspecified)
     }
 
     public func parse(_ arguments: [String]) throws -> Result {
@@ -55,28 +40,11 @@ public class CommandParser {
         let result = try parser.parse(cleanedArgs)
 
         let verbose = result.get(verboseFlag) ?? false
-        let format = result.get(configFormatFlag)
 
         guard let path = result.get(configFlag) else {
             throw NSError(description: "No config file path was specified")
         }
-        return Result(verbose: verbose, path: path, format: formatFromArgument(format))
-    }
-
-    private func formatFromArgument(_ argument: String?) -> Result.ConfigFormat {
-        guard let argument = argument else {
-            return .json
-        }
-
-        switch argument {
-        case "json", "JSON":
-            return .json
-        case "yaml", "YAML":
-            return .yaml
-        default:
-            print(CommandLineFormatter.formatWarning("Unknown config format specified, defaulting to JSON"))
-            return .json
-        }
+        return Result(verbose: verbose, path: path)
     }
 
 }

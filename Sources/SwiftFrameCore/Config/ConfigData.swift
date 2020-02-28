@@ -66,17 +66,17 @@ struct ConfigData: Decodable, ConfigValidatable {
     }
 
     public func printSummary(insetByTabs tabs: Int) {
-        print("### Config Summary Begin", insetByTabs: tabs)
+        ky_print("### Config Summary Begin", insetByTabs: tabs)
         CommandLineFormatter.printKeyValue("Outputs whole image as well as slices", value: outputWholeImage)
         CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)
         CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
 
-        print("Output paths:", insetByTabs: tabs)
-        outputPaths.forEach { print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
+        ky_print("Output paths:", insetByTabs: tabs)
+        outputPaths.forEach { ky_print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
 
-        print("Device data:", insetByTabs: tabs)
+        ky_print("Device data:", insetByTabs: tabs)
         deviceData.forEach {
             $0.printSummary(insetByTabs: tabs + 1)
             print()

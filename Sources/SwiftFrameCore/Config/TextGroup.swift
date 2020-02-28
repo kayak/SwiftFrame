@@ -22,7 +22,7 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
     func validate() throws {}
 
     func printSummary(insetByTabs tabs: Int) {
-        print("Text group: \(identifier)", insetByTabs: tabs)
+        ky_print("Text group: \(identifier)", insetByTabs: tabs)
         CommandLineFormatter.printKeyValue("Identifier", value: identifier, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Max font size", value: maxFontSize, insetBy: tabs + 1)
     }
