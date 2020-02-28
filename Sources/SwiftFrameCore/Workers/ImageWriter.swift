@@ -18,37 +18,30 @@ public final class ImageWriter {
         guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
+        let slices = try sliceImage(image, with: sliceSize)
+
+        let workGroup = DispatchGroup()
+
+        // Writing images asynchronously gave a big performance boost, what a surprise
+        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
+        workGroup.enter()
         DispatchQueue.global().ky_asyncOrExit {
-            let slices = try sliceImage(image, with: sliceSize)
-            var slicesFinished = false
-            var bigImageFinished = !outputWholeImage
+            try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
+            workGroup.leave()
+        }
 
-            let workGroup = DispatchGroup()
+        if outputWholeImage {
             workGroup.enter()
-
-            // Writing images asynchronously gave a big performance boost, what a surprise
-            // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
             DispatchQueue.global().ky_asyncOrExit {
-                try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
-                slicesFinished = true
-                if slicesFinished && bigImageFinished {
-                    workGroup.leave()
+                try outputPaths.forEach {
+                    try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
                 }
+                workGroup.leave()
             }
+        }
 
-            if outputWholeImage {
-                DispatchQueue.global().ky_asyncOrExit {
-                    try outputPaths.forEach {
-                        try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
-                    }
-                    bigImageFinished = true
-                    if slicesFinished && bigImageFinished {
-                        workGroup.leave()
-                    }
-                }
-            }
-
-            workGroup.wait()
+        workGroup.wait()
+        workGroup.ky_notifyOrDie(queue: .global()) {
             try completion()
         }
     }
