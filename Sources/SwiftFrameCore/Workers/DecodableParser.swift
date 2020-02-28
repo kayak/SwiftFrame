@@ -25,11 +25,31 @@ struct DecodableParser {
     private enum FileFormat: String {
         case json
         case yaml
+
+        var decoder: KYDecoder {
+            switch self {
+            case .json:
+                return JSONDecoder()
+            case .yaml:
+                
+            }
+        }
+
+        init?(rawValue: String) {
+            switch rawValue {
+            case "json":
+                self = .json
+            case "yml", "yaml":
+                self = .yaml
+            default:
+                return nil
+            }
+        }
     }
 
     static func parseData<T>(fromURL url: URL) throws -> T where T: Decodable {
         let data = try Data(contentsOf: url)
-        let decoder = try decoderForFile(atURL: url)
+        let decoder = try determineFileFormat(forURL: url).decoder
 
         return try decoder.decode(T.self, from: data)
     }
@@ -39,20 +59,14 @@ struct DecodableParser {
             return format
         } else {
             let contentsOfFile = try String(contentsOf: url)
-            if contentsOfFile.components(separatedBy: .newlines).first?.hasPrefix("{") ?? false {
+            let firstLine = contentsOfFile.components(separatedBy: .newlines).first
+            if firstLine?.hasPrefix("{") ?? false {
                 return .json
+            } else if firstLine?.hasPrefix("---") ?? false {
+                return .yaml
             } else {
                 throw NSError(description: "Unknown file format")
             }
-        }
-    }
-
-    static func decoderForFile(atURL url: URL) throws -> KYDecoder {
-        switch try determineFileFormat(forURL: url) {
-        case .json:
-            return JSONDecoder()
-        case .yaml:
-            return YAMLDecoder()
         }
     }
 
