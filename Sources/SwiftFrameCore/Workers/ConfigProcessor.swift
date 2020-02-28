@@ -1,6 +1,5 @@
 import AppKit
 import Foundation
-import Yams
 
 public class ConfigProcessor {
 

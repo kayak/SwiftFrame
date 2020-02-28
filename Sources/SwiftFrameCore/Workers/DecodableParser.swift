@@ -31,7 +31,7 @@ struct DecodableParser {
             case .json:
                 return JSONDecoder()
             case .yaml:
-                
+                return YAMLDecoder()
             }
         }
 

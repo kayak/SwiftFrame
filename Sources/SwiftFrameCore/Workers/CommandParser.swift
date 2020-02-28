@@ -1,6 +1,5 @@
 import Foundation
 import SPMUtility
-import Yams
 
 public class CommandParser {
 
