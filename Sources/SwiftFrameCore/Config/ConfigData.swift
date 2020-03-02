@@ -13,7 +13,7 @@ struct ConfigData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
-    let clearDirectoriesFirst: Bool
+    let clearDirectories: Bool
     let outputWholeImage: Bool
     let textGroups: [TextGroup]?
     let stringsPath: FileURL
@@ -29,7 +29,7 @@ struct ConfigData: Decodable, ConfigValidatable {
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
-        case clearDirectoriesFirst
+        case clearDirectories
         case outputWholeImage
         case deviceData
         case textGroups

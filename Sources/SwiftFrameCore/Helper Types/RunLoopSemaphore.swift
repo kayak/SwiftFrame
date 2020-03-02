@@ -5,17 +5,23 @@ import Foundation
 /// See: http://stackoverflow.com/questions/17920169/how-to-wait-for-method-that-has-completion-block-all-on-main-thread
 public class RunLoopSemaphore {
 
+    var signalsRemaining: Int?
+
     private var isRunLoopNested = false
     private var isOperationCompleted = false
 
-    public init() {}
+    public init(count: Int? = nil) {
+        signalsRemaining = count
+    }
 
     public func signal() {
+        incrementCounter()
         guard !isOperationCompleted else {
             return
         }
-        isOperationCompleted = true
-        if isRunLoopNested {
+        isOperationCompleted = signalsRemaining == 0
+
+        if isRunLoopNested && (signalsRemaining ?? 0) == 0 {
             CFRunLoopStop(CFRunLoopGetCurrent())
         }
     }
@@ -30,6 +36,12 @@ public class RunLoopSemaphore {
             isRunLoopNested = true
             CFRunLoopRun()
             isRunLoopNested = false
+        }
+    }
+
+    private func incrementCounter() {
+        if let signals = signalsRemaining {
+            self.signalsRemaining = signals - 1
         }
     }
 

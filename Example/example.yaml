@@ -1,5 +1,5 @@
 ---
-clearDirectoriesFirst: true
+clearDirectories: true
 format: png
 stringsPath: Example/Strings/
 maxFontSize: 140

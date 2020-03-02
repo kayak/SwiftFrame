@@ -41,9 +41,7 @@ public final class ImageWriter {
         }
 
         workGroup.wait()
-        workGroup.ky_notifyOrExit(queue: .global()) {
-            try completion()
-        }
+        try DispatchQueue.main.sync { try completion() }
     }
 
     static func sliceImage(_ image: CGImage, with size: CGSize) throws -> [CGImage] {
@@ -52,7 +50,7 @@ public final class ImageWriter {
 
         for i in 0..<numberOfSlices {
             let rect = CGRect(x: size.width * CGFloat(i), y: 0, width: size.width, height: size.height)
-            croppedImages.ky_appendIfNotNil(image.cropping(to: rect))
+            image.cropping(to: rect).flatMap { croppedImages.append($0) }
         }
 
         guard croppedImages.count == numberOfSlices else {
@@ -92,16 +90,6 @@ public final class ImageWriter {
             .appendingPathComponent(fileName)
             .appendingPathExtension(format.fileExtension)
         try data.ky_write(to: targetURL, options: .atomicWrite)
-    }
-
-}
-
-fileprivate extension Array {
-
-    mutating func ky_appendIfNotNil(_ newElement: Element?) {
-        if let newElement = newElement {
-            append(newElement)
-        }
     }
 
 }

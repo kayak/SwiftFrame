@@ -6,7 +6,7 @@ extension ConfigData {
 
     static var goodData: Self {
         ConfigData(
-            clearDirectoriesFirst: true,
+            clearDirectories: true,
             outputWholeImage: true,
             textGroups: nil,
             stringsPath: FileURL(path: "testing/strings/"),
@@ -20,7 +20,7 @@ extension ConfigData {
 
     static var invalidData: Self {
         ConfigData(
-            clearDirectoriesFirst: true,
+            clearDirectories: true,
             outputWholeImage: true,
             textGroups: nil,
             stringsPath: FileURL(path: "testing/strings/"),

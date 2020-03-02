@@ -8,7 +8,7 @@ extension NSError {
 
 }
 
-public func ky_executeSafely<T>(_ work: () throws -> T) -> T {
+public func ky_executeOrExit<T>(_ work: () throws -> T) -> T {
     do {
         return try work()
     } catch let error as NSError {
