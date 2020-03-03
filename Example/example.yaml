@@ -1,0 +1,112 @@
+---
+clearDirectories: true
+format: png
+stringsPath: Example/Strings/
+maxFontSize: 140
+outputPaths:
+  - Example/Output/
+fontFile: "/System/Library/Fonts/HelveticaNeue.ttc"
+textColor: "#FFF"
+outputWholeImage: true
+deviceData:
+  - outputSuffix: iPhone X 5.8 inches
+    screenshots: Example/Screenshots/iPhone X/
+    templateFile: Example/Template Files/iPhone X TemplateFile.png
+    screenshotData:
+      - screenshotName: launchscreen.png
+        zIndex: 12
+        bottomLeft:
+          x: 133
+          y: 2028
+        bottomRight:
+          x: 994
+          y: 2028
+        topLeft:
+          x: 133
+          y: 164
+        topRight:
+          x: 994
+          y: 164
+      - screenshotName: frontdoor.png
+        zIndex: 5
+        bottomLeft:
+          x: 1241
+          y: 1452
+        bottomRight:
+          x: 1852
+          y: 2059
+        topLeft:
+          x: 2561
+          y: 132
+        topRight:
+          x: 3171
+          y: 742
+    textData:
+      - identifier: welcome-title
+        topLeft:
+          x: 66
+          y: 2137
+        bottomRight:
+          x: 1059
+          y: 2377
+        alignment: center
+      - identifier: button-callout
+        topLeft:
+          x: 2349
+          y: 1811
+        bottomRight:
+          x: 3258
+          y: 2171
+        colorOverride: "#ff7518"
+        alignment: right
+  - outputSuffix: iPad Pro 12.9 inch
+    screenshots: Example/Screenshots/iPad Pro/
+    templateFile: Example/Template Files/iPad Pro TemplateFile.png
+    screenshotData:
+      - screenshotName: launchscreen.png
+        zIndex: 12
+        bottomLeft:
+          x: 234
+          y: 2266
+        bottomRight:
+          x: 1812
+          y: 2266
+        topLeft:
+          x: 234
+          y: 162
+        topRight:
+          x: 1812
+          y: 162
+      - screenshotName: frontdoor.png
+        zIndex: 5
+        bottomLeft:
+          x: 2290
+          y: 1008
+        bottomRight:
+          x: 3511
+          y: 2228
+        topLeft:
+          x: 3919
+          y: -621
+        topRight:
+          x: 5139
+          y: 600
+    textData:
+      - identifier: welcome-title
+        topLeft:
+          x: 166
+          y: 2405
+        bottomRight:
+          x: 1882
+          y: 2525
+        alignment: center
+        customFontPath: "/System/Library/Fonts/Avenir Next.ttc"
+      - identifier: button-callout
+        topLeft:
+          x: 2185
+          y: 2068
+        bottomRight:
+          x: 3154
+          y: 2368
+        colorOverride: "#ff7518"
+        alignment: right
