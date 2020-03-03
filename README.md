@@ -1,4 +1,5 @@
 # SwiftFrame
+![Swift](https://github.com/kayak/SwiftFrame/workflows/Swift/badge.svg) [![GitHub license](https://img.shields.io/github/license/kayak/SwiftFrame)](https://github.com/kayak/SwiftFrame/blob/master/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/kayak/SwiftFrame)](https://github.com/kayak/SwiftFrame/issues) ![Swift version](https://img.shields.io/badge/Swift-5.1-%23ff6b20)
 
 SwiftFrame is a command line application for composing and laying out screenshots. Here's an example from the sample app.
 
