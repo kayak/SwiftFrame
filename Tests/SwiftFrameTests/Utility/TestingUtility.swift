@@ -6,7 +6,7 @@ public typealias JSONDictionary = [String: Encodable]
 struct TestingUtility {
 
     static func writeMockScreenshot(locale: String, deviceSuffix: String) throws {
-        let rep = makeImageRepresentationWithSize(.square100Pixels)
+        let rep = CGContext.makeImageRepWithSize(.square100Pixels)
         guard let cgImage = rep.cgImage else {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }
@@ -16,7 +16,7 @@ struct TestingUtility {
     }
 
     static func writeMockTemplateFile(deviceSuffix: String) throws {
-        let rep = makeImageRepresentationWithSize(.square100Pixels)
+        let rep = CGContext.makeImageRepWithSize(.square100Pixels)
         guard let cgImage = rep.cgImage else {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }

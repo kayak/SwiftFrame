@@ -35,7 +35,7 @@ class TextRendererTests: XCTestCase {
         let size = CGSize(width: 100, height: 100)
         let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
 
-        let context = makeCGContext(size)
+        let context = CGContext.with(size: size)
         try renderer.render(text: "Some title", font: .systemFont(ofSize: 20), color: .red, alignment: .center, rect: rect, context: context)
     }
 
