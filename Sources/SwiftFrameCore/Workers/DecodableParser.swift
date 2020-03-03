@@ -3,7 +3,7 @@ import Yams
 
 protocol KYDecoder {
 
-    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T : Decodable
+    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: Decodable
 
 }
 
@@ -11,7 +11,7 @@ extension JSONDecoder: KYDecoder {}
 
 extension YAMLDecoder: KYDecoder {
 
-    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T : Decodable {
+    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: Decodable {
         guard let yamlString = String(data: data, encoding: .utf8) else {
             throw NSError(description: "Could not read specified file")
         }
