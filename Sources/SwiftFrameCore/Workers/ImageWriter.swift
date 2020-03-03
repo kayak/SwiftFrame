@@ -12,8 +12,7 @@ public final class ImageWriter {
         outputWholeImage: Bool,
         locale: String,
         suffix: String,
-        format: FileFormat,
-        completion: @escaping () throws -> Void) throws
+        format: FileFormat) throws
     {
         guard let image = context.makeImage() else {
             throw NSError(description: "Could not render output image")
@@ -41,7 +40,6 @@ public final class ImageWriter {
         }
 
         workGroup.wait()
-        try DispatchQueue.main.sync { try completion() }
     }
 
     static func sliceImage(_ image: CGImage, with size: CGSize) throws -> [CGImage] {

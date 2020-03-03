@@ -53,18 +53,14 @@ public class ConfigProcessor {
         DispatchQueue.global(qos: .userInitiated).async {
             let group = DispatchGroup()
 
-            self.data.deviceData.enumerated().forEach {
-                let deviceData = $0.element
-                for _ in deviceData.screenshotsGroupedByLocale {
-                    group.enter()
-                }
-
+            self.data.deviceData.forEach { deviceData in
+                group.enter()
                 DispatchQueue.global().ky_asyncOrExit { [weak self] in
-                    try self?.process(deviceData: deviceData) {
-                        group.leave()
-                    }
+                    try self?.process(deviceData: deviceData)
+                    group.leave()
                 }
             }
+
             group.wait()
             DispatchQueue.main.async {
                 semaphore.signal()
@@ -78,8 +74,12 @@ public class ConfigProcessor {
         print("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
     }
 
-    private func process(deviceData: DeviceData, completion: @escaping () throws -> Void) throws {
+    private func process(deviceData: DeviceData) throws {
+        let group = DispatchGroup()
+
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
+            group.enter()
+
             guard let templateImage = deviceData.templateImage else { throw NSError(description: "No template image found") }
 
             guard let sliceSize = NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
@@ -109,9 +109,12 @@ public class ConfigProcessor {
                 outputWholeImage: data.outputWholeImage,
                 locale: locale,
                 suffix: deviceData.outputSuffix,
-                format: data.outputFormat,
-                completion: completion)
+                format: data.outputFormat)
+
+            group.leave()
         }
+
+        group.wait()
     }
 
     func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
