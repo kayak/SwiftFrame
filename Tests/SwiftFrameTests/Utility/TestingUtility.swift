@@ -59,17 +59,3 @@ struct TestingUtility {
     }
 
 }
-
-extension Dictionary where Value == String, Key == String {
-
-    func makeStringFileContent() -> String {
-        let strings: [String] = keys.sorted().compactMap {
-            guard let element = self[$0] else {
-                return nil
-            }
-            return [$0, element + ";"].joined(separator: " = ")
-        }
-        return strings.joined(separator: "\n")
-    }
-
-}

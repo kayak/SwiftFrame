@@ -15,7 +15,7 @@ extension ConfigData {
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,
-            deviceData: [DeviceData.goodData])
+            deviceData: [.goodData])
     }
 
     static var invalidData: Self {
@@ -29,7 +29,7 @@ extension ConfigData {
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,
-            deviceData: [DeviceData.invalidData])
+            deviceData: [.invalidData])
     }
 
 }

@@ -46,14 +46,28 @@ public class ConfigProcessor {
         // We need a special semaphore here, since the creation of the attributed strings has to happen
         // on the main thread and anything else can happen asynchronously but we still want to finish
         // execution only when everything has finished
-        let semaphore = RunLoopSemaphore(count: data.deviceData.count * data.titles.count)
+        let semaphore = RunLoopSemaphore()
 
         let start = CFAbsoluteTimeGetCurrent()
 
-        data.deviceData.enumerated().forEach {
-            let deviceData = $0.element
-            DispatchQueue.global().ky_asyncOrExit { [weak self] in
-                try self?.process(deviceData: deviceData) { semaphore.signal() }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let group = DispatchGroup()
+
+            self.data.deviceData.enumerated().forEach {
+                let deviceData = $0.element
+                for _ in deviceData.screenshotsGroupedByLocale {
+                    group.enter()
+                }
+
+                DispatchQueue.global().ky_asyncOrExit { [weak self] in
+                    try self?.process(deviceData: deviceData) {
+                        group.leave()
+                    }
+                }
+            }
+            group.wait()
+            DispatchQueue.main.async {
+                semaphore.signal()
             }
         }
 

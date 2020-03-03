@@ -8,8 +8,8 @@ extension DeviceData {
             outputSuffix: "iPhone X",
             templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
             screenshotsPath: FileURL(path: "testing/screenshots/"),
-            screenshotData: [ScreenshotData.goodData],
-            textData: [TextData.goodData])
+            screenshotData: [.goodData],
+            textData: [.goodData])
     }
 
     static var invalidData: Self {
@@ -17,8 +17,8 @@ extension DeviceData {
             outputSuffix: "iPhone X",
             templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
             screenshotsPath: FileURL(path: "testing/screenshots/"),
-            screenshotData: [ScreenshotData.goodData],
-            textData: [TextData.invalidData])
+            screenshotData: [.goodData],
+            textData: [.invalidData])
     }
 
 }

@@ -6,9 +6,7 @@ class ImageLoaderTests: XCTestCase {
 
     func testLoadImage() throws {
         let rep = makeImageRepresentationWithSize(.square100Pixels)
-        guard let cgImage = rep.cgImage else {
-            throw NSError(description: "Could not make CGImage from Bitmap")
-        }
+        let cgImage = try XCTUnwrap(rep.cgImage)
 
         try ImageWriter.write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device", format: .png)
         XCTAssertNoThrow(try ImageLoader().loadImage(atPath: "testing/en/en-testing_device.png"))
@@ -16,8 +14,4 @@ class ImageLoaderTests: XCTestCase {
         try TestingUtility.clearTestingDirectory()
     }
 
-}
-
-extension CGSize {
-    static let square100Pixels: CGSize = CGSize(width: 100, height: 100)
 }

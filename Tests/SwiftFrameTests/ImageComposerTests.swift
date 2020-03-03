@@ -9,7 +9,10 @@ class ImageComposerTests: XCTestCase {
         let templateFile = makeImageRepresentationWithSize(size)
         let composer = try ImageComposer(canvasSize: size)
         try composer.addTemplateImage(templateFile)
-        XCTAssertNotNil(composer.context.makeImage())
+
+        let image = try XCTUnwrap(composer.context.makeImage())
+        XCTAssertEqual(image.width, Int(size.width))
+        XCTAssertEqual(image.height, Int(size.height))
     }
 
     func testTemplateImageSlicesCorrectly() throws {
@@ -18,15 +21,16 @@ class ImageComposerTests: XCTestCase {
         let composer = try ImageComposer(canvasSize: size)
         try composer.addTemplateImage(templateFile)
 
-        guard let image = composer.context.makeImage() else {
-            throw NSError(description: "Rendered image was nil")
-        }
-
+        let image = try XCTUnwrap(composer.context.makeImage())
         let slices = try ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50))
         XCTAssertEqual(slices.count, 5)
+        for slice in slices {
+            XCTAssertEqual(slice.width, 20)
+            XCTAssertEqual(slice.height, 50)
+        }
     }
 
-    func testCanRenderInContext() throws {
+    func testCanRenderStringsInContext() throws {
         let size = CGSize(width: 100, height: 200)
         let textData = try TextData.goodData.makeProcessedData(size: size)
 

@@ -57,16 +57,16 @@ struct DecodableParser {
     private static func determineFileFormat(forURL url: URL) throws -> FileFormat {
         if let format = FileFormat(rawValue: url.pathExtension.lowercased()) {
             return format
+        }
+
+        let contentsOfFile = try String(contentsOf: url)
+        let firstLine = contentsOfFile.components(separatedBy: .newlines).first
+        if firstLine?.hasPrefix("{") ?? false {
+            return .json
+        } else if firstLine?.hasPrefix("---") ?? false {
+            return .yaml
         } else {
-            let contentsOfFile = try String(contentsOf: url)
-            let firstLine = contentsOfFile.components(separatedBy: .newlines).first
-            if firstLine?.hasPrefix("{") ?? false {
-                return .json
-            } else if firstLine?.hasPrefix("---") ?? false {
-                return .yaml
-            } else {
-                throw NSError(description: "Unknown file format")
-            }
+            throw NSError(description: "Unknown file format")
         }
     }
 
