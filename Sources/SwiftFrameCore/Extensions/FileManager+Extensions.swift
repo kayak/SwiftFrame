@@ -2,14 +2,15 @@ import Foundation
 
 extension FileManager {
 
-    func ky_filesAtPath(_ url: URL, with pathExtension: String) throws -> [URL] {
-        return try contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles).filter { $0.pathExtension == pathExtension }
+    func ky_filesAtPath(_ url: URL, with pathExtension: String? = nil) throws -> [URL] {
+        return try contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            .filter { pathExtension == nil ? true : $0.pathExtension == pathExtension }
     }
 
     // Doesn't throw if the directory doesn't exist or another error occured
     func ky_unsafeFilesAtPath(_ url: URL) -> [URL] {
         do {
-            return try contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            return try ky_filesAtPath(url)
         } catch {
             return []
         }

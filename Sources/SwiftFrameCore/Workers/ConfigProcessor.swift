@@ -55,7 +55,7 @@ public class ConfigProcessor {
 
             self.data.deviceData.forEach { deviceData in
                 group.enter()
-                DispatchQueue.global().ky_asyncOrExit { [weak self] in
+                DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit { [weak self] in
                     try self?.process(deviceData: deviceData)
                     group.leave()
                 }
@@ -80,7 +80,9 @@ public class ConfigProcessor {
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
             group.enter()
 
-            guard let templateImage = deviceData.templateImage else { throw NSError(description: "No template image found") }
+            guard let templateImage = deviceData.templateImage else {
+                throw NSError(description: "No template image found")
+            }
 
             guard let sliceSize = NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
                 throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")

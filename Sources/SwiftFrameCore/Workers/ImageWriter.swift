@@ -24,14 +24,14 @@ public final class ImageWriter {
         // Writing images asynchronously gave a big performance boost, what a surprise
         // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
         workGroup.enter()
-        DispatchQueue.global().ky_asyncOrExit {
+        DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
             try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
             workGroup.leave()
         }
 
         if outputWholeImage {
             workGroup.enter()
-            DispatchQueue.global().ky_asyncOrExit {
+            DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
                 try outputPaths.forEach {
                     try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
                 }
