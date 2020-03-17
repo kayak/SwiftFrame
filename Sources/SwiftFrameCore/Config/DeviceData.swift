@@ -9,12 +9,17 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     let outputSuffix: String
     let templateImagePath: FileURL
+    private let _gapWidth: Int?
     private let screenshotsPath: FileURL
 
-    internal private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
-    internal private(set) var templateImage: NSBitmapImageRep?
-    internal private(set) var screenshotData = [ScreenshotData]()
-    internal private(set) var textData = [TextData]()
+    private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
+    private(set) var templateImage: NSBitmapImageRep?
+    private(set) var screenshotData = [ScreenshotData]()
+    private(set) var textData = [TextData]()
+
+    var gapWidth: Int {
+        _gapWidth ?? 0
+    }
 
     // MARK: - Coding Keys
 
@@ -24,6 +29,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateImagePath = "templateFile"
         case screenshotData
         case textData
+        case _gapWidth = "gapWidth"
     }
 
     // MARK: - Init
@@ -35,7 +41,9 @@ public struct DeviceData: Decodable, ConfigValidatable {
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
-        textData: [TextData] = [TextData]()) {
+        textData: [TextData] = [TextData](),
+        gapWidth: Int? = 0)
+    {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
@@ -43,6 +51,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
+        self._gapWidth = gapWidth
     }
 
     // MARK: - Methods
@@ -73,7 +82,8 @@ public struct DeviceData: Decodable, ConfigValidatable {
             screenshotsGroupedByLocale: parsedScreenshots,
             templateImage: rep,
             screenshotData: processedScreenshotData,
-            textData: processedTextData)
+            textData: processedTextData,
+            gapWidth: _gapWidth)
     }
 
     // MARK: - ConfigValidatable
@@ -92,12 +102,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
         if let screenshotSize = NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
-            guard
-                let templateImageSize = templateImage?.ky_nativeSize,
-                templateImageSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00
-            else {
+            guard let templateImageSize = templateImage?.ky_nativeSize else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
             }
+            try validateSize(templateImageSize, screenshotSize: screenshotSize)
         }
 
         try screenshotData.forEach { try $0.validate() }
@@ -109,6 +117,19 @@ public struct DeviceData: Decodable, ConfigValidatable {
                 if localeDict.value[name] == nil {
                     throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \"\(name)\"")
                 }
+            }
+        }
+    }
+
+    private func validateSize(_ templateSize: CGSize, screenshotSize: CGSize) throws {
+        if gapWidth == 0 {
+            guard templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0 else {
+                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
+            }
+        } else {
+            let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
+            if remainingPixels.truncatingRemainder(dividingBy: gapWidth) != 0 {
+                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
             }
         }
     }

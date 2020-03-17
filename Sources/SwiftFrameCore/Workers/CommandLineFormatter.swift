@@ -5,11 +5,15 @@ public final class CommandLineFormatter {
     fileprivate static let tabsString = String(repeating: " ", count: 4)
 
     public class func formatWarning(_ text: String) -> String {
-        return "\u{001B}[0;33mWarning: \(text)\u{001B}[0;39m"
+        "\u{001B}[0;33mWarning: \(text)\u{001B}[0;39m"
+    }
+
+    public class func formatFailedExpectation(_ text: String) -> String {
+        "\u{001B}[0;33mExpectation: \(text)\u{001B}[0;39m"
     }
 
     public class func formatError(_ text: String) -> String {
-        return "\u{001B}[0;31mError: \(text)\u{001B}[0;39m"
+        "\u{001B}[0;31mError: \(text)\u{001B}[0;39m"
     }
 
     private static func formatKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) -> String {
