@@ -2,21 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "llbuild",
-        "repositoryURL": "https://github.com/apple/swift-llbuild.git",
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
-          "branch": "master",
-          "revision": "435e72e01369ed1397fa01e9f564a299c7e2095a",
-          "version": null
-        }
-      },
-      {
-        "package": "SwiftPM",
-        "repositoryURL": "https://github.com/apple/swift-package-manager",
-        "state": {
-          "branch": "swift-5.1.4-RELEASE",
-          "revision": "331fa5cb245be1e4e16640f20f123eb3461eeced",
-          "version": null
+          "branch": null,
+          "revision": "35b76bf577d3cc74820f8991894ce3bcdf024ddc",
+          "version": "0.0.2"
         }
       },
       {
