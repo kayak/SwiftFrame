@@ -84,7 +84,10 @@ struct TextData: Decodable, ConfigValidatable {
 
     func validate() throws {
         guard (topLeft.x < bottomRight.x) && (topLeft.y > bottomRight.y) else {
-            throw NSError(description: "Bad text bounds - topLeft: \(topLeft) and bottomRight: \(bottomRight), identifier: \(titleIdentifier)")
+            throw NSError(
+                description: "Bad text bounds for identifier \"\(titleIdentifier)\"",
+                expectation: "Top Left coordinates should have smaller x coordinates and smaller y coordinates than bottom right",
+                actualValue: "Top Left: \(topLeft), Bottom Right: \(bottomRight)")
         }
     }
 

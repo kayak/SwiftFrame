@@ -55,11 +55,15 @@ struct ConfigData: Decodable, ConfigValidatable {
 
     public func validate() throws {
         guard !deviceData.isEmpty else {
-            throw NSError(description: "No screenshot data was supplied")
+            throw NSError(
+                description: "No screenshot data was supplied",
+                expectation: "Please supply at least one screenshot along with metadata")
         }
 
         guard !outputPaths.isEmpty else {
-            throw NSError(description: "No output paths were specified")
+            throw NSError(
+                description: "No output paths were specified",
+                expectation: "Please specify at least one output directory")
         }
 
         try deviceData.forEach { try $0.validate() }
