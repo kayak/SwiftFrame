@@ -134,7 +134,8 @@ public struct DeviceData: Decodable, ConfigValidatable {
             }
         } else {
             let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
-            if remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) != 0 {
+            // Make sure there's at least one gap
+            if remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) != 0 || remainingPixels == 0 {
                 throw NSError(
                     description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
                     expectation: "Template image width should be = (x * screenshot width) + (x - 1) * gap width",

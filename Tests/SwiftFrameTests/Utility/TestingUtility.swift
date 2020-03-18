@@ -15,8 +15,8 @@ struct TestingUtility {
         try ImageWriter.write(cgImage, to: url, fileName: deviceSuffix, format: .png)
     }
 
-    static func writeMockTemplateFile(deviceSuffix: String) throws {
-        let rep = CGContext.makeImageRepWithSize(.square100Pixels)
+    static func writeMockTemplateFile(deviceSuffix: String, gapWidth: Int) throws {
+        let rep = CGContext.makeImageRepWithSize(.makeStandardSize(with: gapWidth, numberOfGaps: 4))
         guard let cgImage = rep.cgImage else {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }
@@ -25,11 +25,11 @@ struct TestingUtility {
         try ImageWriter.write(cgImage, to: url, fileName: "templatefile-\(deviceSuffix)", format: .png)
     }
 
-    static func setupMockDirectoryWithScreenshots() throws {
+    static func setupMockDirectoryWithScreenshots(gapWidth: Int = 0) throws {
         let devices = ["debug_device1", "debug_device2"]
         let locales = ["en", "de", "fr"]
         try devices.forEach { device in
-            try writeMockTemplateFile(deviceSuffix: device)
+            try writeMockTemplateFile(deviceSuffix: device, gapWidth: gapWidth)
         }
 
         try locales.forEach { locale in
