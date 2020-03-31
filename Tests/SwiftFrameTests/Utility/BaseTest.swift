@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 
-class KYBaseTest: XCTestCase {
+class BaseTest: XCTestCase {
 
     override func setUp() {
         super.setUp()

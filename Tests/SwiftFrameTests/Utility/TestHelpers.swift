@@ -7,7 +7,7 @@ extension CGSize {
 
     static let square100Pixels: CGSize = CGSize(width: 100, height: 100)
 
-    static func makeStandardSize(with gapWidth: Int, numberOfGaps: Int) -> CGSize {
+    static func make100PixelsSize(with gapWidth: Int, numberOfGaps: Int) -> CGSize {
         CGSize(width: 100 + CGFloat(gapWidth * numberOfGaps), height: 100)
     }
 

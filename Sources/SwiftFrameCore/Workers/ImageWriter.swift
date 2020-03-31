@@ -9,7 +9,7 @@ public final class ImageWriter {
         context: CGContext,
         with outputPaths: [FileURL],
         sliceSize: CGSize,
-        gapWidth: Int? = nil,
+        gapWidth: Int,
         outputWholeImage: Bool,
         locale: String,
         suffix: String,
@@ -43,12 +43,12 @@ public final class ImageWriter {
         workGroup.wait()
     }
 
-    static func sliceImage(_ image: CGImage, with size: CGSize, gapWidth: Int? = nil) throws -> [CGImage] {
+    static func sliceImage(_ image: CGImage, with size: CGSize, gapWidth: Int) throws -> [CGImage] {
         let numberOfSlices = image.width / Int(size.width)
         var croppedImages = [CGImage]()
 
         for i in 0..<numberOfSlices {
-            let rect = CGRect(x: (size.width * CGFloat(i)) + (CGFloat(gapWidth ?? 0) * CGFloat(i)), y: 0, width: size.width, height: size.height)
+            let rect = CGRect(x: (size.width * CGFloat(i)) + (CGFloat(gapWidth) * CGFloat(i)), y: 0, width: size.width, height: size.height)
             image.cropping(to: rect).flatMap { croppedImages.append($0) }
         }
 

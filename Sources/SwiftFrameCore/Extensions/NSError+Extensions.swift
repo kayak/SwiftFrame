@@ -2,8 +2,8 @@ import Foundation
 
 public extension NSError {
 
-    static let kExpectationKey = "kExpectationKey"
-    static let kActualValueKey = "kActualValueKey"
+    private static let kExpectationKey = "kExpectationKey"
+    private static let kActualValueKey = "kActualValueKey"
 
     convenience init(code: Int = 1, description: String, expectation: String? = nil, actualValue: String? = nil) {
         self.init(
@@ -16,9 +16,7 @@ public extension NSError {
             ])
     }
 
-    // Not too sure about this naming yet
-
-    var failedExpectation: String? {
+    var expectation: String? {
         userInfo[NSError.kExpectationKey] as? String
     }
 
@@ -33,7 +31,7 @@ public func ky_executeOrExit<T>(_ work: () throws -> T) -> T {
         return try work()
     } catch let error as NSError {
         print(CommandLineFormatter.formatError(error.localizedDescription))
-        error.failedExpectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
+        error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
         error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
         exit(Int32(error.code))
     }

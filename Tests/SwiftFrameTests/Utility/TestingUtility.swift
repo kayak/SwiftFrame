@@ -16,7 +16,7 @@ struct TestingUtility {
     }
 
     static func writeMockTemplateFile(deviceSuffix: String, gapWidth: Int) throws {
-        let rep = CGContext.makeImageRepWithSize(.makeStandardSize(with: gapWidth, numberOfGaps: 4))
+        let rep = CGContext.makeImageRepWithSize(.make100PixelsSize(with: gapWidth, numberOfGaps: 4))
         guard let cgImage = rep.cgImage else {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }

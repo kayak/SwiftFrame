@@ -104,6 +104,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         }
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
+        // plus specified gap width in between
         if let screenshotSize = NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
             guard let templateImageSize = templateImage?.ky_nativeSize else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" could not be loaded for validation")
@@ -125,17 +126,17 @@ public struct DeviceData: Decodable, ConfigValidatable {
     }
 
     private func validateSize(_ templateSize: CGSize, screenshotSize: CGSize) throws {
+        let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
         if gapWidth == 0 {
-            guard templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0 else {
+            guard remainingPixels == 0 else {
                 throw NSError(
                     description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
                     expectation: "Width should be multiple of \(Int(screenshotSize.width))px",
                     actualValue: "\(Int(screenshotSize.width))px")
             }
         } else {
-            let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
             // Make sure there's at least one gap
-            if remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) != 0 || remainingPixels == 0 {
+            guard remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) == 0 && remainingPixels != 0 else {
                 throw NSError(
                     description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
                     expectation: "Template image width should be = (x * screenshot width) + (x - 1) * gap width",

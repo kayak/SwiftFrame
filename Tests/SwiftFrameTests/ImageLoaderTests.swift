@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class ImageLoaderTests: KYBaseTest {
+class ImageLoaderTests: BaseTest {
 
     func testLoadImage() throws {
         let rep = CGContext.makeImageRepWithSize(.square100Pixels)

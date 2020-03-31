@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class DeviceDataTests: KYBaseTest {
+class DeviceDataTests: BaseTest {
 
     func testValidData() throws {
         let data = try DeviceData.goodData.makeProcessedData()
