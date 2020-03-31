@@ -9,12 +9,17 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     let outputSuffix: String
     let templateImagePath: FileURL
+    private let _gapWidth: Int?
     private let screenshotsPath: FileURL
 
-    internal private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
-    internal private(set) var templateImage: NSBitmapImageRep?
-    internal private(set) var screenshotData = [ScreenshotData]()
-    internal private(set) var textData = [TextData]()
+    private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
+    private(set) var templateImage: NSBitmapImageRep?
+    private(set) var screenshotData = [ScreenshotData]()
+    private(set) var textData = [TextData]()
+
+    var gapWidth: Int {
+        _gapWidth ?? 0
+    }
 
     // MARK: - Coding Keys
 
@@ -24,6 +29,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateImagePath = "templateFile"
         case screenshotData
         case textData
+        case _gapWidth = "gapWidth"
     }
 
     // MARK: - Init
@@ -35,7 +41,9 @@ public struct DeviceData: Decodable, ConfigValidatable {
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
-        textData: [TextData] = [TextData]()) {
+        textData: [TextData] = [TextData](),
+        gapWidth: Int? = 0)
+    {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
@@ -43,6 +51,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
+        self._gapWidth = gapWidth
     }
 
     // MARK: - Methods
@@ -73,7 +82,8 @@ public struct DeviceData: Decodable, ConfigValidatable {
             screenshotsGroupedByLocale: parsedScreenshots,
             templateImage: rep,
             screenshotData: processedScreenshotData,
-            textData: processedTextData)
+            textData: processedTextData,
+            gapWidth: _gapWidth)
     }
 
     // MARK: - ConfigValidatable
@@ -84,20 +94,22 @@ public struct DeviceData: Decodable, ConfigValidatable {
                 return
             }
             try localeDict.value.forEach {
-                if NSBitmapImageRep.ky_loadFromURL($0.value)?.ky_nativeSize != NSBitmapImageRep.ky_loadFromURL(first)?.ky_nativeSize {
-                    throw NSError(description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"")
+                if let size = NSBitmapImageRep.ky_loadFromURL($0.value)?.ky_nativeSize, size != NSBitmapImageRep.ky_loadFromURL(first)?.ky_nativeSize {
+                    throw NSError(
+                        description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"",
+                        expectation: "All screenshots should have the same resolution",
+                        actualValue: "Screenshot with dimensions \(size)")
                 }
             }
         }
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
+        // plus specified gap width in between
         if let screenshotSize = NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
-            guard
-                let templateImageSize = templateImage?.ky_nativeSize,
-                templateImageSize.width.truncatingRemainder(dividingBy: screenshotSize.width) == 0.00
-            else {
-                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width")
+            guard let templateImageSize = templateImage?.ky_nativeSize else {
+                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" could not be loaded for validation")
             }
+            try validateSize(templateImageSize, screenshotSize: screenshotSize)
         }
 
         try screenshotData.forEach { try $0.validate() }
@@ -113,9 +125,30 @@ public struct DeviceData: Decodable, ConfigValidatable {
         }
     }
 
+    private func validateSize(_ templateSize: CGSize, screenshotSize: CGSize) throws {
+        let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
+        if gapWidth == 0 {
+            guard remainingPixels == 0 else {
+                throw NSError(
+                    description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
+                    expectation: "Width should be multiple of \(Int(screenshotSize.width))px",
+                    actualValue: "\(Int(screenshotSize.width))px")
+            }
+        } else {
+            // Make sure there's at least one gap
+            guard remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) == 0 && remainingPixels != 0 else {
+                throw NSError(
+                    description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
+                    expectation: "Template image width should be = (x * screenshot width) + (x - 1) * gap width",
+                    actualValue: "Template image width: \(templateSize.width)px, screenshot width: \(screenshotSize.width), gap width: \(gapWidth)")
+            }
+        }
+    }
+
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshotsGroupedByLocale.count, insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }

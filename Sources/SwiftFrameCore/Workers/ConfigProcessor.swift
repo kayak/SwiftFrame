@@ -108,6 +108,7 @@ public class ConfigProcessor {
                 context: composer.context,
                 with: data.outputPaths,
                 sliceSize: sliceSize,
+                gapWidth: deviceData.gapWidth,
                 outputWholeImage: data.outputWholeImage,
                 locale: locale,
                 suffix: deviceData.outputSuffix,

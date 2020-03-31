@@ -22,7 +22,7 @@ class ImageComposerTests: XCTestCase {
         try composer.addTemplateImage(templateFile)
 
         let image = try ky_unwrap(composer.context.makeImage())
-        let slices = try ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50))
+        let slices = try ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50), gapWidth: 0)
         XCTAssertEqual(slices.count, 5)
         for slice in slices {
             XCTAssertEqual(slice.width, 20)
