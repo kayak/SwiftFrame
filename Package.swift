@@ -12,7 +12,7 @@ let package = Package(
         .executable(name: "swiftframe", targets: ["SwiftFrame"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.2.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0")
     ],
     targets: [
