@@ -65,14 +65,16 @@ public struct DeviceData: Decodable, ConfigValidatable {
         try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
-                .filter { kScreenshotExtensions.contains($0.pathExtension.lowercased()) }
-                .forEach { dictionary[$0.lastPathComponent] = $0 }
+                .filter { url in
+                    kScreenshotExtensions.contains(url.pathExtension.lowercased())
+                    && screenshotData.contains(where: { $0.screenshotName == url.lastPathComponent })
+                }.forEach { dictionary[$0.lastPathComponent] = $0 }
             parsedScreenshots[folder.lastPathComponent] = dictionary
         }
 
         let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
         let processedScreenshotData = screenshotData
-            .map { $0.makeProcessedData(size: rep.size)}
+            .map { $0.makeProcessedData(size: rep.size) }
             .sorted { $0.zIndex ?? 0 < $1.zIndex ?? 0 }
 
         return DeviceData(
