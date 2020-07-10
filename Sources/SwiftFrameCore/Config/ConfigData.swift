@@ -104,11 +104,14 @@ struct ConfigData: Decodable, ConfigValidatable {
 
     public func printSummary(insetByTabs tabs: Int) {
         ky_print("### Config Summary Start", insetByTabs: tabs)
-        CommandLineFormatter.printKeyValue("Outputs whole image as well as slices", value: outputWholeImage)
+        CommandLineFormatter.printKeyValue("Outputs whole image as well in addition to slices", value: outputWholeImage)
         CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
+        CommandLineFormatter.printKeyValue(
+            "String Files",
+            value: titles.isEmpty ? "none" : titles.keys.joined(separator: ", "),
+            insetBy: tabs)
         CommandLineFormatter.printKeyValue(
             "Skipped Locales",
             value: skippedLocales.isEmpty ? "none" : skippedLocales.joined(separator: ", "),

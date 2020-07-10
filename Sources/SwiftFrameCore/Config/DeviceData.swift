@@ -150,7 +150,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshotsGroupedByLocale.count, insetBy: tabs)
+        CommandLineFormatter.printKeyValue(
+            "Screenshot folders",
+            value: screenshotsGroupedByLocale.isEmpty ? "none" : screenshotsGroupedByLocale.keys.joined(separator: ", "),
+            insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }
