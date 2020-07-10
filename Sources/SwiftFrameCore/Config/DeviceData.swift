@@ -11,6 +11,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     let templateImagePath: FileURL
     private let screenshotsPath: FileURL
 
+    @DecodableDefault.EmptyList var skippedLocales: [String]
     @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
@@ -27,6 +28,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case screenshotData
         case textData
         case gapWidth
+        case skippedLocales
     }
 
     // MARK: - Init
@@ -39,7 +41,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
         textData: [TextData] = [TextData](),
-        gapWidth: Int? = 0)
+        gapWidth: Int = 0)
     {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
@@ -48,18 +50,18 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
-        self.gapWidth = gapWidth ?? 0
+        self.gapWidth = gapWidth
     }
 
     // MARK: - Methods
 
-    func makeProcessedData() throws -> DeviceData {
+    func makeProcessedData(skippedLocales: [String]) throws -> DeviceData {
         guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
         var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
+        try screenshotsPath.absoluteURL.subDirectories.filter({ !skippedLocales.contains($0.lastPathComponent) }).forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in

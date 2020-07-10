@@ -6,8 +6,6 @@ extension ConfigData {
 
     static var goodData: Self {
         ConfigData(
-            clearDirectories: true,
-            outputWholeImage: true,
             textGroups: [],
             stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
@@ -15,13 +13,13 @@ extension ConfigData {
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,
+            clearDirectories: true,
+            outputWholeImage: true,
             deviceData: [.goodData])
     }
 
     static var invalidData: Self {
         ConfigData(
-            clearDirectories: true,
-            outputWholeImage: true,
             textGroups: [],
             stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
@@ -29,6 +27,8 @@ extension ConfigData {
             fontSource: .nsFont(.systemFont(ofSize: 20)),
             textColorSource: try! ColorSource(hexString: "#ff00ff"),
             outputFormat: .png,
+            clearDirectories: true,
+            outputWholeImage: true,
             deviceData: [.invalidData])
     }
 

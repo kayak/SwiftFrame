@@ -47,8 +47,6 @@ struct ConfigData: Decodable, ConfigValidatable {
     // MARK: - Init
 
     public init(
-        clearDirectories: Bool,
-        outputWholeImage: Bool,
         textGroups: [TextGroup] = [],
         stringsPath: FileURL,
         maxFontSize: CGFloat,
@@ -56,11 +54,11 @@ struct ConfigData: Decodable, ConfigValidatable {
         fontSource: FontSource,
         textColorSource: ColorSource,
         outputFormat: FileFormat,
+        clearDirectories: Bool,
+        outputWholeImage: Bool,
         deviceData: [DeviceData],
         skippedLocales: [String] = [])
     {
-        self.clearDirectories = clearDirectories
-        self.outputWholeImage = outputWholeImage
         self.textGroups = textGroups
         self.stringsPath = stringsPath
         self.maxFontSize = maxFontSize
@@ -68,6 +66,8 @@ struct ConfigData: Decodable, ConfigValidatable {
         self.fontSource = fontSource
         self.textColorSource = textColorSource
         self.outputFormat = outputFormat
+        self.clearDirectories = clearDirectories
+        self.outputWholeImage = outputWholeImage
         self.deviceData = deviceData
         self.skippedLocales = skippedLocales
     }
@@ -75,9 +75,11 @@ struct ConfigData: Decodable, ConfigValidatable {
     // MARK: - Processing
 
     mutating public func process() throws {
-        deviceData = try deviceData.map { try $0.makeProcessedData() }
+        deviceData = try deviceData.map { try $0.makeProcessedData(skippedLocales: skippedLocales) }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings")
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter {
+            !skippedLocales.contains($0.deletingPathExtension().lastPathComponent)
+        }
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
