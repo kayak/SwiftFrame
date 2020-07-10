@@ -10,8 +10,7 @@ public class ConfigProcessor {
 
     // MARK: - Init
 
-    public init(filePath: String, verbose: Bool) throws {
-        let configURL = URL(fileURLWithPath: filePath)
+    public init(configURL: URL, verbose: Bool) throws {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
     }
