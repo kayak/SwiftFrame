@@ -23,12 +23,14 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 * `fontFile`: a path to a font file
 * `format`: the output format of the screenshots, can be `png`, `jpeg` or `jpg`
 * `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
-* `outputWholeImage`: a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
-* `clearDirectories`: a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example
+* `outputWholeImage`: **optional (default: false)** a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
+* `clearDirectories`: **optional (default: true)** a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example
+* `skippedLocales`: an array of locale identifiers (strings) which will be skipped during rendering
 * `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
   * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
   * `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device
   * `templateFile`: an image file that will be rendered above the screenshots to overlay device frames (e.g. see `Example/Template Files/iPhone X/TemplateFile.png`) **Note:** places where screenshots should go need to be transparent
+  * `gapWidth`: **optional (default: 0)** a gap width in pixels that will be skipped after every screenshot that is sliced from the template file
   * `screenshotData`: an array containing further information about screenshot coordinates
     * `screenshotName`: the file name (just name, not path) to the screenshot file to render
     * `zIndex`: **optional**, use this to avoid wrong rendering order if two screenshots need to overlap each other for example
