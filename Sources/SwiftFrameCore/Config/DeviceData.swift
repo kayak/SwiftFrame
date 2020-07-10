@@ -9,17 +9,14 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     let outputSuffix: String
     let templateImagePath: FileURL
-    private let _gapWidth: Int?
     private let screenshotsPath: FileURL
+
+    @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
     private(set) var templateImage: NSBitmapImageRep?
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
-
-    var gapWidth: Int {
-        _gapWidth ?? 0
-    }
 
     // MARK: - Coding Keys
 
@@ -29,7 +26,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateImagePath = "templateFile"
         case screenshotData
         case textData
-        case _gapWidth = "gapWidth"
+        case gapWidth
     }
 
     // MARK: - Init
@@ -51,7 +48,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
-        self._gapWidth = gapWidth
+        self.gapWidth = gapWidth ?? 0
     }
 
     // MARK: - Methods
@@ -75,7 +72,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
         let processedScreenshotData = screenshotData
             .map { $0.makeProcessedData(size: rep.size) }
-            .sorted { $0.zIndex ?? 0 < $1.zIndex ?? 0 }
+            .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
             outputSuffix: outputSuffix,
@@ -85,7 +82,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             templateImage: rep,
             screenshotData: processedScreenshotData,
             textData: processedTextData,
-            gapWidth: _gapWidth)
+            gapWidth: gapWidth)
     }
 
     // MARK: - ConfigValidatable

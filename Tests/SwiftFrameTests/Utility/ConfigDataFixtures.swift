@@ -8,7 +8,7 @@ extension ConfigData {
         ConfigData(
             clearDirectories: true,
             outputWholeImage: true,
-            textGroups: nil,
+            textGroups: [],
             stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
             outputPaths: [FileURL(path: "testing/output/")],
@@ -22,7 +22,7 @@ extension ConfigData {
         ConfigData(
             clearDirectories: true,
             outputWholeImage: true,
-            textGroups: nil,
+            textGroups: [],
             stringsPath: FileURL(path: "testing/strings/"),
             maxFontSize: 200,
             outputPaths: [FileURL(path: "testing/output/")],

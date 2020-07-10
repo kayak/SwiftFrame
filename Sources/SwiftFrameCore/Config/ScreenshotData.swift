@@ -9,7 +9,8 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     let bottomRight: Point
     let topLeft: Point
     let topRight: Point
-    let zIndex: Int?
+
+    @DecodableDefault.IntZero var zIndex: Int
 
     // MARK: - Init
 
@@ -19,7 +20,7 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
         self.bottomRight = bottomRight
         self.topLeft = topLeft
         self.topRight = topRight
-        self.zIndex = zIndex
+        self.zIndex = zIndex ?? 0
     }
 
     // MARK: - Misc
