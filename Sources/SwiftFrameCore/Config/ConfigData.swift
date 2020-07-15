@@ -110,7 +110,6 @@ struct ConfigData: Decodable, ConfigValidatable {
             "String Files",
             value: titles.isEmpty ? "none" : titles.keys.joined(separator: ", "),
             insetBy: tabs)
-        // TODO: Print all locales that will be used
 
         ky_print("Output paths:", insetByTabs: tabs)
         outputPaths.forEach { ky_print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
