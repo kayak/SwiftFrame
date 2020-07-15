@@ -27,7 +27,7 @@ extension ConfigData {
         clearDirectories: true,
         outputWholeImage: true,
         deviceData: [.goodData],
-        skippedLocales: ["en", "fr"])
+        localesRegex: "^(?!en|fr$)\\w*$")
 
     static let invalidData = ConfigData(
         textGroups: [],

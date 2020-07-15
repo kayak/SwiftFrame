@@ -19,11 +19,11 @@ struct ConfigData: Decodable, ConfigValidatable {
     let fontSource: FontSource
     let textColorSource: ColorSource
     let outputFormat: FileFormat
+    let localesRegex: String?
 
     @DecodableDefault.True var clearDirectories: Bool
     @DecodableDefault.False var outputWholeImage: Bool
     @DecodableDefault.EmptyList var textGroups: [TextGroup]
-    @DecodableDefault.EmptyList var skippedLocales: [String]
 
     internal private(set) var deviceData: [DeviceData]
     internal private(set) var titles = LocalizedStringFiles()
@@ -41,7 +41,7 @@ struct ConfigData: Decodable, ConfigValidatable {
         case fontSource = "fontFile"
         case textColorSource = "textColor"
         case outputFormat = "format"
-        case skippedLocales
+        case localesRegex = "locales"
     }
 
     // MARK: - Init
@@ -57,7 +57,7 @@ struct ConfigData: Decodable, ConfigValidatable {
         clearDirectories: Bool,
         outputWholeImage: Bool,
         deviceData: [DeviceData],
-        skippedLocales: [String] = [])
+        localesRegex: String? = nil)
     {
         self.textGroups = textGroups
         self.stringsPath = stringsPath
@@ -69,17 +69,15 @@ struct ConfigData: Decodable, ConfigValidatable {
         self.clearDirectories = clearDirectories
         self.outputWholeImage = outputWholeImage
         self.deviceData = deviceData
-        self.skippedLocales = skippedLocales
+        self.localesRegex = localesRegex
     }
 
     // MARK: - Processing
 
     mutating public func process() throws {
-        deviceData = try deviceData.map { try $0.makeProcessedData(skippedLocales: skippedLocales) }
+        deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: localesRegex) }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter {
-            !skippedLocales.contains($0.deletingPathExtension().lastPathComponent)
-        }
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter(pattern: localesRegex)
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
@@ -112,10 +110,7 @@ struct ConfigData: Decodable, ConfigValidatable {
             "String Files",
             value: titles.isEmpty ? "none" : titles.keys.joined(separator: ", "),
             insetBy: tabs)
-        CommandLineFormatter.printKeyValue(
-            "Skipped Locales",
-            value: skippedLocales.isEmpty ? "none" : skippedLocales.joined(separator: ", "),
-            insetBy: tabs)
+        // TODO: Print all locales that will be used
 
         ky_print("Output paths:", insetByTabs: tabs)
         outputPaths.forEach { ky_print($0.path.formattedGreen(), insetByTabs: tabs + 1) }

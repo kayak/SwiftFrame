@@ -11,7 +11,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
     let templateImagePath: FileURL
     private let screenshotsPath: FileURL
 
-    @DecodableDefault.EmptyList var skippedLocales: [String]
     @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
@@ -28,7 +27,6 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case screenshotData
         case textData
         case gapWidth
-        case skippedLocales
     }
 
     // MARK: - Init
@@ -55,13 +53,13 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Methods
 
-    func makeProcessedData(skippedLocales: [String]) throws -> DeviceData {
+    func makeProcessedData(localesRegex: String?) throws -> DeviceData {
         guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
         var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.filter({ !skippedLocales.contains($0.lastPathComponent) }).forEach { folder in
+        try screenshotsPath.absoluteURL.subDirectories.filter(pattern: localesRegex).forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in
