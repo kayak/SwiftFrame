@@ -2,12 +2,9 @@ import Foundation
 
 extension Array where Element == URL {
 
-    func filter(pattern: String?) throws -> Self {
-        guard let pattern = pattern else {
+    func filter(regex: NSRegularExpression?) throws -> Self {
+        guard let regex = regex else {
             return self
-        }
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            throw NSError(description: "Invalid regular expression: \"\(pattern)\"")
         }
         return self.filter { url in
             let lastComponent = url.deletingPathExtension().lastPathComponent
@@ -20,7 +17,7 @@ extension Array where Element == URL {
 extension NSRegularExpression {
 
     func matches(_ string: String) -> Bool {
-        let range = NSRange(location: 0, length: string.utf16.count)
+        let range = NSRange(location: 0, length: (string as NSString).length)
         return firstMatch(in: string, options: [], range: range) != nil
     }
 

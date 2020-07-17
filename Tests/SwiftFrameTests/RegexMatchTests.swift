@@ -14,17 +14,13 @@ class RegexMatchTests: XCTestCase {
     }()
 
     func testAllURLs() throws {
-        let urls = try RegexMatchTests.urls.filter(pattern: nil)
+        let urls = try RegexMatchTests.urls.filter(regex: nil)
         XCTAssertEqual(urls, RegexMatchTests.urls)
     }
 
-//    func testAllFilteredOut() throws {
-//        let urls = try RegexMatchTests.urls.filter(pattern: nil)
-//        XCTAssertTrue(urls.isEmpty)
-//    }
-
     func testFranceFilteredOut() throws {
-        let urls = try RegexMatchTests.urls.filter(pattern: "^(?!fr$)\\w*$")
+        let regex = try NSRegularExpression(pattern: "^(?!fr$)\\w*$", options: .caseInsensitive)
+        let urls = try RegexMatchTests.urls.filter(regex: regex)
 
         guard ky_assertEqual(urls.count, 3) else {
             return
@@ -34,8 +30,20 @@ class RegexMatchTests: XCTestCase {
         XCTAssertTrue(urls[2].absoluteString.hasSuffix("ru.strings"))
     }
 
+    func testFranceAndRussiaFilteredOut() throws {
+        let regex = try NSRegularExpression(pattern: "^(?!fr|ru$)\\w*$", options: .caseInsensitive)
+        let urls = try RegexMatchTests.urls.filter(regex: regex)
+
+        guard ky_assertEqual(urls.count, 2) else {
+            return
+        }
+        XCTAssertTrue(urls[0].absoluteString.hasSuffix("en.strings"))
+        XCTAssertTrue(urls[1].absoluteString.hasSuffix("de.strings"))
+    }
+
     func testOnlyRussiaAndFrance() throws {
-        let urls = try RegexMatchTests.urls.filter(pattern: "ru|fr")
+        let regex = try NSRegularExpression(pattern: "ru|fr", options: .caseInsensitive)
+        let urls = try RegexMatchTests.urls.filter(regex: regex)
 
         guard ky_assertEqual(urls.count, 2) else {
             return

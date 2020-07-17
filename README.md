@@ -25,7 +25,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 * `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
 * `outputWholeImage`: **optional (default: false)** a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
 * `clearDirectories`: **optional (default: true)** a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example
-* `locales`: **optional (default: all)** a regular expression that can be used to exlude (or include) certain locales during rendering
+* `locales`: **optional** a regular expression that can be used to exlude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
 * `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
   * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
   * `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device

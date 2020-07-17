@@ -75,9 +75,16 @@ struct ConfigData: Decodable, ConfigValidatable {
     // MARK: - Processing
 
     mutating public func process() throws {
-        deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: localesRegex) }
+        let regex: NSRegularExpression?
+        if let pattern = localesRegex {
+            regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        } else {
+            regex = nil
+        }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter(pattern: localesRegex)
+        deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
+
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter(regex: regex)
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }

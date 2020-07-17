@@ -53,13 +53,13 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     // MARK: - Methods
 
-    func makeProcessedData(localesRegex: String?) throws -> DeviceData {
+    func makeProcessedData(localesRegex: NSRegularExpression?) throws -> DeviceData {
         guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
         var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.filter(pattern: localesRegex).forEach { folder in
+        try screenshotsPath.absoluteURL.subDirectories.filter(regex: localesRegex).forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in
@@ -88,6 +88,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
     // MARK: - ConfigValidatable
 
     func validate() throws {
+        guard !screenshotsGroupedByLocale.isEmpty else {
+            throw NSError(description: "No screenshots were loaded, most likely caused by a faulty regular expression")
+        }
+
         try screenshotsGroupedByLocale.forEach { localeDict in
             guard let first = localeDict.value.first?.value else {
                 return
