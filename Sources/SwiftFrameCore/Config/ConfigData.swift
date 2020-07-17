@@ -13,15 +13,17 @@ struct ConfigData: Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
-    let clearDirectories: Bool
-    let outputWholeImage: Bool
-    let textGroups: [TextGroup]?
     let stringsPath: FileURL
     let maxFontSize: CGFloat
     let outputPaths: [FileURL]
     let fontSource: FontSource
     let textColorSource: ColorSource
     let outputFormat: FileFormat
+    let localesRegex: String?
+
+    @DecodableDefault.True var clearDirectories: Bool
+    @DecodableDefault.False var outputWholeImage: Bool
+    @DecodableDefault.EmptyList var textGroups: [TextGroup]
 
     internal private(set) var deviceData: [DeviceData]
     internal private(set) var titles = LocalizedStringFiles()
@@ -39,14 +41,50 @@ struct ConfigData: Decodable, ConfigValidatable {
         case fontSource = "fontFile"
         case textColorSource = "textColor"
         case outputFormat = "format"
+        case localesRegex = "locales"
+    }
+
+    // MARK: - Init
+
+    public init(
+        textGroups: [TextGroup] = [],
+        stringsPath: FileURL,
+        maxFontSize: CGFloat,
+        outputPaths: [FileURL],
+        fontSource: FontSource,
+        textColorSource: ColorSource,
+        outputFormat: FileFormat,
+        clearDirectories: Bool,
+        outputWholeImage: Bool,
+        deviceData: [DeviceData],
+        localesRegex: String? = nil)
+    {
+        self.textGroups = textGroups
+        self.stringsPath = stringsPath
+        self.maxFontSize = maxFontSize
+        self.outputPaths = outputPaths
+        self.fontSource = fontSource
+        self.textColorSource = textColorSource
+        self.outputFormat = outputFormat
+        self.clearDirectories = clearDirectories
+        self.outputWholeImage = outputWholeImage
+        self.deviceData = deviceData
+        self.localesRegex = localesRegex
     }
 
     // MARK: - Processing
 
     mutating public func process() throws {
-        deviceData = try deviceData.map { try $0.makeProcessedData() }
+        let regex: NSRegularExpression?
+        if let pattern = localesRegex {
+            regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        } else {
+            regex = nil
+        }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings")
+        deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
+
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filterByFileOrFoldername(regex: regex)
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
@@ -70,12 +108,15 @@ struct ConfigData: Decodable, ConfigValidatable {
     }
 
     public func printSummary(insetByTabs tabs: Int) {
-        ky_print("### Config Summary Begin", insetByTabs: tabs)
-        CommandLineFormatter.printKeyValue("Outputs whole image as well as slices", value: outputWholeImage)
+        ky_print("### Config Summary Start", insetByTabs: tabs)
+        CommandLineFormatter.printKeyValue("Outputs whole image as well in addition to slices", value: outputWholeImage)
         CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("String Files", value: titles.count, insetBy: tabs)
+        CommandLineFormatter.printKeyValue(
+            "String Files",
+            value: titles.isEmpty ? "none" : titles.keys.joined(separator: ", "),
+            insetBy: tabs)
 
         ky_print("Output paths:", insetByTabs: tabs)
         outputPaths.forEach { ky_print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
@@ -86,9 +127,9 @@ struct ConfigData: Decodable, ConfigValidatable {
             print()
         }
 
-        if let groups = textGroups, !groups.isEmpty {
+        if !textGroups.isEmpty {
             print("Text groups:")
-            groups.forEach {
+            textGroups.forEach {
                 $0.printSummary(insetByTabs: tabs + 1)
                 print()
             }
@@ -111,13 +152,13 @@ struct ConfigData: Decodable, ConfigValidatable {
     }
 
     func makeSharedFontSizes(for associatedStrings: [AssociatedString]) throws -> [String: CGFloat] {
-        return try textGroups?.reduce(into: [String: CGFloat]()) { dictionary, group in
+        return try textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
             let strings = associatedStrings.filter({ $0.data.groupIdentifier == group.identifier })
             dictionary[group.identifier] = try group.sharedFontSize(
                 with: strings,
                 globalFont: try fontSource.font(),
                 globalMaxSize: maxFontSize)
-        } ?? [:]
+        }
     }
 
 }

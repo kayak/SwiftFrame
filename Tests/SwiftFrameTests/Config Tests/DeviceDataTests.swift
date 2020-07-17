@@ -5,24 +5,24 @@ import XCTest
 class DeviceDataTests: BaseTest {
 
     func testValidData() throws {
-        let data = try DeviceData.goodData.makeProcessedData()
+        let data = try DeviceData.goodData.makeProcessedData(localesRegex: nil)
         XCTAssertNoThrow(try data.validate())
     }
 
     func testGapDataValid() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots(gapWidth: 16)
 
-        let data = try DeviceData.gapData.makeProcessedData()
+        let data = try DeviceData.gapData.makeProcessedData(localesRegex: nil)
         XCTAssertNoThrow(try data.validate())
     }
 
     func testGapDataInvalid() throws {
-        let data = try DeviceData.gapData.makeProcessedData()
+        let data = try DeviceData.gapData.makeProcessedData(localesRegex: nil)
         XCTAssertThrowsError(try data.validate())
     }
 
     func testInvalidData() throws {
-        let data = try DeviceData.invalidData.makeProcessedData()
+        let data = try DeviceData.invalidData.makeProcessedData(localesRegex: nil)
         XCTAssertThrowsError(try data.validate())
     }
 

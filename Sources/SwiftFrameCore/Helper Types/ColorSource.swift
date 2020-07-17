@@ -13,8 +13,8 @@ struct ColorSource: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        hexString = try container.decode(String.self)
-        color = try NSColor(hexString: hexString)
+        let hexString = try container.decode(String.self)
+        try self.init(hexString: hexString)
     }
 
 }

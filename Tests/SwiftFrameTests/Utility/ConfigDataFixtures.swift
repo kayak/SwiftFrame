@@ -4,32 +4,54 @@ import Foundation
 
 extension ConfigData {
 
-    static var goodData: Self {
-        ConfigData(
-            clearDirectories: true,
-            outputWholeImage: true,
-            textGroups: nil,
-            stringsPath: FileURL(path: "testing/strings/"),
-            maxFontSize: 200,
-            outputPaths: [FileURL(path: "testing/output/")],
-            fontSource: .nsFont(.systemFont(ofSize: 20)),
-            textColorSource: try! ColorSource(hexString: "#ff00ff"),
-            outputFormat: .png,
-            deviceData: [.goodData])
-    }
+    static let goodData = ConfigData(
+        textGroups: [],
+        stringsPath: FileURL(path: "testing/strings/"),
+        maxFontSize: 200,
+        outputPaths: [FileURL(path: "testing/output/")],
+        fontSource: .nsFont(.systemFont(ofSize: 20)),
+        textColorSource: try! ColorSource(hexString: "#ff00ff"),
+        outputFormat: .png,
+        clearDirectories: true,
+        outputWholeImage: true,
+        deviceData: [.goodData])
 
-    static var invalidData: Self {
-        ConfigData(
-            clearDirectories: true,
-            outputWholeImage: true,
-            textGroups: nil,
-            stringsPath: FileURL(path: "testing/strings/"),
-            maxFontSize: 200,
-            outputPaths: [FileURL(path: "testing/output/")],
-            fontSource: .nsFont(.systemFont(ofSize: 20)),
-            textColorSource: try! ColorSource(hexString: "#ff00ff"),
-            outputFormat: .png,
-            deviceData: [.invalidData])
-    }
+    static let skippedLocaleData = ConfigData(
+        textGroups: [],
+        stringsPath: FileURL(path: "testing/strings/"),
+        maxFontSize: 200,
+        outputPaths: [FileURL(path: "testing/output/")],
+        fontSource: .nsFont(.systemFont(ofSize: 20)),
+        textColorSource: try! ColorSource(hexString: "#ff00ff"),
+        outputFormat: .png,
+        clearDirectories: true,
+        outputWholeImage: true,
+        deviceData: [.goodData],
+        localesRegex: "^(?!en|fr$)\\w*$")
+
+    static let englishOnlyData = ConfigData(
+        textGroups: [],
+        stringsPath: FileURL(path: "testing/strings/"),
+        maxFontSize: 200,
+        outputPaths: [FileURL(path: "testing/output/")],
+        fontSource: .nsFont(.systemFont(ofSize: 20)),
+        textColorSource: try! ColorSource(hexString: "#ff00ff"),
+        outputFormat: .png,
+        clearDirectories: true,
+        outputWholeImage: true,
+        deviceData: [.goodData],
+        localesRegex: "en")
+
+    static let invalidData = ConfigData(
+        textGroups: [],
+        stringsPath: FileURL(path: "testing/strings/"),
+        maxFontSize: 200,
+        outputPaths: [FileURL(path: "testing/output/")],
+        fontSource: .nsFont(.systemFont(ofSize: 20)),
+        textColorSource: try! ColorSource(hexString: "#ff00ff"),
+        outputFormat: .png,
+        clearDirectories: true,
+        outputWholeImage: true,
+        deviceData: [.invalidData])
 
 }

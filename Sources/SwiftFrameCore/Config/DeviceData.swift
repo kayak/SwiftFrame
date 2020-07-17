@@ -9,17 +9,14 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     let outputSuffix: String
     let templateImagePath: FileURL
-    private let _gapWidth: Int?
     private let screenshotsPath: FileURL
+
+    @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
     private(set) var templateImage: NSBitmapImageRep?
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
-
-    var gapWidth: Int {
-        _gapWidth ?? 0
-    }
 
     // MARK: - Coding Keys
 
@@ -29,7 +26,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case templateImagePath = "templateFile"
         case screenshotData
         case textData
-        case _gapWidth = "gapWidth"
+        case gapWidth
     }
 
     // MARK: - Init
@@ -42,7 +39,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
         textData: [TextData] = [TextData](),
-        gapWidth: Int? = 0)
+        gapWidth: Int = 0)
     {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
@@ -51,18 +48,18 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.templateImage = templateImage
         self.screenshotData = screenshotData
         self.textData = textData
-        self._gapWidth = gapWidth
+        self.gapWidth = gapWidth
     }
 
     // MARK: - Methods
 
-    func makeProcessedData() throws -> DeviceData {
+    func makeProcessedData(localesRegex: NSRegularExpression?) throws -> DeviceData {
         guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
         var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.forEach { folder in
+        try screenshotsPath.absoluteURL.subDirectories.filterByFileOrFoldername(regex: localesRegex).forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in
@@ -75,7 +72,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
         let processedScreenshotData = screenshotData
             .map { $0.makeProcessedData(size: rep.size) }
-            .sorted { $0.zIndex ?? 0 < $1.zIndex ?? 0 }
+            .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
             outputSuffix: outputSuffix,
@@ -85,12 +82,16 @@ public struct DeviceData: Decodable, ConfigValidatable {
             templateImage: rep,
             screenshotData: processedScreenshotData,
             textData: processedTextData,
-            gapWidth: _gapWidth)
+            gapWidth: gapWidth)
     }
 
     // MARK: - ConfigValidatable
 
     func validate() throws {
+        guard !screenshotsGroupedByLocale.isEmpty else {
+            throw NSError(description: "No screenshots were loaded, most likely caused by a faulty regular expression")
+        }
+
         try screenshotsGroupedByLocale.forEach { localeDict in
             guard let first = localeDict.value.first?.value else {
                 return
@@ -151,7 +152,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
-        CommandLineFormatter.printKeyValue("Screenshot folders", value: screenshotsGroupedByLocale.count, insetBy: tabs)
+        CommandLineFormatter.printKeyValue(
+            "Screenshot folders",
+            value: screenshotsGroupedByLocale.isEmpty ? "none" : screenshotsGroupedByLocale.keys.joined(separator: ", "),
+            insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }
