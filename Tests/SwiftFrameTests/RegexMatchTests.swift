@@ -14,13 +14,13 @@ class RegexMatchTests: XCTestCase {
     }()
 
     func testAllURLs() throws {
-        let urls = try RegexMatchTests.urls.filter(regex: nil)
+        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: nil)
         XCTAssertEqual(urls, RegexMatchTests.urls)
     }
 
     func testFranceFilteredOut() throws {
         let regex = try NSRegularExpression(pattern: "^(?!fr$)\\w*$", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filter(regex: regex)
+        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 3) else {
             return
@@ -32,7 +32,7 @@ class RegexMatchTests: XCTestCase {
 
     func testFranceAndRussiaFilteredOut() throws {
         let regex = try NSRegularExpression(pattern: "^(?!fr|ru$)\\w*$", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filter(regex: regex)
+        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 2) else {
             return
@@ -43,7 +43,7 @@ class RegexMatchTests: XCTestCase {
 
     func testOnlyRussiaAndFrance() throws {
         let regex = try NSRegularExpression(pattern: "ru|fr", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filter(regex: regex)
+        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 2) else {
             return

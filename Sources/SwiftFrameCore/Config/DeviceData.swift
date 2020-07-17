@@ -59,7 +59,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         }
 
         var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.filter(regex: localesRegex).forEach { folder in
+        try screenshotsPath.absoluteURL.subDirectories.filterByFileOrFoldername(regex: localesRegex).forEach { folder in
             var dictionary = [String: URL]()
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in

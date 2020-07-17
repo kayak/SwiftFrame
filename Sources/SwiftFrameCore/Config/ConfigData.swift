@@ -84,7 +84,7 @@ struct ConfigData: Decodable, ConfigValidatable {
 
         deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filter(regex: regex)
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filterByFileOrFoldername(regex: regex)
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }

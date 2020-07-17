@@ -2,7 +2,7 @@ import Foundation
 
 extension Array where Element == URL {
 
-    func filter(regex: NSRegularExpression?) throws -> Self {
+    func filterByFileOrFoldername(regex: NSRegularExpression?) throws -> Self {
         guard let regex = regex else {
             return self
         }
