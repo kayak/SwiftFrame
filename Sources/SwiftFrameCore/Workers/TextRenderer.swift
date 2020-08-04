@@ -5,7 +5,7 @@ final class TextRenderer {
 
     private let minFontSize: CGFloat = 1
     static let pointSizeTolerance: CGFloat = 1e-7
-    static let verticalAlignmentPadding: CGFloat = 0.5
+    static let verticalAlignmentPadding: CGFloat = 1.2
 
     // MARK: - Frame Rendering
 
@@ -50,6 +50,7 @@ final class TextRenderer {
             originY = outerFrame.origin.y
         }
 
+        // We need to add a little bit of padding again, because CoreText has hiccups and struggles to render multi-line text into an exactly fitting rect
         return CGRect(x: originX, y: originY, width: innerFrame.width, height: innerFrame.height + TextRenderer.verticalAlignmentPadding)
     }
 
