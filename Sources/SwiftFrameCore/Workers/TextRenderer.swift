@@ -19,39 +19,29 @@ final class TextRenderer {
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) -> CTFrame {
-        let textRect = attributedText.boundingRect(with: rect.size, options: [.usesLineFragmentOrigin, .usesFontLeading])
-        let alignedRect = calculateAlignedRect(innerFrame: textRect, outerFrame: rect, alignment: alignment)
+        let textSize = attributedStringSize(attributedText, maxWidth: rect.width)
+        let alignedRect = calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
 
         let path = CGPath(rect: alignedRect, transform: nil)
         let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
         return CTFramesetterCreateFrame(frameSetter, CFRange(location: 0, length: attributedText.length), path, nil)
     }
 
-    private func calculateAlignedRect(innerFrame: CGRect, outerFrame: CGRect, alignment: TextAlignment) -> CGRect {
-        let originX: CGFloat
-        switch alignment.horizontal {
-        case .left, .justify:
-            originX = outerFrame.origin.x
-        case .right:
-            originX = outerFrame.origin.x + (outerFrame.width - innerFrame.width)
-        case .center:
-            originX = outerFrame.origin.x + ((outerFrame.width - innerFrame.width) / 2)
-        }
-
+    private func calculateAlignedRect(size: CGSize, outerFrame: CGRect, alignment: TextAlignment) -> CGRect {
         let originY: CGFloat
         switch alignment.vertical {
         case .top:
-            let baseOriginY = outerFrame.origin.y + (outerFrame.height - innerFrame.height)
+            let baseOriginY = outerFrame.origin.y + (outerFrame.height - size.height)
             originY = baseOriginY - TextRenderer.verticalAlignmentPadding
         case .center:
-            let baseOriginY = outerFrame.origin.y + ((outerFrame.height / 2) - (innerFrame.height / 2))
+            let baseOriginY = outerFrame.origin.y + ((outerFrame.height / 2) - (size.height / 2))
             originY = baseOriginY - TextRenderer.verticalAlignmentPadding
         case .bottom:
             originY = outerFrame.origin.y
         }
 
         // We need to add a little bit of padding again, because CoreText has hiccups and struggles to render multi-line text into an exactly fitting rect
-        return CGRect(x: originX, y: originY, width: innerFrame.width, height: innerFrame.height + TextRenderer.verticalAlignmentPadding)
+        return CGRect(x: outerFrame.origin.x, y: originY, width: outerFrame.width, height: size.height + TextRenderer.verticalAlignmentPadding)
     }
 
     // MARK: - Fitting & Size Computations
@@ -97,10 +87,13 @@ final class TextRenderer {
     }
 
     private func formattedString(_ attributedString: NSAttributedString, fitsIntoRect desiredSize: CGSize) -> Bool {
-        let constraintSize = CGSize(width: desiredSize.width, height: CGFloat.greatestFiniteMagnitude)
-        let stringSize = attributedString.boundingRect(with: constraintSize, options: [.usesLineFragmentOrigin, .usesFontLeading]).size
-
+        let stringSize = attributedStringSize(attributedString, maxWidth: desiredSize.width)
         return stringSize.width <= desiredSize.width && stringSize.height <= desiredSize.height
+    }
+
+    private func attributedStringSize(_ attributedString: NSAttributedString, maxWidth: CGFloat) -> CGSize {
+        let constraintSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        return attributedString.boundingRect(with: constraintSize, options: [.usesLineFragmentOrigin, .usesFontLeading]).size
     }
 
     // MARK: - Misc
