@@ -45,4 +45,37 @@ class TextRendererTests: XCTestCase {
             context: context)
     }
 
+    func testBottomAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .bottom))
+
+        XCTAssertEqual(alignedRect.origin, rect.origin)
+        XCTAssertEqual(alignedRect.height, size.height + TextRenderer.verticalAlignmentPadding)
+    }
+
+    func testTopAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .top))
+
+        XCTAssertEqual(alignedRect.origin.y, rect.origin.y + (rect.height - alignedRect.height))
+        XCTAssertEqual(alignedRect.height, size.height + TextRenderer.verticalAlignmentPadding)
+    }
+
+    func testCenterAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .center))
+
+        XCTAssertEqual(alignedRect.origin.y, rect.origin.y + ((rect.height - alignedRect.height - TextRenderer.verticalAlignmentPadding) / 2))
+        XCTAssertEqual(alignedRect.height, size.height + TextRenderer.verticalAlignmentPadding)
+    }
+
 }

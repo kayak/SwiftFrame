@@ -3,9 +3,9 @@ import Foundation
 
 final class TextRenderer {
 
-    private let minFontSize: CGFloat = 1
     static let pointSizeTolerance: CGFloat = 1e-7
-    static let verticalAlignmentPadding: CGFloat = 1.2
+    static let minFontSize: CGFloat = 1
+    static let verticalAlignmentPadding: CGFloat = 4
 
     // MARK: - Frame Rendering
 
@@ -13,21 +13,25 @@ final class TextRenderer {
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
-        let frame = makeFrame(from: attributedString, in: rect, alignment: alignment)
+        let frame = try makeFrame(from: attributedString, in: rect, alignment: alignment)
         CTFrameDraw(frame, context)
         context.restoreGState()
     }
 
-    private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) -> CTFrame {
+    private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {
         let textSize = attributedStringSize(attributedText, maxWidth: rect.width)
-        let alignedRect = calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
+        let alignedRect = try calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
 
         let path = CGPath(rect: alignedRect, transform: nil)
         let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
         return CTFramesetterCreateFrame(frameSetter, CFRange(location: 0, length: attributedText.length), path, nil)
     }
 
-    private func calculateAlignedRect(size: CGSize, outerFrame: CGRect, alignment: TextAlignment) -> CGRect {
+    func calculateAlignedRect(size: CGSize, outerFrame: CGRect, alignment: TextAlignment) throws -> CGRect {
+        guard size <= outerFrame.size else {
+            throw NSError(description: "Calculated text size was bigger than bounding rect's size")
+        }
+
         let originY: CGFloat
         switch alignment.vertical {
         case .top:
@@ -53,7 +57,13 @@ final class TextRenderer {
             throw NSError(description: "Empty string was passed to TextRenderer")
         }
 
-        let calculatedFontSize = try maxFontSizeThatFits(string: string, font: font, alignment: alignment, minSize: minFontSize, maxSize: maxSize, size: size)
+        let calculatedFontSize = try maxFontSizeThatFits(
+            string: string,
+            font: font,
+            alignment: alignment,
+            minSize: TextRenderer.minFontSize,
+            maxSize: maxSize,
+            size: size)
         // Subtract some small number to make absolutely sure text will be rendered completely
         return min(calculatedFontSize.rounded(.down) - TextRenderer.pointSizeTolerance, maxSize)
     }
@@ -88,7 +98,7 @@ final class TextRenderer {
 
     private func formattedString(_ attributedString: NSAttributedString, fitsIntoRect desiredSize: CGSize) -> Bool {
         let stringSize = attributedStringSize(attributedString, maxWidth: desiredSize.width)
-        return stringSize.width <= desiredSize.width && stringSize.height <= desiredSize.height
+        return stringSize <= desiredSize
     }
 
     private func attributedStringSize(_ attributedString: NSAttributedString, maxWidth: CGFloat) -> CGSize {
@@ -120,4 +130,12 @@ final class TextRenderer {
         return String(format: "<span style=\"%@\">%@</span>", constructedAttributes, text)
     }
 
+}
+
+fileprivate func >=(lhs: CGSize, rhs: CGSize) -> Bool {
+    lhs.width >= rhs.width && lhs.height >= rhs.height
+}
+
+fileprivate func <=(lhs: CGSize, rhs: CGSize) -> Bool {
+    lhs.width <= rhs.width && lhs.height <= rhs.height
 }
