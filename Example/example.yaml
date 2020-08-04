@@ -49,7 +49,9 @@ deviceData:
         bottomRight:
           x: 1059
           y: 2377
-        alignment: center
+        alignment: 
+          horizontal: center
+          vertical: center
       - identifier: button-callout
         topLeft:
           x: 2349
@@ -58,7 +60,9 @@ deviceData:
           x: 3258
           y: 2171
         colorOverride: "#ff7518"
-        alignment: right
+        alignment: 
+          horizontal: right
+          vertical: center
   - outputSuffix: iPad Pro 12.9 inch
     screenshots: Example/Screenshots/iPad Pro/
     templateFile: Example/Template Files/iPad Pro TemplateFile.png
@@ -99,7 +103,9 @@ deviceData:
         bottomRight:
           x: 1882
           y: 2525
-        alignment: center
+        alignment: 
+          horizontal: right
+          vertical: center
         customFontPath: "/System/Library/Fonts/Avenir Next.ttc"
       - identifier: button-callout
         topLeft:
@@ -109,4 +115,6 @@ deviceData:
           x: 3154
           y: 2368
         colorOverride: "#ff7518"
-        alignment: right
+        alignment: 
+          horizontal: right
+          vertical: center

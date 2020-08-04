@@ -11,7 +11,7 @@ class TextRendererTests: XCTestCase {
         let maxSize = try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
             font: NSFont.systemFont(ofSize: 200),
-            alignment: .center,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
             maxSize: 400,
             size: veryLargeSize)
 
@@ -25,7 +25,7 @@ class TextRendererTests: XCTestCase {
         XCTAssertThrowsError(try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
             font: NSFont.systemFont(ofSize: 200),
-            alignment: .center,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
             maxSize: 400,
             size: smallSize))
     }
@@ -36,7 +36,13 @@ class TextRendererTests: XCTestCase {
         let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
 
         let context = CGContext.with(size: size)
-        try renderer.render(text: "Some title", font: .systemFont(ofSize: 20), color: .red, alignment: .center, rect: rect, context: context)
+        try renderer.render(
+            text: "Some title",
+            font: .systemFont(ofSize: 20),
+            color: .red,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
+            rect: rect,
+            context: context)
     }
 
 }

@@ -40,7 +40,9 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
   * `textData`: an array containing further information about text titles coordinates and its layout
     * `titleIdentifer`: the key that SwiftFrame should look for in the `.strings` file for a certain title
     * `textColorOverride`: **optional**, a color in Hex format to use specifically for this title
-    * `textAlignment`: the text alignment in CSS style (`left`, `right`, `center`, `justify` or `natural`)
+    * `textAlignment`: information about text alignment
+      * `horizontal`: the horizontal text alignment in CSS style (`left`, `right`, `center`, `justify` or `natural`)
+      * `vertical`: the vertical text alignment in (`top`, `center`, `bottom`)
     * `customFontPath`: **optional**, a path to a font file to use specifically for this title
     * `groupIdentifier`: **optional**, an identifier for a text group (see below)
     * `topLeft` and `bottomRight`: the bounding coordinate points of the text (as of right now, it's not possible to have rotated text)

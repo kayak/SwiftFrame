@@ -5,6 +5,7 @@ final class TextRenderer {
 
     private let minFontSize: CGFloat = 1
     static let pointSizeTolerance: CGFloat = 1e-7
+    static let verticalAlignmentPadding: CGFloat = 0.5
 
     // MARK: - Frame Rendering
 
@@ -12,15 +13,44 @@ final class TextRenderer {
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
-        let frame = makeFrame(from: attributedString, in: rect)
+        let frame = makeFrame(from: attributedString, in: rect, alignment: alignment)
         CTFrameDraw(frame, context)
         context.restoreGState()
     }
 
-    private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect) -> CTFrame {
-        let path = CGPath(rect: rect, transform: nil)
+    private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) -> CTFrame {
+        let textRect = attributedText.boundingRect(with: rect.size, options: [.usesLineFragmentOrigin, .usesFontLeading])
+        let alignedRect = calculateAlignedRect(innerFrame: textRect, outerFrame: rect, alignment: alignment)
+
+        let path = CGPath(rect: alignedRect, transform: nil)
         let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
         return CTFramesetterCreateFrame(frameSetter, CFRange(location: 0, length: attributedText.length), path, nil)
+    }
+
+    private func calculateAlignedRect(innerFrame: CGRect, outerFrame: CGRect, alignment: TextAlignment) -> CGRect {
+        let originX: CGFloat
+        switch alignment.horizontal {
+        case .left, .justify:
+            originX = outerFrame.origin.x
+        case .right:
+            originX = outerFrame.origin.x + (outerFrame.width - innerFrame.width)
+        case .center:
+            originX = outerFrame.origin.x + ((outerFrame.width - innerFrame.width) / 2)
+        }
+
+        let originY: CGFloat
+        switch alignment.vertical {
+        case .top:
+            let baseOriginY = outerFrame.origin.y + (outerFrame.height - innerFrame.height)
+            originY = baseOriginY - TextRenderer.verticalAlignmentPadding
+        case .center:
+            let baseOriginY = outerFrame.origin.y + ((outerFrame.height / 2) - (innerFrame.height / 2))
+            originY = baseOriginY - TextRenderer.verticalAlignmentPadding
+        case .bottom:
+            originY = outerFrame.origin.y
+        }
+
+        return CGRect(x: originX, y: originY, width: innerFrame.width, height: innerFrame.height + TextRenderer.verticalAlignmentPadding)
     }
 
     // MARK: - Fitting & Size Computations
@@ -79,7 +109,7 @@ final class TextRenderer {
         guard let stringData = htmlString.data(using: .utf8), let attributedString = NSMutableAttributedString.ky_makeFromHTMLData(stringData) else {
             throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
         }
-        attributedString.setAlignment(alignment.nsAlignment, range: NSRange(location: 0, length: attributedString.length))
+        attributedString.setAlignment(alignment.horizontal.nsAlignment, range: NSRange(location: 0, length: attributedString.length))
         return attributedString
     }
 

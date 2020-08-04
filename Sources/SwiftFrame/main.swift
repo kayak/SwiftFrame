@@ -37,9 +37,18 @@ struct SwiftFrame: ParsableCommand {
             try processor.validate()
             try processor.run()
         } catch let error as NSError {
-            print(CommandLineFormatter.formatError(error.localizedDescription))
+            let errorMessage = verbose
+                ? CommandLineFormatter.formatError(error.description)
+                : CommandLineFormatter.formatError(error.localizedDescription)
+            print(errorMessage)
+
             error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
             error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
+
+            if !verbose {
+                print("Use --verbose to get additional error information")
+            }
+            
             Darwin.exit(Int32(error.code))
         }
     }
