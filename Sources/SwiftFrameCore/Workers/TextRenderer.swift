@@ -13,11 +13,6 @@ final class TextRenderer {
 
         context.saveGState()
 
-        context.setStrokeColor(NSColor.red.cgColor)
-        context.setLineWidth(2)
-        context.addRect(rect)
-        context.drawPath(using: .stroke)
-
         let frame = try makeFrame(from: attributedString, in: rect, alignment: alignment)
         CTFrameDraw(frame, context)
         context.restoreGState()
