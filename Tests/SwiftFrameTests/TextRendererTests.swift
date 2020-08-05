@@ -15,7 +15,7 @@ class TextRendererTests: XCTestCase {
             maxSize: 400,
             size: veryLargeSize)
 
-        XCTAssertEqual(maxSize, 400 - TextRenderer.pointSizeTolerance)
+        XCTAssertEqual(maxSize, 400)
     }
 
     func testBoxTooSmall() {
