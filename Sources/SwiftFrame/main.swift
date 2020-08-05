@@ -18,7 +18,7 @@ struct SwiftFrame: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "swiftframe",
         abstract: "CLI application for speedy screenshot framing",
-        version: "2.2.0",
+        version: "2.3.0",
         helpNames: .shortAndLong)
 
     @Flag(name: .shortAndLong, help: "Prints additional information and lets you verify the config file before rendering")

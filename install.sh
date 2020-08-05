@@ -4,7 +4,7 @@ set -e
 
 SCRIPTPATH="$(dirname "$0")"
 
-swift build -c release --package-path "$SCRIPTPATH"
+swift build -c release --package-path "$SCRIPTPATH" -v
 cp -f "$SCRIPTPATH/.build/release/SwiftFrame" "/usr/local/bin/swiftframe"
 rm -r "$SCRIPTPATH/.build/release"
 

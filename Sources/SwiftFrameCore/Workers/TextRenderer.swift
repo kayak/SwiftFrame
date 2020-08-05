@@ -9,6 +9,11 @@ final class TextRenderer {
     // MARK: - Frame Rendering
 
     func render(text: String, font: NSFont, color: NSColor, alignment: TextAlignment, rect: NSRect, context: CGContext) throws {
+        guard !text.isEmpty else {
+            print(CommandLineFormatter.formatWarning(text: "String was emtpy and will not be rendered"))
+            return
+        }
+
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
@@ -61,7 +66,9 @@ final class TextRenderer {
     /// particular number of lines
     func maximumFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
         guard !string.isEmpty else {
-            throw NSError(description: "Empty string was passed to TextRenderer")
+            // Will be skipped during rendering anyways and won't affect text group's max size negatively, so it's okay to
+            // return maxSize here
+            return maxSize
         }
 
         let calculatedFontSize = try maxFontSizeThatFits(
