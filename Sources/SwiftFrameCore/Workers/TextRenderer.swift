@@ -23,21 +23,14 @@ final class TextRenderer {
         context.restoreGState()
     }
 
-    private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {
-        let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
-
-        let textSize = CTFramesetterSuggestFrameSizeWithConstraints(
-            frameSetter,
-            CFRange(location: 0, length: attributedText.length),
-            nil,
-            rect.size,
-            nil
-        )
+    private func makeFrame(from attributedString: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {
+        let textSize = attributedStringSize(attributedString, maxWidth: rect.width)
+        let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
 
         let alignedRect = try calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
         let path = CGPath(rect: alignedRect, transform: nil)
 
-        return CTFramesetterCreateFrame(frameSetter, CFRange(location: 0, length: attributedText.length), path, nil)
+        return CTFramesetterCreateFrame(framesetter, CFRange(location: 0, length: attributedString.length), path, nil)
     }
 
     func calculateAlignedRect(size: CGSize, outerFrame: CGRect, alignment: TextAlignment) throws -> CGRect {
