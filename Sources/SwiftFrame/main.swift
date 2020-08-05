@@ -45,10 +45,6 @@ struct SwiftFrame: ParsableCommand {
             error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
             error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
 
-            if !verbose {
-                print("Use --verbose to get additional error information")
-            }
-
             Darwin.exit(Int32(error.code))
         }
     }

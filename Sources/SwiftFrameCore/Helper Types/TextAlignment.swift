@@ -3,12 +3,15 @@ import Foundation
 
 struct TextAlignment: Codable, Equatable {
 
+    // MARK: - Nested Types
+
     enum Horizontal: String, Codable {
 
         case left
         case right
         case center
         case justify
+        case natural
 
         var nsAlignment: NSTextAlignment {
             switch self {
@@ -20,6 +23,8 @@ struct TextAlignment: Codable, Equatable {
                 return .center
             case .justify:
                 return .justified
+            case .natural:
+                return .natural
             }
         }
 
@@ -29,12 +34,9 @@ struct TextAlignment: Codable, Equatable {
         case top, center, bottom
     }
 
+    // MARK: - Properties
+
     let horizontal: Horizontal
     let vertical: Vertical
-
-    init(horizontal: Horizontal, vertical: Vertical) {
-        self.horizontal = horizontal
-        self.vertical = vertical
-    }
 
 }
