@@ -4,36 +4,25 @@ import Foundation
 import SwiftFrameCore
 import ArgumentParser
 
-extension URL: ExpressibleByArgument {
-
-    public init?(argument: String) {
-        self.init(fileURLWithPath: argument)
-    }
-
-}
-
-// Struct name serves as command name
 struct SwiftFrame: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         commandName: "swiftframe",
         abstract: "CLI application for speedy screenshot framing",
-        version: "2.3.0",
+        version: "3.0.0",
         helpNames: .shortAndLong)
+
+    @Argument(help: "Read configuration values from the specified file", completion: .list(["config", "yml", "yaml"]))
+    var configFilePath: String
 
     @Flag(name: .shortAndLong, help: "Prints additional information and lets you verify the config file before rendering")
     var verbose = false
 
-    @Option(name: .shortAndLong, help: "Read configuration values from the specified file")
-    var configPath: URL
-
     func run() throws {
-        runWrapped()
-    }
+        let configFileURL = URL(fileURLWithPath: configFilePath)
 
-    private func runWrapped() {
         do {
-            let processor = try ConfigProcessor(configURL: configPath, verbose: verbose)
+            let processor = try ConfigProcessor(configURL: configFileURL, verbose: verbose)
             try processor.validate()
             try processor.run()
         } catch let error as NSError {
