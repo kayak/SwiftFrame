@@ -5,7 +5,6 @@ final class TextRenderer {
 
     static let pointSizeTolerance: CGFloat = 1e-7
     static let minFontSize: CGFloat = 1
-    static let verticalAlignmentPadding: CGFloat = 4
 
     // MARK: - Frame Rendering
 
@@ -13,17 +12,31 @@ final class TextRenderer {
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
         context.saveGState()
+
+        context.setStrokeColor(NSColor.red.cgColor)
+        context.setLineWidth(2)
+        context.addRect(rect)
+        context.drawPath(using: .stroke)
+
         let frame = try makeFrame(from: attributedString, in: rect, alignment: alignment)
         CTFrameDraw(frame, context)
         context.restoreGState()
     }
 
     private func makeFrame(from attributedText: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {
-        let textSize = attributedStringSize(attributedText, maxWidth: rect.width)
-        let alignedRect = try calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
-
-        let path = CGPath(rect: alignedRect, transform: nil)
         let frameSetter = CTFramesetterCreateWithAttributedString(attributedText)
+
+        let textSize = CTFramesetterSuggestFrameSizeWithConstraints(
+            frameSetter,
+            CFRange(location: 0, length: attributedText.length),
+            nil,
+            rect.size,
+            nil
+        )
+
+        let alignedRect = try calculateAlignedRect(size: textSize, outerFrame: rect, alignment: alignment)
+        let path = CGPath(rect: alignedRect, transform: nil)
+
         return CTFramesetterCreateFrame(frameSetter, CFRange(location: 0, length: attributedText.length), path, nil)
     }
 
@@ -36,16 +49,15 @@ final class TextRenderer {
         switch alignment.vertical {
         case .top:
             let baseOriginY = outerFrame.origin.y + (outerFrame.height - size.height)
-            originY = baseOriginY - TextRenderer.verticalAlignmentPadding
+            originY = baseOriginY
         case .center:
             let baseOriginY = outerFrame.origin.y + ((outerFrame.height / 2) - (size.height / 2))
-            originY = baseOriginY - TextRenderer.verticalAlignmentPadding
+            originY = baseOriginY
         case .bottom:
             originY = outerFrame.origin.y
         }
 
-        // We need to add a little bit of padding again, because CoreText has hiccups and struggles to render multi-line text into an exactly fitting rect
-        return CGRect(x: outerFrame.origin.x, y: originY, width: outerFrame.width, height: size.height + TextRenderer.verticalAlignmentPadding)
+        return CGRect(x: outerFrame.origin.x, y: originY, width: outerFrame.width, height: size.height)
     }
 
     // MARK: - Fitting & Size Computations
@@ -65,7 +77,7 @@ final class TextRenderer {
             maxSize: maxSize,
             size: size)
         // Subtract some small number to make absolutely sure text will be rendered completely
-        return min(calculatedFontSize.rounded(.down) - TextRenderer.pointSizeTolerance, maxSize)
+        return min(calculatedFontSize.rounded(.down), maxSize)
     }
 
     private func maxFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
@@ -103,7 +115,15 @@ final class TextRenderer {
 
     private func attributedStringSize(_ attributedString: NSAttributedString, maxWidth: CGFloat) -> CGSize {
         let constraintSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
-        return attributedString.boundingRect(with: constraintSize, options: [.usesLineFragmentOrigin, .usesFontLeading]).size
+
+        let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
+        return CTFramesetterSuggestFrameSizeWithConstraints(
+            framesetter,
+            CFRange(location: 0, length: attributedString.length),
+            nil,
+            constraintSize,
+            nil
+        )
     }
 
     // MARK: - Misc
@@ -132,10 +152,10 @@ final class TextRenderer {
 
 }
 
-fileprivate func >=(lhs: CGSize, rhs: CGSize) -> Bool {
+private func >=(lhs: CGSize, rhs: CGSize) -> Bool {
     lhs.width >= rhs.width && lhs.height >= rhs.height
 }
 
-fileprivate func <=(lhs: CGSize, rhs: CGSize) -> Bool {
+private func <=(lhs: CGSize, rhs: CGSize) -> Bool {
     lhs.width <= rhs.width && lhs.height <= rhs.height
 }

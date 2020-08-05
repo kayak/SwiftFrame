@@ -48,7 +48,7 @@ struct SwiftFrame: ParsableCommand {
             if !verbose {
                 print("Use --verbose to get additional error information")
             }
-            
+
             Darwin.exit(Int32(error.code))
         }
     }
