@@ -6,7 +6,7 @@ extension TextData {
 
     static let goodData = TextData(
         titleIdentifier: "someId",
-        textAlignment: .center,
+        textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
         textColorOverrideString: nil,
@@ -17,7 +17,7 @@ extension TextData {
 
     static let invalidData = TextData(
         titleIdentifier: "someId",
-        textAlignment: .center,
+        textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
         textColorOverrideString: nil,
@@ -28,7 +28,7 @@ extension TextData {
 
     static let invertedData = TextData(
         titleIdentifier: "someId",
-        textAlignment: .center,
+        textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
         textColorOverrideString: nil,

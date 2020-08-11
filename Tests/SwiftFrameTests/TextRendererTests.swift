@@ -11,11 +11,11 @@ class TextRendererTests: XCTestCase {
         let maxSize = try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
             font: NSFont.systemFont(ofSize: 200),
-            alignment: .center,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
             maxSize: 400,
             size: veryLargeSize)
 
-        XCTAssertEqual(maxSize, 400 - TextRenderer.pointSizeTolerance)
+        XCTAssertEqual(maxSize, 400)
     }
 
     func testBoxTooSmall() {
@@ -25,7 +25,7 @@ class TextRendererTests: XCTestCase {
         XCTAssertThrowsError(try renderer.maximumFontSizeThatFits(
             string: "Some testing string",
             font: NSFont.systemFont(ofSize: 200),
-            alignment: .center,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
             maxSize: 400,
             size: smallSize))
     }
@@ -36,7 +36,46 @@ class TextRendererTests: XCTestCase {
         let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
 
         let context = CGContext.with(size: size)
-        try renderer.render(text: "Some title", font: .systemFont(ofSize: 20), color: .red, alignment: .center, rect: rect, context: context)
+        try renderer.render(
+            text: "Some title",
+            font: .systemFont(ofSize: 20),
+            color: .red,
+            alignment: TextAlignment(horizontal: .center, vertical: .top),
+            rect: rect,
+            context: context)
+    }
+
+    func testBottomAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .bottom))
+
+        XCTAssertEqual(alignedRect.origin, rect.origin)
+        XCTAssertEqual(alignedRect.height, size.height)
+    }
+
+    func testTopAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .top))
+
+        XCTAssertEqual(alignedRect.origin.y, rect.origin.y + (rect.height - alignedRect.height))
+        XCTAssertEqual(alignedRect.height, size.height)
+    }
+
+    func testCenterAlignedRect() throws {
+        let renderer = TextRenderer()
+        let size = CGSize(width: 60, height: 60)
+        let rect = NSRect(x: 10, y: 10, width: 80, height: 80)
+
+        let alignedRect = try renderer.calculateAlignedRect(size: size, outerFrame: rect, alignment: .init(horizontal: .center, vertical: .center))
+
+        XCTAssertEqual(alignedRect.origin.y, rect.origin.y + ((rect.height - alignedRect.height) / 2))
+        XCTAssertEqual(alignedRect.height, size.height)
     }
 
 }

@@ -56,7 +56,7 @@ class RegexMatchTests: XCTestCase {
 
 // with this wrapper method we can make tests fail and return a boolean at the same time
 // since simply asserting would not stop the test
-fileprivate func ky_assertEqual<T: Equatable>(_ value1: T, _ value2: T) -> Bool {
+private func ky_assertEqual<T: Equatable>(_ value1: T, _ value2: T) -> Bool {
     if value1 != value2 {
         XCTFail("\(value1) is not equal to \(value2)")
     }
