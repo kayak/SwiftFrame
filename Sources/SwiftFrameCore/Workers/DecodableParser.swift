@@ -1,51 +1,7 @@
 import Foundation
 import Yams
 
-protocol KYDecoder {
-
-    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: Decodable
-
-}
-
-extension JSONDecoder: KYDecoder {}
-
-extension YAMLDecoder: KYDecoder {
-
-    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: Decodable {
-        guard let yamlString = String(data: data, encoding: .utf8) else {
-            throw NSError(description: "Could not read specified file")
-        }
-        return try decode(type, from: yamlString)
-    }
-
-}
-
 struct DecodableParser {
-
-    private enum FileFormat: String {
-        case json
-        case yaml
-
-        var decoder: KYDecoder {
-            switch self {
-            case .json:
-                return JSONDecoder()
-            case .yaml:
-                return YAMLDecoder()
-            }
-        }
-
-        init?(rawValue: String) {
-            switch rawValue {
-            case "json":
-                self = .json
-            case "yml", "yaml":
-                self = .yaml
-            default:
-                return nil
-            }
-        }
-    }
 
     static func parseData<T>(fromURL url: URL) throws -> T where T: Decodable {
         let data = try Data(contentsOf: url)
@@ -54,8 +10,8 @@ struct DecodableParser {
         return try decoder.decode(T.self, from: data)
     }
 
-    private static func determineFileFormat(forURL url: URL) throws -> FileFormat {
-        if let format = FileFormat(rawValue: url.pathExtension.lowercased()) {
+    private static func determineFileFormat(forURL url: URL) throws -> ConfigFileFormat {
+        if let format = ConfigFileFormat(rawValue: url.pathExtension.lowercased()) {
             return format
         }
 

@@ -50,3 +50,19 @@ extension NSBitmapImageRep.FileType: Decodable {
     }
 
 }
+
+extension NSBitmapImageRep.FileType: Encodable {
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .jpeg:
+            try container.encode("jpg")
+        case .png:
+            try container.encode("png")
+        default:
+            throw NSError(description: "Should not encode other file types than the supported ones")
+        }
+    }
+
+}

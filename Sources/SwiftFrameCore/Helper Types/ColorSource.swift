@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct ColorSource: Decodable {
+struct ColorSource: Codable {
 
     let hexString: String
     let color: NSColor
@@ -15,6 +15,11 @@ struct ColorSource: Decodable {
         let container = try decoder.singleValueContainer()
         let hexString = try container.decode(String.self)
         try self.init(hexString: hexString)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(hexString)
     }
 
 }

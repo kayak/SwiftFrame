@@ -2,14 +2,27 @@ import Foundation
 import AppKit
 
 protocol ConfigValidatable {
+
     func validate() throws
     func printSummary(insetByTabs tabs: Int)
+
 }
 
 /// First key is locale, second is regular key in string file
 typealias LocalizedStringFiles = [String: [String: String]]
 
-struct ConfigData: Decodable, ConfigValidatable {
+protocol Config {
+
+    var stringsPath: FileURL { get }
+    var maxFontSize: CGFloat { get }
+    var outputPaths: [FileURL] { get }
+    var textColorSource: ColorSource { get }
+    var outputFormat: FileFormat { get }
+    var localesRegex: String? { get }
+
+}
+
+struct ConfigData: Config, Decodable, ConfigValidatable {
 
     // MARK: - Properties
 
