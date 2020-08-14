@@ -8,7 +8,11 @@ extension NSMutableAttributedString {
         guard Thread.isMainThread else {
             return DispatchQueue.main.sync { ky_makeFromHTMLData(data) }
         }
-        return NSMutableAttributedString(html: data, documentAttributes: nil)
+        return NSMutableAttributedString(
+            html: data,
+            options: [.characterEncoding: String.Encoding.utf8.rawValue],
+            documentAttributes: nil
+        )
     }
 
 }
