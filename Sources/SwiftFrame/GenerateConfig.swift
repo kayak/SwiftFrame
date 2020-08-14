@@ -17,8 +17,10 @@ struct GenerateConfig: ParsableCommand {
     var outputFormat: ConfigFileFormat
 
     func run() throws {
-        let data = try ConfigFactory.createConfig(format: .json)
-        try data.write(to: URL(fileURLWithPath: outputPath))
+        ky_runWrapped(verbose: false) {
+            let data = try ConfigFactory.createConfig(format: .json)
+            try data.write(to: URL(fileURLWithPath: outputPath))
+        }
     }
 
 }

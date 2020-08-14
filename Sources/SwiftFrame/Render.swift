@@ -19,21 +19,27 @@ struct Render: ParsableCommand {
     func run() throws {
         let configFileURL = URL(fileURLWithPath: configFilePath)
 
-        do {
+        ky_runWrapped(verbose: verbose) {
             let processor = try ConfigProcessor(configURL: configFileURL, verbose: verbose)
             try processor.validate()
             try processor.run()
-        } catch let error as NSError {
-            let errorMessage = verbose
-                ? CommandLineFormatter.formatError(error.description)
-                : CommandLineFormatter.formatError(error.localizedDescription)
-            print(errorMessage)
-
-            error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
-            error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
-
-            Darwin.exit(Int32(error.code))
         }
     }
 
+}
+
+func ky_runWrapped(verbose: Bool, _ work: () throws -> Void) {
+    do {
+        try work()
+    } catch let error as NSError {
+        let errorMessage = verbose
+            ? CommandLineFormatter.formatError(error.description)
+            : CommandLineFormatter.formatError(error.localizedDescription)
+        print(errorMessage)
+
+        error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
+        error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
+
+        Darwin.exit(Int32(error.code))
+    }
 }
