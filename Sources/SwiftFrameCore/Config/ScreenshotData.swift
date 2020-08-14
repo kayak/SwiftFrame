@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
+public struct ScreenshotData: Codable, Equatable {
 
     // MARK: - Properties
 
@@ -35,7 +35,11 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
             zIndex: zIndex)
     }
 
-    // MARK: - ConfigValidatable
+}
+
+// MARK: - ConfigValidatable
+
+extension ScreenshotData: ConfigValidatable {
 
     func validate() throws {}
 
@@ -47,4 +51,22 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
         CommandLineFormatter.printKeyValue("Top Right", value: topRight, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Z Index", value: zIndex, insetBy: tabs + 1)
     }
+
+}
+
+// MARK: - ConfigCreatable
+
+extension ScreenshotData: ConfigCreatable {
+
+    static func makeTemplate() -> Self {
+        ScreenshotData(
+            screenshotName: "screenshot_identifier",
+            bottomLeft: Point(x: 10, y: 10),
+            bottomRight: Point(x: 60, y: 5),
+            topLeft: Point(x: 9, y: 200),
+            topRight: Point(x: 70, y: 180),
+            zIndex: 0
+        )
+    }
+
 }

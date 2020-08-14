@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public struct DeviceData: Decodable, ConfigValidatable {
+public struct DeviceData: Codable {
 
     // MARK: - Properties
 
@@ -85,7 +85,11 @@ public struct DeviceData: Decodable, ConfigValidatable {
             gapWidth: gapWidth)
     }
 
-    // MARK: - ConfigValidatable
+}
+
+// MARK: - ConfigValidatable
+
+extension DeviceData: ConfigValidatable {
 
     func validate() throws {
         guard !screenshotsGroupedByLocale.isEmpty else {
@@ -158,6 +162,25 @@ public struct DeviceData: Decodable, ConfigValidatable {
             insetBy: tabs)
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
+    }
+
+}
+
+// MARK: - ConfigCreatable
+
+extension DeviceData: ConfigCreatable {
+
+    static func makeTemplate() -> Self {
+        DeviceData(
+            outputSuffix: "output_suffix_for_device",
+            templateImagePath: .makeTemplate(),
+            screenshotsPath: .makeTemplate(),
+            screenshotsGroupedByLocale: nil,
+            templateImage: nil,
+            screenshotData: [.makeTemplate(), .makeTemplate()],
+            textData: [.makeTemplate(), .makeTemplate()],
+            gapWidth: 52
+        )
     }
 
 }

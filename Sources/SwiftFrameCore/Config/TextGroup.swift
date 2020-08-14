@@ -1,9 +1,7 @@
 import AppKit
 import Foundation
 
-private let kNumTitleLines = 3
-
-public struct TextGroup: Decodable, ConfigValidatable, Hashable {
+public struct TextGroup: Codable, Hashable {
 
     // MARK: - Properties
 
@@ -15,16 +13,6 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
     enum CodingKeys: String, CodingKey {
         case identifier
         case maxFontSize
-    }
-
-    // MARK: - ConfigValidatable
-
-    func validate() throws {}
-
-    func printSummary(insetByTabs tabs: Int) {
-        ky_print("Text group: \(identifier)", insetByTabs: tabs)
-        CommandLineFormatter.printKeyValue("Identifier", value: identifier, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Max font size", value: maxFontSize, insetBy: tabs + 1)
     }
 
     // MARK: - Misc
@@ -42,4 +30,28 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
         // Can force-unwrap since array will never be empty
         return ([globalMaxSize, maxFontSize] + maxFontSizes).min()!
     }
+}
+
+// MARK: - ConfigValidatable
+
+extension TextGroup: ConfigValidatable {
+
+    func validate() throws {}
+
+    func printSummary(insetByTabs tabs: Int) {
+        ky_print("Text group: \(identifier)", insetByTabs: tabs)
+        CommandLineFormatter.printKeyValue("Identifier", value: identifier, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Max font size", value: maxFontSize, insetBy: tabs + 1)
+    }
+
+}
+
+// MARK: - ConfigCreatable
+
+extension TextGroup: ConfigCreatable {
+
+    static func makeTemplate() -> TextGroup {
+        TextGroup(identifier: "some_textgroup_id", maxFontSize: 120)
+    }
+
 }

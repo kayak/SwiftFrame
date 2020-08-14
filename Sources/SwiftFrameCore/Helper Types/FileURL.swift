@@ -31,9 +31,21 @@ struct FileURL: Codable {
         url = URL(fileURLWithPath: rawPath)
     }
 
+    // MARK: - Encoding
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(url.path)
+    }
+
+}
+
+// MARK: - ConfigCreatable
+
+extension FileURL: ConfigCreatable {
+
+    static func makeTemplate() -> FileURL {
+        FileURL(path: "Example/placeholder.path")
     }
 
 }

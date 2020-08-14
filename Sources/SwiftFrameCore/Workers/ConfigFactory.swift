@@ -1,39 +1,24 @@
 import Foundation
 import Yams
 
-struct BareboneConfigData: Config, Encodable {
-
-    let stringsPath: FileURL
-    let maxFontSize: CGFloat
-    let outputPaths: [FileURL]
-    let textColorSource: ColorSource
-    let outputFormat: FileFormat
-    let localesRegex: String?
-
-    enum CodingKeys: String, CodingKey {
-        case stringsPath
-        case maxFontSize
-        case outputPaths
-        case textColorSource = "textColor"
-        case outputFormat = "format"
-        case localesRegex = "locales"
-    }
-
-}
-
 public struct ConfigFactory {
 
     public static func createConfig(format: ConfigFileFormat) throws -> Data {
-
-        let configData = BareboneConfigData(
-            stringsPath: FileURL(path: "test"),
+        let config = ConfigData(
+            textGroups: [.makeTemplate(), .makeTemplate()],
+            stringsPath: .makeTemplate(),
             maxFontSize: 120,
-            outputPaths: [FileURL(path: "Example/")],
-            textColorSource: try ColorSource(hexString: "#FFF"),
-            outputFormat: .jpeg,
-            localesRegex: nil)
+            outputPaths: [.makeTemplate()],
+            fontSource: .filePath("/System/Library/Fonts/HelveticaNeue.ttc"),
+            textColorSource: try .init(hexString: "#FFF"),
+            outputFormat: .png,
+            clearDirectories: true,
+            outputWholeImage: true,
+            deviceData: [.makeTemplate(), .makeTemplate()],
+            localesRegex: nil
+        )
 
-        return try format.encoder.encode(configData)
+        return try format.encoder.encode(config)
     }
 
 }

@@ -8,21 +8,16 @@ protocol ConfigValidatable {
 
 }
 
-/// First key is locale, second is regular key in string file
-typealias LocalizedStringFiles = [String: [String: String]]
+protocol ConfigCreatable {
 
-protocol Config {
-
-    var stringsPath: FileURL { get }
-    var maxFontSize: CGFloat { get }
-    var outputPaths: [FileURL] { get }
-    var textColorSource: ColorSource { get }
-    var outputFormat: FileFormat { get }
-    var localesRegex: String? { get }
+    static func makeTemplate() -> Self
 
 }
 
-struct ConfigData: Config, Decodable, ConfigValidatable {
+/// First key is locale, second is regular key in string file
+typealias LocalizedStringFiles = [String: [String: String]]
+
+struct ConfigData: Codable {
 
     // MARK: - Properties
 
@@ -102,7 +97,32 @@ struct ConfigData: Config, Decodable, ConfigValidatable {
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - Screenshot Factory
+
+    func makeAssociatedStrings(for device: DeviceData, locale: String) throws -> [AssociatedString] {
+        return try device.textData.map {
+            guard let title = titles[locale]?[$0.titleIdentifier] else {
+                throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
+            }
+            return (title, $0)
+        }
+    }
+
+    func makeSharedFontSizes(for associatedStrings: [AssociatedString]) throws -> [String: CGFloat] {
+        return try textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
+            let strings = associatedStrings.filter({ $0.data.groupIdentifier == group.identifier })
+            dictionary[group.identifier] = try group.sharedFontSize(
+                with: strings,
+                globalFont: try fontSource.font(),
+                globalMaxSize: maxFontSize)
+        }
+    }
+
+}
+
+// MARK: - ConfigValidatable
+
+extension ConfigData: ConfigValidatable {
 
     public func validate() throws {
         guard !deviceData.isEmpty else {
@@ -151,27 +171,6 @@ struct ConfigData: Config, Decodable, ConfigValidatable {
         }
 
         print("### Config Summary End")
-    }
-
-    // MARK: - Screenshot Factory
-
-    func makeAssociatedStrings(for device: DeviceData, locale: String) throws -> [AssociatedString] {
-        return try device.textData.map {
-            guard let title = titles[locale]?[$0.titleIdentifier] else {
-                throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
-            }
-            return (title, $0)
-        }
-    }
-
-    func makeSharedFontSizes(for associatedStrings: [AssociatedString]) throws -> [String: CGFloat] {
-        return try textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
-            let strings = associatedStrings.filter({ $0.data.groupIdentifier == group.identifier })
-            dictionary[group.identifier] = try group.sharedFontSize(
-                with: strings,
-                globalFont: try fontSource.font(),
-                globalMaxSize: maxFontSize)
-        }
     }
 
 }

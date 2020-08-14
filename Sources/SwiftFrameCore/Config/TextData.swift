@@ -3,7 +3,7 @@ import Foundation
 
 typealias AssociatedString = (string: String, data: TextData)
 
-struct TextData: Decodable, ConfigValidatable {
+struct TextData: Codable {
 
     // MARK: - Properties
 
@@ -42,10 +42,10 @@ struct TextData: Decodable, ConfigValidatable {
     internal init(
         titleIdentifier: String,
         textAlignment: TextAlignment,
-        maxFontSizeOverride: CGFloat?,
-        fontOverride: FontSource?,
-        textColorOverrideString: String?,
-        groupIdentifier: String?,
+        maxFontSizeOverride: CGFloat? = nil,
+        fontOverride: FontSource? = nil,
+        textColorOverrideString: String? = nil,
+        groupIdentifier: String? = nil,
         topLeft: Point,
         bottomRight: Point,
         textColorOverride: NSColor? = nil)
@@ -77,10 +77,15 @@ struct TextData: Decodable, ConfigValidatable {
             groupIdentifier: groupIdentifier,
             topLeft: processedTopLeft,
             bottomRight: processedBottomRight,
-            textColorOverride: colorOverride)
+            textColorOverride: colorOverride
+        )
     }
 
-    // MARK: - ConfigValidatable
+}
+
+// MARK: - ConfigValidatable
+
+extension TextData: ConfigValidatable {
 
     func validate() throws {
         guard (topLeft.x < bottomRight.x) && (topLeft.y > bottomRight.y) else {
@@ -108,4 +113,22 @@ struct TextData: Decodable, ConfigValidatable {
             CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.ky_hexString, insetBy: tabs + 1)
         }
     }
+
+}
+
+// MARK: - ConfigCreatable
+
+extension TextData: ConfigCreatable {
+
+    static func makeTemplate() -> Self {
+        TextData(
+            titleIdentifier: "some_title_id",
+            textAlignment: .init(horizontal: .center, vertical: .top),
+            textColorOverrideString: "#4F4F4F",
+            groupIdentifier: nil,
+            topLeft: Point(x: 20, y: 30),
+            bottomRight: Point(x: 74, y: 11)
+        )
+    }
+
 }

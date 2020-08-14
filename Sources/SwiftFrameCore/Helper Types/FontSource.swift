@@ -19,3 +19,16 @@ extension FontSource: Decodable {
     }
 
 }
+
+extension FontSource: Encodable {
+
+    func encode(to encoder: Encoder) throws {
+        guard case .filePath(let path) = self else {
+            throw NSError(description: "Cannot NSFont objects")
+        }
+
+        var container = encoder.singleValueContainer()
+        try container.encode(path)
+    }
+
+}

@@ -17,7 +17,7 @@ public enum ConfigFileFormat: String {
     }
 }
 
-internal extension ConfigFileFormat {
+extension ConfigFileFormat {
 
     var decoder: KYDecoder {
         switch self {
