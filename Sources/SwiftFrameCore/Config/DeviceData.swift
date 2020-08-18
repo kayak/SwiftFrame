@@ -10,6 +10,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     let outputSuffix: String
     let templateImagePath: FileURL
     private let screenshotsPath: FileURL
+    let sliceSizeOverride: DecodableSize?
 
     @DecodableDefault.IntZero var gapWidth: Int
 
@@ -24,6 +25,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         case outputSuffix
         case screenshotsPath = "screenshots"
         case templateImagePath = "templateFile"
+        case sliceSizeOverride
         case screenshotData
         case textData
         case gapWidth
@@ -35,6 +37,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         outputSuffix: String,
         templateImagePath: FileURL,
         screenshotsPath: FileURL,
+        sliceSizeOverride: DecodableSize? = nil,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
@@ -44,6 +47,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         self.outputSuffix = outputSuffix
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
+        self.sliceSizeOverride = sliceSizeOverride
         self.screenshotsGroupedByLocale = screenshotsGroupedByLocale
         self.templateImage = templateImage
         self.screenshotData = screenshotData
@@ -78,6 +82,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             outputSuffix: outputSuffix,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
+            sliceSizeOverride: sliceSizeOverride,
             screenshotsGroupedByLocale: parsedScreenshots,
             templateImage: rep,
             screenshotData: processedScreenshotData,
@@ -108,7 +113,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
         // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
         // plus specified gap width in between
-        if let screenshotSize = NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
+        if let screenshotSize = sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
             guard let templateImageSize = templateImage?.ky_nativeSize else {
                 throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" could not be loaded for validation")
             }

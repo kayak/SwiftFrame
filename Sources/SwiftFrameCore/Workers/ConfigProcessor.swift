@@ -83,7 +83,7 @@ public class ConfigProcessor {
                 throw NSError(description: "No template image found")
             }
 
-            guard let sliceSize = NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
+            guard let sliceSize = deviceData.sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
                 throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
             }
 
