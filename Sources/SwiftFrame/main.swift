@@ -9,7 +9,7 @@ struct SwiftFrame: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "swiftframe",
         abstract: "CLI application for speedy screenshot framing",
-        version: "3.0.0",
+        version: "3.1.0",
         helpNames: .shortAndLong)
 
     @Argument(help: "Read configuration values from the specified file", completion: .list(["config", "yml", "yaml"]))
