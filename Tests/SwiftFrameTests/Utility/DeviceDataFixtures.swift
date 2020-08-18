@@ -25,4 +25,21 @@ extension DeviceData {
         screenshotData: [.goodData],
         textData: [.invalidData])
 
+    static let mismatchingDeviceSizeData = DeviceData(
+        outputSuffix: "iPhone X",
+        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+        screenshotsPath: FileURL(path: "testing/screenshots/"),
+        sliceSizeOverride: DecodableSize(width: 50, height: 100),
+        screenshotData: [.goodData],
+        textData: [.goodData])
+
+    static let faultyMismatchingDeviceSizeData = DeviceData(
+        outputSuffix: "iPhone X",
+        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+        screenshotsPath: FileURL(path: "testing/screenshots/"),
+        sliceSizeOverride: DecodableSize(width: 50, height: 100),
+        screenshotData: [.goodData],
+        textData: [.goodData],
+        gapWidth: 2)
+
 }
