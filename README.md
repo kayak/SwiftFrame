@@ -30,13 +30,16 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
   * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
   * `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device
   * `templateFile`: an image file that will be rendered above the screenshots to overlay device frames (e.g. see `Example/Template Files/iPhone X/TemplateFile.png`) **Note:** places where screenshots should go need to be transparent
+  * `sliceSizeOverride`: **optional** A custom slice size override in cases where you want to use different size screenshots (for example iPhone X screenshots with a iPhone 8 template file)
+    * `width`: The width of the custom slice size
+    * `height`: The height of the custom slice size 
   * `gapWidth`: **optional (default: 0)** a gap width in pixels that will be skipped after every screenshot that is sliced from the template file
   * `screenshotData`: an array containing further information about screenshot coordinates
     * `screenshotName`: the file name (just name, not path) to the screenshot file to render
     * `zIndex`: **optional**, use this to avoid wrong rendering order if two screenshots need to overlap each other for example
     * `bottomLeft`, `bottomRight`, `topLeft` and `topRight`: the corners of the screenshot to render. Note that screenshots can be rotated in 3D, so the corners of the resulting don't have to form 90 degree angles
       * `x`: The x coordinate of the corner point, relative to the left edge
-      * `y`: the y coordinate of the corner point, relative to the top or bottom edge, depending on `coordinatesOriginIsTopLeft`
+      * `y`: the y coordinate of the corner point, relative to the top or bottom edge
   * `textData`: an array containing further information about text titles coordinates and its layout
     * `titleIdentifer`: the key that SwiftFrame should look for in the `.strings` file for a certain title
     * `textColorOverride`: **optional**, a color in Hex format to use specifically for this title
@@ -47,7 +50,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
     * `groupIdentifier`: **optional**, an identifier for a text group (see below)
     * `topLeft` and `bottomRight`: the bounding coordinate points of the text (as of right now, it's not possible to have rotated text)
       * `x`: The x coordinate of the corner point, relative to the left edge
-      * `y`: the y coordinate of the corner point, relative to the top or bottom edge, depending on `coordinatesOriginIsTopLeft` 
+      * `y`: the y coordinate of the corner point, relative to the top or bottom edge
 * `textGroups`: **optional**, an array of text groups which you can use to force multiple titles to use the same font size
   * `identifier`: the identifier of the text group
   * `maxFontSize`: the maximum font point size titles with this group ID should be using (overrides the global `maxFontSize`)
