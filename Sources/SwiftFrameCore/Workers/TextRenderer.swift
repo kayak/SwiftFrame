@@ -8,7 +8,7 @@ final class TextRenderer {
 
     // MARK: - Frame Rendering
 
-    func render(text: String, font: NSFont, color: NSColor, alignment: TextAlignment, rect: NSRect, context: CGContext) throws {
+    func render(text: String, font: NSFont, color: NSColor, alignment: TextAlignment, rect: NSRect, context: GraphicsContext) throws {
         guard !text.isEmpty else {
             print(CommandLineFormatter.formatWarning(text: "String was emtpy and will not be rendered"))
             return
@@ -16,11 +16,11 @@ final class TextRenderer {
 
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
-        context.saveGState()
+        context.cgContext.saveGState()
 
         let frame = try makeFrame(from: attributedString, in: rect, alignment: alignment)
-        CTFrameDraw(frame, context)
-        context.restoreGState()
+        CTFrameDraw(frame, context.cgContext)
+        context.cgContext.restoreGState()
     }
 
     private func makeFrame(from attributedString: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {

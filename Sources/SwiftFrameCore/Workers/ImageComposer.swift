@@ -17,12 +17,12 @@ final class ImageComposer {
     private let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
 
-    let context: CGContext
+    let context: GraphicsContext
 
     // MARK: - Init
 
     init(canvasSize: CGSize) throws {
-        self.context = try ImageComposer.createContext(size: canvasSize)
+        self.context = try GraphicsContext(canvasSize: canvasSize)
     }
 
     // MARK: - Preparation
@@ -49,9 +49,9 @@ final class ImageComposer {
             throw NSError(description: "Could not render template image")
         }
 
-        context.saveGState()
-        context.draw(templateImage, in: image.ky_nativeRect)
-        context.restoreGState()
+        context.cgContext.saveGState()
+        context.cgContext.draw(templateImage, in: image.ky_nativeRect)
+        context.cgContext.restoreGState()
     }
 
     // MARK: - Titles Rendering

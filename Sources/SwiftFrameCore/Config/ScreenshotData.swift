@@ -26,7 +26,7 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
     // MARK: - Misc
 
     func makeProcessedData(size: CGSize) -> ScreenshotData {
-        return ScreenshotData(
+        ScreenshotData(
             screenshotName: screenshotName,
             bottomLeft: bottomLeft.convertingToBottomLeftOrigin(withSize: size),
             bottomRight: bottomRight.convertingToBottomLeftOrigin(withSize: size),
