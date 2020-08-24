@@ -6,8 +6,8 @@ class ScreenshotRendererTests: XCTestCase {
 
     func testRenderScreenshot() throws {
         let size = CGSize(width: 100, height: 100)
-        let context = try GraphicsContext(canvasSize: size)
-        let rep = CGContext.makeImageRepWithSize(size)
+        let context = try GraphicsContext(size: size)
+        let rep = context.cg.makePlainWhiteImageRep()
 
         let mockScreenshotData = ScreenshotData.goodData
 

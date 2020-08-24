@@ -15,12 +15,12 @@ class GraphicsContext {
     }()
 
 
-    init(canvasSize: CGSize) throws {
+    init(size: CGSize) throws {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let context = CGContext(
             data: nil,
-            width: Int(canvasSize.width),
-            height: Int(canvasSize.height),
+            width: Int(size.width),
+            height: Int(size.height),
             bitsPerComponent: 8,
             bytesPerRow: 0,
             space: colorSpace,

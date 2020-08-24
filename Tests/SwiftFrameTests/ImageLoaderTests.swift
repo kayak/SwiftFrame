@@ -5,7 +5,8 @@ import XCTest
 class ImageLoaderTests: BaseTest {
 
     func testLoadImage() throws {
-        let rep = CGContext.makeImageRepWithSize(.square100Pixels)
+        let context = try GraphicsContext(size: .square100Pixels)
+        let rep = context.cg.makePlainWhiteImageRep()
         let cgImage = try ky_unwrap(rep.cgImage)
 
         try ImageWriter.write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device", format: .png)

@@ -22,24 +22,7 @@ final class ImageComposer {
     // MARK: - Init
 
     init(canvasSize: CGSize) throws {
-        self.context = try GraphicsContext(canvasSize: canvasSize)
-    }
-
-    // MARK: - Preparation
-
-    private static func createContext(size: CGSize) throws -> CGContext {
-        guard let context = CGContext(
-            data: nil,
-            width: Int(size.width),
-            height: Int(size.height),
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        else {
-            throw NSError(description: "Failed to create graphics context")
-        }
-        return context
+        self.context = try GraphicsContext(size: canvasSize)
     }
 
     // MARK: - Composition
