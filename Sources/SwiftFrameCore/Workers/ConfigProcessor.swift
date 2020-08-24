@@ -101,8 +101,6 @@ public class ConfigProcessor {
                 color: data.textColorSource.color,
                 maxFontSize: data.maxFontSize)
 
-            printVerbose("Writing images for device \"\(deviceData.outputSuffix)\" for locale \"\(locale)\" asynchronously...")
-
             try ImageWriter.finish(
                 context: composer.context,
                 with: data.outputPaths,
@@ -112,6 +110,8 @@ public class ConfigProcessor {
                 locale: locale,
                 suffix: deviceData.outputSuffix,
                 format: data.outputFormat)
+
+            print("Finished \(locale)-\(deviceData.outputSuffix)")
 
             group.leave()
         }

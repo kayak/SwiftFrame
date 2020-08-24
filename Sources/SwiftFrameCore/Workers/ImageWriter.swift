@@ -6,7 +6,7 @@ public final class ImageWriter {
     // MARK: - Exporting
 
     static func finish(
-        context: CGContext,
+        context: GraphicsContext,
         with outputPaths: [FileURL],
         sliceSize: CGSize,
         gapWidth: Int,
@@ -15,7 +15,7 @@ public final class ImageWriter {
         suffix: String,
         format: FileFormat) throws
     {
-        guard let image = context.makeImage() else {
+        guard let image = context.cg.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
         let slices = try sliceImage(image, with: sliceSize, gapWidth: gapWidth)

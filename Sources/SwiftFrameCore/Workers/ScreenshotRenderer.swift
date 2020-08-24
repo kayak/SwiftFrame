@@ -5,16 +5,16 @@ final class ScreenshotRenderer {
 
     // MARK: - Screenshot Rendering
 
-    func render(screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: CGContext) throws {
-        let cgImage = try renderScreenshot(screenshot, with: data)
+    func render(screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: GraphicsContext) throws {
+        let cgImage = try renderScreenshot(screenshot, with: data, in: context)
         let rect = calculateRect(for: data)
 
-        context.saveGState()
-        context.draw(cgImage, in: rect)
-        context.restoreGState()
+        context.cg.saveGState()
+        context.cg.draw(cgImage, in: rect)
+        context.cg.restoreGState()
     }
 
-    private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData) throws -> CGImage {
+    private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: GraphicsContext) throws -> CGImage {
         let ciImage = CIImage(bitmapImageRep: screenshot)
 
         let perspectiveTransform = CIFilter(name: "CIPerspectiveTransform")!
@@ -27,7 +27,7 @@ final class ScreenshotRenderer {
 
         guard
             let compositeImage = perspectiveTransform.outputImage,
-            let cgImage = CIContext().createCGImage(compositeImage, from: calculateRect(for: data))
+            let cgImage = context.ci.createCGImage(compositeImage, from: calculateRect(for: data))
         else {
             throw NSError(description: "Could not skew screenshot")
         }

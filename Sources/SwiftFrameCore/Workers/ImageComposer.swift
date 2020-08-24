@@ -17,29 +17,12 @@ final class ImageComposer {
     private let textRenderer = TextRenderer()
     private let screenshotRenderer = ScreenshotRenderer()
 
-    let context: CGContext
+    let context: GraphicsContext
 
     // MARK: - Init
 
     init(canvasSize: CGSize) throws {
-        self.context = try ImageComposer.createContext(size: canvasSize)
-    }
-
-    // MARK: - Preparation
-
-    private static func createContext(size: CGSize) throws -> CGContext {
-        guard let context = CGContext(
-            data: nil,
-            width: Int(size.width),
-            height: Int(size.height),
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        else {
-            throw NSError(description: "Failed to create graphics context")
-        }
-        return context
+        self.context = try GraphicsContext(size: canvasSize)
     }
 
     // MARK: - Composition
@@ -49,9 +32,9 @@ final class ImageComposer {
             throw NSError(description: "Could not render template image")
         }
 
-        context.saveGState()
-        context.draw(templateImage, in: image.ky_nativeRect)
-        context.restoreGState()
+        context.cg.saveGState()
+        context.cg.draw(templateImage, in: image.ky_nativeRect)
+        context.cg.restoreGState()
     }
 
     // MARK: - Titles Rendering

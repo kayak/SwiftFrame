@@ -33,22 +33,10 @@ extension Dictionary where Value == String, Key == String {
 
 extension CGContext {
 
-    static func with(size: CGSize) -> CGContext {
-        CGContext(
-            data: nil,
-            width: Int(size.width),
-            height: Int(size.height),
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    }
-
-    static func makeImageRepWithSize(_ size: CGSize) -> NSBitmapImageRep {
-        let context = CGContext.with(size: size)
-        context.setFillColor(.white)
-        context.fill(NSRect(x: 0, y: 0, width: size.width, height: size.height))
-        return NSBitmapImageRep(cgImage: context.makeImage()!)
+    func makePlainWhiteImageRep() -> NSBitmapImageRep {
+        setFillColor(.white)
+        fill(NSRect(x: 0, y: 0, width: width, height: height))
+        return NSBitmapImageRep(cgImage: makeImage()!)
     }
 
 }
