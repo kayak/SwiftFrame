@@ -4,11 +4,11 @@ import Foundation
 
 class GraphicsContext {
 
-    let cgContext: CGContext
+    let cg: CGContext
     private let colorSpace: CGColorSpace
 
-    lazy var ciContext: CIContext = {
-        CIContext(cgContext: cgContext, options: [
+    lazy var ci: CIContext = {
+        CIContext(cgContext: cg, options: [
             CIContextOption.workingColorSpace: colorSpace,
             CIContextOption.useSoftwareRenderer: false
         ])
@@ -23,14 +23,14 @@ class GraphicsContext {
             height: Int(canvasSize.height),
             bitsPerComponent: 8,
             bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(),
+            space: colorSpace,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         )
 
         guard let cgContext = context else {
             throw NSError(description: "Failed to create graphics context")
         }
-        self.cgContext = cgContext
+        self.cg = cgContext
         self.colorSpace = colorSpace
     }
 

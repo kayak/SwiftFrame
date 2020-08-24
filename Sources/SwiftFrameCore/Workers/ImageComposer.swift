@@ -49,9 +49,9 @@ final class ImageComposer {
             throw NSError(description: "Could not render template image")
         }
 
-        context.cgContext.saveGState()
-        context.cgContext.draw(templateImage, in: image.ky_nativeRect)
-        context.cgContext.restoreGState()
+        context.cg.saveGState()
+        context.cg.draw(templateImage, in: image.ky_nativeRect)
+        context.cg.restoreGState()
     }
 
     // MARK: - Titles Rendering

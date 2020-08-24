@@ -10,7 +10,7 @@ class ImageComposerTests: XCTestCase {
         let composer = try ImageComposer(canvasSize: size)
         try composer.addTemplateImage(templateFile)
 
-        let image = try ky_unwrap(composer.context.cgContext.makeImage())
+        let image = try ky_unwrap(composer.context.cg.makeImage())
         XCTAssertEqual(image.width, Int(size.width))
         XCTAssertEqual(image.height, Int(size.height))
     }
@@ -21,7 +21,7 @@ class ImageComposerTests: XCTestCase {
         let composer = try ImageComposer(canvasSize: size)
         try composer.addTemplateImage(templateFile)
 
-        let image = try ky_unwrap(composer.context.cgContext.makeImage())
+        let image = try ky_unwrap(composer.context.cg.makeImage())
         let slices = try ImageWriter.sliceImage(image, with: NSSize(width: 20, height: 50), gapWidth: 0)
         XCTAssertEqual(slices.count, 5)
         for slice in slices {

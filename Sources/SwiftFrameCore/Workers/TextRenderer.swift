@@ -16,11 +16,11 @@ final class TextRenderer {
 
         let attributedString = try makeAttributedString(for: text, font: font, color: color, alignment: alignment)
 
-        context.cgContext.saveGState()
+        context.cg.saveGState()
 
         let frame = try makeFrame(from: attributedString, in: rect, alignment: alignment)
-        CTFrameDraw(frame, context.cgContext)
-        context.cgContext.restoreGState()
+        CTFrameDraw(frame, context.cg)
+        context.cg.restoreGState()
     }
 
     private func makeFrame(from attributedString: NSAttributedString, in rect: NSRect, alignment: TextAlignment) throws -> CTFrame {

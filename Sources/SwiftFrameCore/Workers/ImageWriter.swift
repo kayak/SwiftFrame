@@ -15,7 +15,7 @@ public final class ImageWriter {
         suffix: String,
         format: FileFormat) throws
     {
-        guard let image = context.cgContext.makeImage() else {
+        guard let image = context.cg.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
         let slices = try sliceImage(image, with: sliceSize, gapWidth: gapWidth)
