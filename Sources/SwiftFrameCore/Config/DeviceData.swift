@@ -165,7 +165,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
         if !additionalSuffixes.isEmpty {
-            CommandLineFormatter.printKeyValue("Additional output suffixes", value: additionalSuffixes.joined(separator: ", "))
+            CommandLineFormatter.printKeyValue("Additional output suffixes", value: additionalSuffixes.joined(separator: ", "), insetBy: tabs)
         }
 
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
