@@ -28,6 +28,7 @@ To use SwiftFrame, you need to pass it a configuration file (which is a plain JS
 * `locales`: **optional** a regular expression that can be used to exlude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
 * `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
   * `outputSuffix`: a suffix to apply to the output files in addition to the locale identifier and index
+  * `additionalSuffixes`: **optional** an array of additional output suffixes (for example to render the same screenshots a second time for a different device)
   * `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device
   * `templateFile`: an image file that will be rendered above the screenshots to overlay device frames (e.g. see `Example/Template Files/iPhone X/TemplateFile.png`) **Note:** places where screenshots should go need to be transparent
   * `sliceSizeOverride`: **optional** A custom slice size override in cases where you want to use different size screenshots (for example iPhone X screenshots with a iPhone 8 template file)
