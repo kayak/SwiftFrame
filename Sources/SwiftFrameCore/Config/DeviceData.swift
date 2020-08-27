@@ -8,6 +8,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     private let kScreenshotExtensions = Set(["png", "jpg", "jpeg"])
 
     let outputSuffix: String
+    @DecodableDefault.EmptyList var additionalSuffixes: [String]
     let templateImagePath: FileURL
     private let screenshotsPath: FileURL
     let sliceSizeOverride: DecodableSize?
@@ -19,10 +20,15 @@ public struct DeviceData: Decodable, ConfigValidatable {
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
 
+    var allOutputSuffixes: [String] {
+        [outputSuffix] + additionalSuffixes
+    }
+
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case outputSuffix
+        case additionalSuffixes
         case screenshotsPath = "screenshots"
         case templateImagePath = "templateFile"
         case sliceSizeOverride
@@ -35,6 +41,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     internal init(
         outputSuffix: String,
+        additionalSuffixes: [String],
         templateImagePath: FileURL,
         screenshotsPath: FileURL,
         sliceSizeOverride: DecodableSize? = nil,
@@ -45,6 +52,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         gapWidth: Int = 0)
     {
         self.outputSuffix = outputSuffix
+        self.additionalSuffixes = additionalSuffixes
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
         self.sliceSizeOverride = sliceSizeOverride
@@ -80,6 +88,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
         return DeviceData(
             outputSuffix: outputSuffix,
+            additionalSuffixes: additionalSuffixes,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
             sliceSizeOverride: sliceSizeOverride,
@@ -155,6 +164,10 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
+        if !additionalSuffixes.isEmpty {
+            CommandLineFormatter.printKeyValue("Additional output suffixes", value: additionalSuffixes.joined(separator: ", "))
+        }
+
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
         CommandLineFormatter.printKeyValue(

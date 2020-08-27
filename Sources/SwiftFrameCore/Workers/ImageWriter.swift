@@ -12,7 +12,7 @@ public final class ImageWriter {
         gapWidth: Int,
         outputWholeImage: Bool,
         locale: String,
-        suffix: String,
+        suffixes: [String],
         format: FileFormat) throws
     {
         guard let image = context.cg.makeImage() else {
@@ -22,21 +22,23 @@ public final class ImageWriter {
 
         let workGroup = DispatchGroup()
 
-        // Writing images asynchronously gave a big performance boost, what a surprise
-        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
-        workGroup.enter()
-        DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
-            try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
-            workGroup.leave()
-        }
-
-        if outputWholeImage {
+        suffixes.forEach { suffix in
+            // Writing images asynchronously gave a big performance boost, what a surprise
+            // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
             workGroup.enter()
             DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
-                try outputPaths.forEach {
-                    try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
-                }
+                try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
                 workGroup.leave()
+            }
+
+            if outputWholeImage {
+                workGroup.enter()
+                DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
+                    try outputPaths.forEach {
+                        try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
+                    }
+                    workGroup.leave()
+                }
             }
         }
 
