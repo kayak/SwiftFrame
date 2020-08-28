@@ -108,10 +108,12 @@ public class ConfigProcessor {
                 gapWidth: deviceData.gapWidth,
                 outputWholeImage: data.outputWholeImage,
                 locale: locale,
-                suffix: deviceData.outputSuffix,
+                suffixes: deviceData.outputSuffixes,
                 format: data.outputFormat)
 
-            print("Finished \(locale)-\(deviceData.outputSuffix)")
+            deviceData.outputSuffixes.forEach { suffix in
+                print("Finished \(locale)-\(suffix)")
+            }
 
             group.leave()
         }
