@@ -9,7 +9,9 @@ class ImageLoaderTests: BaseTest {
         let rep = context.cg.makePlainWhiteImageRep()
         let cgImage = try ky_unwrap(rep.cgImage)
 
-        try ImageWriter.write(cgImage, to: "testing/", locale: "en", deviceID: "testing_device", format: .png)
+        let url = URL(fileURLWithPath: "testing/en/en-testing_device.png")
+
+        try ImageWriter.writeImage(cgImage, to: [url], format: .png)
         XCTAssertNoThrow(try ImageLoader().loadImage(atPath: "testing/en/en-testing_device.png"))
     }
 

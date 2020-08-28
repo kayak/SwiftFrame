@@ -7,8 +7,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
 
     private let kScreenshotExtensions = Set(["png", "jpg", "jpeg"])
 
-    let outputSuffix: String
-    @DecodableDefault.EmptyList var additionalSuffixes: [String]
+    let outputSuffixes: [String]
     let templateImagePath: FileURL
     private let screenshotsPath: FileURL
     let sliceSizeOverride: DecodableSize?
@@ -20,15 +19,14 @@ public struct DeviceData: Decodable, ConfigValidatable {
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
 
-    var allOutputSuffixes: [String] {
-        [outputSuffix] + additionalSuffixes
+    private var suffixesStringRepresentation: String {
+        outputSuffixes.map { "\"\($0)\"" }.joined(separator: ", ")
     }
 
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
-        case outputSuffix
-        case additionalSuffixes
+        case outputSuffixes
         case screenshotsPath = "screenshots"
         case templateImagePath = "templateFile"
         case sliceSizeOverride
@@ -40,8 +38,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     // MARK: - Init
 
     internal init(
-        outputSuffix: String,
-        additionalSuffixes: [String],
+        outputSuffixes: [String],
         templateImagePath: FileURL,
         screenshotsPath: FileURL,
         sliceSizeOverride: DecodableSize? = nil,
@@ -51,8 +48,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         textData: [TextData] = [TextData](),
         gapWidth: Int = 0)
     {
-        self.outputSuffix = outputSuffix
-        self.additionalSuffixes = additionalSuffixes
+        self.outputSuffixes = outputSuffixes
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
         self.sliceSizeOverride = sliceSizeOverride
@@ -87,8 +83,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
-            outputSuffix: outputSuffix,
-            additionalSuffixes: additionalSuffixes,
+            outputSuffixes: outputSuffixes,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
             sliceSizeOverride: sliceSizeOverride,
@@ -124,7 +119,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         // plus specified gap width in between
         if let screenshotSize = sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
             guard let templateImageSize = templateImage?.ky_nativeSize else {
-                throw NSError(description: "Template image for output suffix \"\(outputSuffix)\" could not be loaded for validation")
+                throw NSError(description: "Template image for output suffixes \(suffixesStringRepresentation) could not be loaded for validation")
             }
             try validateSize(templateImageSize, screenshotSize: screenshotSize)
         }
@@ -147,7 +142,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
         if gapWidth == 0 {
             guard remainingPixels == 0 else {
                 throw NSError(
-                    description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
+                    description: "Template image for output suffixes \(suffixesStringRepresentation) is not a multiple in width as associated screenshot width",
                     expectation: "Width should be multiple of \(Int(screenshotSize.width))px",
                     actualValue: "\(Int(screenshotSize.width))px")
             }
@@ -155,7 +150,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             // Make sure there's at least one gap
             guard remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) == 0 && remainingPixels != 0 else {
                 throw NSError(
-                    description: "Template image for output suffix \"\(outputSuffix)\" is not a multiple in width as associated screenshot width",
+                    description: "Template image for output suffixes \(suffixesStringRepresentation) is not a multiple in width as associated screenshot width",
                     expectation: "Template image width should be = (x * screenshot width) + (x - 1) * gap width",
                     actualValue: "Template image width: \(templateSize.width)px, screenshot width: \(screenshotSize.width), gap width: \(gapWidth)")
             }
@@ -163,11 +158,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
     }
 
     func printSummary(insetByTabs tabs: Int) {
-        CommandLineFormatter.printKeyValue("Ouput suffix", value: outputSuffix, insetBy: tabs)
-        if !additionalSuffixes.isEmpty {
-            CommandLineFormatter.printKeyValue("Additional output suffixes", value: additionalSuffixes.joined(separator: ", "), insetBy: tabs)
-        }
-
+        CommandLineFormatter.printKeyValue("Ouput suffixes", value: outputSuffixes.joined(separator: ", "), insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
         CommandLineFormatter.printKeyValue(

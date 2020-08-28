@@ -19,26 +19,28 @@ public final class ImageWriter {
             throw NSError(description: "Could not render output image")
         }
         let slices = try sliceImage(image, with: sliceSize, gapWidth: gapWidth)
+        let fileNameConfiguration = OutputConfiguration(
+            outputPaths: outputPaths,
+            locale: locale,
+            suffixes: suffixes,
+            format: format
+        )
 
         let workGroup = DispatchGroup()
 
-        suffixes.forEach { suffix in
-            // Writing images asynchronously gave a big performance boost, what a surprise
-            // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
+        // Writing images asynchronously gave a big performance boost, what a surprise
+        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
+        workGroup.enter()
+        DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
+            try ImageWriter.writeSlices(slices, with: fileNameConfiguration)
+            workGroup.leave()
+        }
+
+        if outputWholeImage {
             workGroup.enter()
             DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
-                try ImageWriter.write(images: slices, to: outputPaths, locale: locale, suffix: suffix, format: format)
+                try ImageWriter.writeBigImage(image, with: fileNameConfiguration)
                 workGroup.leave()
-            }
-
-            if outputWholeImage {
-                workGroup.enter()
-                DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
-                    try outputPaths.forEach {
-                        try ImageWriter.write(image, to: $0.absoluteURL.appendingPathComponent(locale), fileName: "\(locale)-\(suffix)-big", format: format)
-                    }
-                    workGroup.leave()
-                }
             }
         }
 
@@ -62,35 +64,72 @@ public final class ImageWriter {
 
     // MARK: - Writing Images
 
-    static func write(images: [CGImage], to outputPaths: [FileURL], locale: String, suffix: String, format: FileFormat) throws {
-        try outputPaths.forEach { url in
-            try images.enumerated().forEach { tuple in
-                try write(tuple.element, to: url.path, locale: locale, deviceID: suffix, index: tuple.offset, format: format)
-            }
+    static func writeSlices(_ images: [CGImage], with configuration: OutputConfiguration) throws {
+        try images.enumerated().forEach { value in
+            let outputPaths = configuration.makeOutputPaths(for: value.offset)
+            try writeImage(value.element, to: outputPaths, format: configuration.format)
         }
     }
 
-    static func write(_ image: CGImage, to directoryPath: String, locale: String, deviceID: String, index: Int? = nil, format: FileFormat) throws {
-        let fileName: String
-        if let index = index {
-            fileName = "\(locale)-\(deviceID)-\(index)"
-        } else {
-            fileName = "\(locale)-\(deviceID)"
-        }
-        let directory = URL(fileURLWithPath: directoryPath).appendingPathComponent(locale)
-        try write(image, to: directory, fileName: fileName, format: format)
+    static func writeBigImage(_ image: CGImage, with configuration: OutputConfiguration) throws {
+        let outputPaths = configuration.makeBigImageOutputPaths()
+        try writeImage(image, to: outputPaths, format: configuration.format)
     }
 
-    static func write(_ image: CGImage, to directoryPath: URL, fileName: String, format: FileFormat) throws {
+    static func writeImage(_ image: CGImage, to urls: [URL], format: FileFormat) throws {
         let rep = NSBitmapImageRep(cgImage: image)
         guard let data = rep.representation(using: format, properties: [:]) else {
-            throw NSError(description: "Failed to convert composed image to PNG")
+            throw NSError(description: "Failed to convert image to \(format.fileExtension.uppercased())")
         }
 
-        let targetURL = directoryPath
-            .appendingPathComponent(fileName)
-            .appendingPathExtension(format.fileExtension)
-        try data.ky_write(to: targetURL, options: .atomicWrite)
+        try urls.forEach {
+            try data.ky_write(to: $0, options: .atomicWrite)
+        }
+    }
+
+}
+
+// MARK: - OutputConfiguration
+
+extension ImageWriter {
+
+    struct OutputConfiguration {
+
+        // MARK: - Properties
+
+        let outputPaths: [FileURL]
+        let locale: String
+        let suffixes: [String]
+        let format: FileFormat
+
+        // MARK: - Methods
+
+        func makeBigImageOutputPaths() -> [URL] {
+            var urls = [URL]()
+            makeBasePaths().forEach { basePath in
+                suffixes.forEach { suffix in
+                    let url = basePath.appendingPathComponent("\(locale)-\(suffix)-big").appendingPathExtension(format.fileExtension)
+                    urls.append(url)
+                }
+            }
+            return urls
+        }
+
+        func makeOutputPaths(for sliceIndex: Int) -> [URL] {
+            var urls = [URL]()
+            makeBasePaths().forEach { basePath in
+                suffixes.forEach { suffix in
+                    let url = basePath.appendingPathComponent("\(locale)-\(suffix)-\(sliceIndex)").appendingPathExtension(format.fileExtension)
+                    urls.append(url)
+                }
+            }
+            return urls
+        }
+
+        private func makeBasePaths() -> [URL] {
+            outputPaths.map { $0.absoluteURL.appendingPathComponent(locale) }
+        }
+
     }
 
 }

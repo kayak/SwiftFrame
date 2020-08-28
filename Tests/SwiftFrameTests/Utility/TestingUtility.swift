@@ -11,8 +11,11 @@ struct TestingUtility {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }
 
-        let url = URL(fileURLWithPath: "testing/screenshots/").appendingPathComponent(locale)
-        try ImageWriter.write(cgImage, to: url, fileName: deviceSuffix, format: .png)
+        let url = URL(fileURLWithPath: "testing/screenshots/")
+            .appendingPathComponent(locale)
+            .appendingPathComponent(deviceSuffix)
+            .appendingPathExtension(FileFormat.png.fileExtension)
+        try ImageWriter.writeImage(cgImage, to: [url], format: .png)
     }
 
     static func writeMockTemplateFile(deviceSuffix: String, gapWidth: Int) throws {
@@ -21,8 +24,8 @@ struct TestingUtility {
             throw NSError(description: "Could not make CGImage from Bitmap")
         }
 
-        let url = URL(fileURLWithPath: "testing/")
-        try ImageWriter.write(cgImage, to: url, fileName: "templatefile-\(deviceSuffix)", format: .png)
+        let url = URL(fileURLWithPath: "testing/templatefile-\(deviceSuffix).png")
+        try ImageWriter.writeImage(cgImage, to: [url], format: .png)
     }
 
     static func setupMockDirectoryWithScreenshots(gapWidth: Int = 0) throws {
