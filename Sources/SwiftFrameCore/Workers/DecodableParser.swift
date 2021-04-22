@@ -36,7 +36,7 @@ struct DecodableParser {
         }
 
         init?(rawValue: String) {
-            switch rawValue {
+            switch rawValue.lowercased() {
             case "config", "json":
                 self = .json
             case "yml", "yaml":

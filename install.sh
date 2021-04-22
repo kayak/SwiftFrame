@@ -5,7 +5,6 @@ set -e
 SCRIPTPATH="$(dirname "$0")"
 
 swift build -c release --package-path "$SCRIPTPATH" -v
-cp -f "$SCRIPTPATH/.build/release/SwiftFrame" "/usr/local/bin/swiftframe"
-rm -r "$SCRIPTPATH/.build/release"
+install -v "$SCRIPTPATH/.build/release/swiftframe" "/usr/local/bin/swiftframe"
 
-echo "Installed swiftframe into /usr/local/bin/swiftframe"
+echo "|> \033[32mInstalled swiftframe into /usr/local/bin/swiftframe\033[0m"
