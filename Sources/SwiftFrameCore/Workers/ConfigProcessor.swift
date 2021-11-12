@@ -33,40 +33,21 @@ public class ConfigProcessor {
             _ = readLine()
         }
 
-        print("Parsed and validated config file")
+        print("Parsed and validated config file\n")
 
         if data.clearDirectories {
-            print("Clearing Output Directories")
+            let clearingStart = CFAbsoluteTimeGetCurrent()
             try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
+            let clearingDiff = CFAbsoluteTimeGetCurrent() - clearingStart
+            print("Cleared output directories in \(String(format: "%.3f", clearingDiff)) seconds\n")
         }
 
         print("Rendering...\n")
 
-        // We need a special semaphore here, since the creation of the attributed strings has to happen
-        // on the main thread and anything else can happen asynchronously but we still want to finish
-        // execution only when everything has finished
-        let semaphore = RunLoopSemaphore()
-
         let start = CFAbsoluteTimeGetCurrent()
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            let group = DispatchGroup()
-
-            self.data.deviceData.forEach { deviceData in
-                group.enter()
-                DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit { [weak self] in
-                    try self?.process(deviceData: deviceData)
-                    group.leave()
-                }
-            }
-
-            group.wait()
-            DispatchQueue.main.async {
-                semaphore.signal()
-            }
+        try data.deviceData.forEach { deviceData in
+            try process(deviceData: deviceData)
         }
-
-        semaphore.wait()
 
         print("All done!".formattedGreen())
         let diff = CFAbsoluteTimeGetCurrent() - start

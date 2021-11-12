@@ -1,16 +1,16 @@
-import AppKit
-import CoreGraphics
+import ArgumentParser
 import Foundation
 import SwiftFrameCore
-import ArgumentParser
 
+@main
 struct SwiftFrame: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         commandName: "swiftframe",
         abstract: "CLI application for speedy screenshot framing",
         version: "4.0.1",
-        helpNames: .shortAndLong)
+        helpNames: .shortAndLong
+    )
 
     @Argument(help: "Read configuration values from the specified file", completion: .list(["config", "json", "yml", "yaml"]))
     var configFilePath: String
@@ -39,5 +39,3 @@ struct SwiftFrame: ParsableCommand {
     }
 
 }
-
-SwiftFrame.main()
