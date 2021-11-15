@@ -24,6 +24,7 @@ locales = ['en',
            ]
 benchmark_config_file = 'Benchmark/example.config'
 
+# Create directory if needed
 print("Setting up benchmark directory")
 
 Path('Benchmark/').mkdir(parents=True, exist_ok=True)
@@ -35,9 +36,11 @@ with open('Example/example.config', 'rt') as fin:
         for line in fin:
             fout.write(line.replace('Example', 'Benchmark'))
 
+# Copy template files
 template_files_folder = 'Example/Template Files/'
 copy_tree(template_files_folder, 'Benchmark/Template Files/')
 
+# Copying over screenshots and titles
 for locale in locales:
     print(f'Copying files for {locale}')
     for device in ["iPhone X", 'iPad Pro']:
@@ -49,16 +52,17 @@ for locale in locales:
     string_destination_file = f'Benchmark/Strings/{locale}.strings'
     copy2(string_source_file, string_destination_file)
 
+# Compile SwiftFrame
 compile_process = subprocess.run(
     'swift build -c release', shell=True, check=True)
 
 if compile_process.returncode != 0:
     exit(compile_process.returncode)
 
-executable_path = os.path.realpath('.build/release')
+# Running benchmark
 benchmark_start = time.time()
 run_process = subprocess.run(
-    f'{executable_path}/swiftframe Benchmark/example.config', shell=True, check=True)
+    f'.build/release/swiftframe Benchmark/example.config', shell=True, check=True)
 benchmark_end = time.time()
 
 if run_process.returncode != 0:
