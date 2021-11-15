@@ -7,7 +7,21 @@ from shutil import copy2, rmtree
 import os
 import time
 
-locales = ['en', 'fr-FR', 'de', 'sv', 'no', 'pl', 'br-PT']
+locales = ['en',
+           'fr-FR',
+           'de-DE',
+           'sv',
+           'no',
+           'pl',
+           'br-PT',
+           'it',
+           'ja',
+           'ro',
+           'th',
+           'tr',
+           'uk',
+           'vi'
+           ]
 benchmark_config_file = 'Benchmark/example.config'
 
 print("Setting up benchmark directory")
