@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import atexit
 from os import path
 import subprocess
 from distutils.dir_util import copy_tree
@@ -25,9 +26,13 @@ locales = ['en',
 benchmark_config_file = 'Benchmark/example.config'
 
 # Setup exit handler
+
+
+@atexit.register
 def exit_handler():
     print('My application is ending!')
     rmtree('Benchmark/')
+
 
 # Create directory if needed
 print("Setting up benchmark directory")
@@ -62,8 +67,7 @@ if path.exists(".build"):
     rmtree('.build')
 
 # Compile SwiftFrame
-compile_process = subprocess.run(
-    'swift build -c release', shell=True, check=True)
+compile_process = subprocess.run('swift build -c release', shell=True)
 
 if compile_process.returncode != 0:
     exit(compile_process.returncode)
@@ -71,7 +75,7 @@ if compile_process.returncode != 0:
 # Running benchmark
 benchmark_start = time.time()
 run_process = subprocess.run(
-    '.build/release/swiftframe Benchmark/example.config --verbose --skip-manual-validation', shell=True, check=True)
+    '.build/release/swiftframe Benchmark/example.config --verbose --skip-validation', shell=True)
 benchmark_end = time.time()
 
 if run_process.returncode != 0:
