@@ -30,7 +30,7 @@ public func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -
     do {
         return try work()
     } catch let error as NSError {
-        ky_exitWithError(error)
+        ky_exitWithError(error, verbose: verbose)
     }
 }
 
