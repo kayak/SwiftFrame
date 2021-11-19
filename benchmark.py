@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import atexit
-from os import path
 import subprocess
+import time
 from distutils.dir_util import copy_tree
+from os import path
 from pathlib import Path
 from shutil import copy2, rmtree
-import time
 
 locales = ['en',
            'fr-FR',
@@ -30,7 +30,6 @@ benchmark_config_file = 'Benchmark/example.config'
 
 @atexit.register
 def exit_handler():
-    print('My application is ending!')
     rmtree('Benchmark/')
 
 
