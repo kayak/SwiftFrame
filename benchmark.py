@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
+from os import path
 import subprocess
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from shutil import copy2, rmtree
-import os
 import time
 
 locales = ['en',
@@ -23,6 +23,11 @@ locales = ['en',
            'vi'
            ]
 benchmark_config_file = 'Benchmark/example.config'
+
+# Setup exit handler
+def exit_handler():
+    print('My application is ending!')
+    rmtree('Benchmark/')
 
 # Create directory if needed
 print("Setting up benchmark directory")
@@ -52,6 +57,10 @@ for locale in locales:
     string_destination_file = f'Benchmark/Strings/{locale}.strings'
     copy2(string_source_file, string_destination_file)
 
+# Clear .build directory
+if path.exists(".build"):
+    rmtree('.build')
+
 # Compile SwiftFrame
 compile_process = subprocess.run(
     'swift build -c release', shell=True, check=True)
@@ -62,12 +71,10 @@ if compile_process.returncode != 0:
 # Running benchmark
 benchmark_start = time.time()
 run_process = subprocess.run(
-    f'.build/release/swiftframe Benchmark/example.config', shell=True, check=True)
+    '.build/release/swiftframe Benchmark/example.config --verbose --skip-manual-validation', shell=True, check=True)
 benchmark_end = time.time()
 
 if run_process.returncode != 0:
     exit(compile_process.returncode)
-else:
-    rmtree('Benchmark/')
 
 print(f'Benchmark finished in {benchmark_end - benchmark_start}s')

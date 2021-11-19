@@ -32,7 +32,23 @@ To use SwiftFrame, you need to pass it a configuration file (which is a JSON or 
 swiftframe path/to/your/config/file --verbose
 ```
 
+### Available Options
+
+#### --verbose
+
+Prints additional information during processing and rendering. This will also ask you to confirm the processed config file before SwiftFrame starts rendering
+
+#### --no-color-output
+
+Disables colored output. Useful for CI logs for example
+
+#### --no-manual-validation
+
+Disables the manual validation that requires you to confirm the parsed config file by pressing a key. Only useful in combination with `--verbose`
+
 You can also use the `--help` flag to print SwiftFrame's documentation out
+
+## Configuration File
 
 The format of the configuration file is specified as following (indent levels represent nesting levels within the file):
 

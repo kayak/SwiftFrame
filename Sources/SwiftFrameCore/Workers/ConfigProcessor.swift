@@ -1,18 +1,23 @@
 import AppKit
 import Foundation
 
-public class ConfigProcessor {
+public class ConfigProcessor: VerbosePrintable {
 
     // MARK: - Properties
 
+    static var noColorOutput = true
+
+    public let verbose: Bool
+    private let noManualValidation: Bool
     private var data: ConfigData
-    let verbose: Bool
 
     // MARK: - Init
 
-    public init(configURL: URL, verbose: Bool) throws {
+    public init(configURL: URL, verbose: Bool, noManualValidation: Bool, noColorOutput: Bool) throws {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
+        self.noManualValidation = noManualValidation
+        ConfigProcessor.noColorOutput = noColorOutput
     }
 
     // MARK: - Methods
@@ -27,7 +32,7 @@ public class ConfigProcessor {
     }
 
     public func run() throws {
-        if verbose {
+        if verbose && !noManualValidation {
             data.printSummary(insetByTabs: 0)
             print("Press return key to continue")
             _ = readLine()
@@ -38,20 +43,49 @@ public class ConfigProcessor {
         if data.clearDirectories {
             let clearingStart = CFAbsoluteTimeGetCurrent()
             try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
-            let clearingDiff = CFAbsoluteTimeGetCurrent() - clearingStart
-            print("Cleared output directories in \(String(format: "%.3f", clearingDiff)) seconds\n")
+            printElapsedTime("Clear output directories", startTime: clearingStart)
         }
 
-        print("Rendering...\n")
+        let stringProcessingStart = CFAbsoluteTimeGetCurrent()
 
-        let start = CFAbsoluteTimeGetCurrent()
         try data.deviceData.forEach { deviceData in
-            try process(deviceData: deviceData)
+            try deviceData.screenshotsGroupedByLocale.forEach { locale, _ in
+                printVerbose("Processing strings for locale \(locale) (\(deviceData.outputSuffixes.first ?? "unknown device"))")
+
+                let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
+                let fontSizesByGroup = try data.makeSharedFontSizes(for: associatedStrings)
+                try AttributedStringCache.shared.process(
+                    associatedStrings,
+                    locale: locale,
+                    deviceIdentifier: deviceData.outputSuffixes.joined(),
+                    maxFontSizeByGroup: fontSizesByGroup,
+                    font: try data.fontSource.font(),
+                    color: data.textColorSource.color,
+                    maxFontSize: data.maxFontSize
+                )
+            }
         }
+
+        printElapsedTime("Parse HTML strings into attributed strings", startTime: stringProcessingStart)
+
+        print("\nRendering...\n")
+
+        let imageRenderingStart = CFAbsoluteTimeGetCurrent()
+
+        let group = DispatchGroup()
+
+        data.deviceData.forEach { deviceData in
+            group.enter()
+            DispatchQueue.global(qos: .utility).ky_asyncOrExit(verbose: verbose) { [weak self] in
+                try self?.process(deviceData: deviceData)
+                group.leave()
+            }
+        }
+
+        group.wait()
 
         print("All done!".formattedGreen())
-        let diff = CFAbsoluteTimeGetCurrent() - start
-        print("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
+        printElapsedTime("Rendered and sliced all screenshots", startTime: imageRenderingStart)
     }
 
     private func process(deviceData: DeviceData) throws {
@@ -72,15 +106,7 @@ public class ConfigProcessor {
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
             try composer.addTemplateImage(templateImage)
 
-            let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
-            let fontSizesByGroup = try data.makeSharedFontSizes(for: associatedStrings)
-
-            try composer.addStrings(
-                associatedStrings,
-                maxFontSizeByGroup: fontSizesByGroup,
-                font: data.fontSource.font(),
-                color: data.textColorSource.color,
-                maxFontSize: data.maxFontSize)
+            try composer.addStrings(deviceData.textData, locale: locale, deviceIdentifier: deviceData.outputSuffixes.joined())
 
             try ImageWriter.finish(
                 context: composer.context,
@@ -100,13 +126,6 @@ public class ConfigProcessor {
         }
 
         group.wait()
-    }
-
-    func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
-        if verbose {
-            let formattedArgs = args.map { String(describing: $0) }.joined(separator: " ")
-            ky_print(formattedArgs, insetByTabs: tabs)
-        }
     }
 
 }

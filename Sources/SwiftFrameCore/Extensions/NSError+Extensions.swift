@@ -26,13 +26,22 @@ public extension NSError {
 
 }
 
-public func ky_executeOrExit<T>(_ work: () throws -> T) -> T {
+public func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
     do {
         return try work()
     } catch let error as NSError {
-        print(CommandLineFormatter.formatError(error.localizedDescription))
-        error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
-        error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
-        exit(Int32(error.code))
+        ky_exitWithError(error)
     }
+}
+
+public func ky_exitWithError(_ error: Error, verbose: Bool = false) -> Never {
+    let error = error as NSError
+    let errorMessage = verbose
+        ? CommandLineFormatter.formatError(error.description)
+        : CommandLineFormatter.formatError(error.localizedDescription)
+    print(errorMessage)
+
+    error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "EXPECTATION", text: $0)) }
+    error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "ACTUAL", text: $0)) }
+    exit(Int32(error.code))
 }

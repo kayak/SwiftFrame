@@ -2,27 +2,59 @@ import Foundation
 
 public final class CommandLineFormatter {
 
+    // MARK: - Nested Types
+
+    enum Color: Int {
+        case red = 31
+        case green = 32
+        case yellow = 33
+        case `default` = 39
+
+        var escapeSquence: String {
+            "\u{001B}[0;\(rawValue)m"
+        }
+    }
+
     fileprivate static let tabsString = String(repeating: " ", count: 4)
 
-    public class func formatWarning(title: String = "Warning", text: String) -> String {
-        "\u{001B}[0;33m[\(title.uppercased())] \(text)\u{001B}[0;39m"
+    // MARK: - Message Formatting
+
+    public class func formatWarning(title: String = "WARNING", text: String) -> String {
+        let message = "[\(title)] \(text)"
+        return formatWithColorIfNeeded(message, color: .yellow)
     }
 
     public class func formatError(_ text: String) -> String {
-        "\u{001B}[0;31m[ERROR] \(text)\u{001B}[0;39m"
+        let message = "[ERROR] \(text)"
+        return formatWithColorIfNeeded(message, color: .red)
     }
 
-    private static func formatKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) -> String {
-        let tabsString = String(repeating: CommandLineFormatter.tabsString, count: tabs)
-        let formattedString = "\(key): \(String(describing: value).formattedGreen())"
-        return tabsString + formattedString
+    public class func formatTimeMeasurement(_ text: String) -> String {
+        let message = "[TIME] \(text)"
+        return formatWithColorIfNeeded(message, color: .green)
     }
+
+    class func formatWithColorIfNeeded(_ message: String, color: Color) -> String {
+        if ConfigProcessor.noColorOutput {
+            return message
+        } else {
+            return [color.escapeSquence, message, Color.default.escapeSquence].joined()
+        }
+    }
+
+    // MARK: - Key-Value Formatting
 
     public class func printKeyValue(_ key: String, value: Any?, insetBy tabs: Int = 0) {
         guard let value = value else {
             return
         }
         print(CommandLineFormatter.formatKeyValue(key, value: value, insetBy: tabs))
+    }
+
+    private class func formatKeyValue(_ key: String, value: Any, insetBy tabs: Int = 0) -> String {
+        let tabsString = String(repeating: CommandLineFormatter.tabsString, count: tabs)
+        let formattedString = "\(key): \(String(describing: value).formattedGreen())"
+        return tabsString + formattedString
     }
 
 }

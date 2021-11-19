@@ -2,7 +2,6 @@ import ArgumentParser
 import Foundation
 import SwiftFrameCore
 
-@main
 struct SwiftFrame: ParsableCommand {
 
     static let configuration = CommandConfiguration(
@@ -18,24 +17,29 @@ struct SwiftFrame: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Prints additional information and lets you verify the config file before rendering")
     var verbose = false
 
+    @Flag(name: .long)
+    var noManualValidation = false
+
+    @Flag(name: .long)
+    var noColorOutput = false
+
     func run() throws {
         let configFileURL = URL(fileURLWithPath: configFilePath)
 
         do {
-            let processor = try ConfigProcessor(configURL: configFileURL, verbose: verbose)
+            let processor = try ConfigProcessor(
+                configURL: configFileURL,
+                verbose: verbose,
+                noManualValidation: noManualValidation,
+                noColorOutput: noColorOutput
+            )
             try processor.validate()
             try processor.run()
-        } catch let error as NSError {
-            let errorMessage = verbose
-                ? CommandLineFormatter.formatError(error.description)
-                : CommandLineFormatter.formatError(error.localizedDescription)
-            print(errorMessage)
-
-            error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "Expectation", text: $0)) }
-            error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "Actual", text: $0)) }
-
-            Darwin.exit(Int32(error.code))
+        } catch let error {
+            ky_exitWithError(error, verbose: verbose)
         }
     }
 
 }
+
+SwiftFrame.main()
