@@ -5,13 +5,6 @@ import CoreImage
 
 final class ImageComposer {
 
-    // MARK: - Nested Type
-
-    enum FontMode {
-        case dynamic(maxSize: CGFloat)
-        case fixed(pointSize: CGFloat)
-    }
-
     // MARK: - Properties
 
     private let textRenderer = TextRenderer()
@@ -39,40 +32,17 @@ final class ImageComposer {
 
     // MARK: - Titles Rendering
 
-    func addStrings(_ associatedStrings: [AssociatedString], maxFontSizeByGroup: [String: CGFloat], font: NSFont, color: NSColor, maxFontSize: CGFloat) throws {
-        try associatedStrings.forEach {
-            let fontMode: FontMode
-            if let sharedSize = $0.data.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
-                // Can use fixed font size since common maximum has already been calculated
-                fontMode = .fixed(pointSize: sharedSize)
-            } else {
-                fontMode = .dynamic(maxSize: $0.data.maxFontSizeOverride ?? maxFontSize)
-            }
-
-            try add(
-                title: $0.string,
-                font: $0.data.fontOverride?.font() ?? font,
-                color: $0.data.textColorOverride ?? color,
-                fontMode: fontMode,
-                textData: $0.data)
+    func addStrings(_ textData: [TextData], locale: String, deviceIdentifier: String) throws {
+        try textData.forEach {
+            try textRenderer.renderText(
+                forKey: $0.titleIdentifier,
+                locale: locale,
+                deviceIdentifier: deviceIdentifier,
+                alignment: $0.textAlignment,
+                rect: $0.rect,
+                context: context
+            )
         }
-    }
-
-    private func add(title: String, font: NSFont, color: NSColor, fontMode: FontMode, textData: TextData) throws {
-        let fontSize: CGFloat
-        switch fontMode {
-        case let .dynamic(maxSize: maxSize):
-            fontSize = try textRenderer.maximumFontSizeThatFits(
-                string: title,
-                font: font,
-                alignment: textData.textAlignment,
-                maxSize: maxSize,
-                size: textData.rect.size)
-        case let .fixed(pointSize: size):
-            fontSize = size
-        }
-        let adaptedFont = font.ky_toFont(ofSize: fontSize)
-        try textRenderer.render(text: title, font: adaptedFont, color: color, alignment: textData.textAlignment, rect: textData.rect, context: context)
     }
 
     // MARK: - Screenshots Rendering

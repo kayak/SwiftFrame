@@ -1,18 +1,23 @@
 import AppKit
 import Foundation
 
-public class ConfigProcessor {
+public class ConfigProcessor: VerbosePrintable {
 
     // MARK: - Properties
 
+    static var noColorOutput = true
+
+    public let verbose: Bool
+    private let noManualValidation: Bool
     private var data: ConfigData
-    let verbose: Bool
 
     // MARK: - Init
 
-    public init(configURL: URL, verbose: Bool) throws {
+    public init(configURL: URL, verbose: Bool, noManualValidation: Bool, noColorOutput: Bool) throws {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
+        self.noManualValidation = noManualValidation
+        ConfigProcessor.noColorOutput = noColorOutput
     }
 
     // MARK: - Methods
@@ -27,50 +32,57 @@ public class ConfigProcessor {
     }
 
     public func run() throws {
-        if verbose {
+        if verbose && !noManualValidation {
             data.printSummary(insetByTabs: 0)
             print("Press return key to continue")
             _ = readLine()
         }
 
-        print("Parsed and validated config file")
+        print("Parsed and validated config file\n")
 
         if data.clearDirectories {
-            print("Clearing Output Directories")
+            let clearingStart = CFAbsoluteTimeGetCurrent()
             try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
+            printElapsedTime("Clear output directories", startTime: clearingStart)
         }
 
-        print("Rendering...\n")
+        let stringProcessingStart = CFAbsoluteTimeGetCurrent()
 
-        // We need a special semaphore here, since the creation of the attributed strings has to happen
-        // on the main thread and anything else can happen asynchronously but we still want to finish
-        // execution only when everything has finished
-        let semaphore = RunLoopSemaphore()
+        try data.deviceData.forEach { deviceData in
+            try deviceData.screenshotsGroupedByLocale.forEach { locale, _ in
+                printVerbose("Processing strings for locale \(locale) (\(deviceData.outputSuffixes.first ?? "unknown device"))")
 
-        let start = CFAbsoluteTimeGetCurrent()
+                let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
+                let fontSizesByGroup = try data.makeSharedFontSizes(for: associatedStrings)
+                try AttributedStringCache.shared.process(
+                    associatedStrings,
+                    locale: locale,
+                    deviceIdentifier: deviceData.outputSuffixes.joined(),
+                    maxFontSizeByGroup: fontSizesByGroup,
+                    font: try data.fontSource.font(),
+                    color: data.textColorSource.color,
+                    maxFontSize: data.maxFontSize
+                )
+            }
+        }
 
-        DispatchQueue.global(qos: .userInitiated).async {
-            let group = DispatchGroup()
+        printElapsedTime("Parse HTML strings into attributed strings", startTime: stringProcessingStart)
 
-            self.data.deviceData.forEach { deviceData in
-                group.enter()
-                DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit { [weak self] in
-                    try self?.process(deviceData: deviceData)
-                    group.leave()
+        print("\nRendering...\n")
+
+        let imageRenderingStart = CFAbsoluteTimeGetCurrent()
+
+        DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
+            ky_executeOrExit(verbose: verbose) { [weak self] in
+                guard let `self` = self else {
+                    throw NSError(description: "Could not reference weak self")
                 }
-            }
-
-            group.wait()
-            DispatchQueue.main.async {
-                semaphore.signal()
+                try self.process(deviceData: self.data.deviceData[index])
             }
         }
-
-        semaphore.wait()
 
         print("All done!".formattedGreen())
-        let diff = CFAbsoluteTimeGetCurrent() - start
-        print("Rendered and sliced all screenshots in \(String(format: "%.3f", diff)) seconds")
+        printElapsedTime("Rendered and sliced all screenshots", startTime: imageRenderingStart)
     }
 
     private func process(deviceData: DeviceData) throws {
@@ -91,15 +103,7 @@ public class ConfigProcessor {
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
             try composer.addTemplateImage(templateImage)
 
-            let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
-            let fontSizesByGroup = try data.makeSharedFontSizes(for: associatedStrings)
-
-            try composer.addStrings(
-                associatedStrings,
-                maxFontSizeByGroup: fontSizesByGroup,
-                font: data.fontSource.font(),
-                color: data.textColorSource.color,
-                maxFontSize: data.maxFontSize)
+            try composer.addStrings(deviceData.textData, locale: locale, deviceIdentifier: deviceData.outputSuffixes.joined())
 
             try ImageWriter.finish(
                 context: composer.context,
@@ -119,13 +123,6 @@ public class ConfigProcessor {
         }
 
         group.wait()
-    }
-
-    func printVerbose(_ args: Any..., insetByTabs tabs: Int = 0) {
-        if verbose {
-            let formattedArgs = args.map { String(describing: $0) }.joined(separator: " ")
-            ky_print(formattedArgs, insetByTabs: tabs)
-        }
     }
 
 }

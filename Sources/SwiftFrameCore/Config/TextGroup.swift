@@ -30,9 +30,8 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
     // MARK: - Misc
 
     func sharedFontSize(with strings: [AssociatedString], globalFont: NSFont, globalMaxSize: CGFloat) throws -> CGFloat {
-        let textRenderer = TextRenderer()
         let maxFontSizes: [CGFloat] = try strings.compactMap {
-            return try textRenderer.maximumFontSizeThatFits(
+            return try TextRenderer.maximumFontSizeThatFits(
                 string: $0.string,
                 font: $0.data.fontOverride?.font() ?? globalFont,
                 alignment: $0.data.textAlignment,

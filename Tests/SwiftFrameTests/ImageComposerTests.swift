@@ -30,18 +30,4 @@ class ImageComposerTests: XCTestCase {
         }
     }
 
-    func testCanRenderStringsInContext() throws {
-        let size = CGSize(width: 100, height: 200)
-        let textData = try TextData.goodData.makeProcessedData(size: size)
-
-        let composer = try ImageComposer(canvasSize: size)
-        let strings: [AssociatedString] = [(string: "Some testing title", data: textData)]
-        XCTAssertNoThrow(try composer.addStrings(
-            strings,
-            maxFontSizeByGroup: [:],
-            font: .systemFont(ofSize: 20),
-            color: .red,
-            maxFontSize: 30))
-    }
-
 }

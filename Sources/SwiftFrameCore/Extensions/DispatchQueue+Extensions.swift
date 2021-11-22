@@ -2,9 +2,9 @@ import Foundation
 
 extension DispatchQueue {
 
-    func ky_asyncOrExit(_ block: @escaping () throws -> Void) {
+    func ky_asyncOrExit(verbose: Bool = false, _ block: @escaping () throws -> Void) {
         async {
-            ky_executeOrExit(block)
+            ky_executeOrExit(verbose: verbose, block)
         }
     }
 

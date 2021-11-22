@@ -65,9 +65,12 @@ public final class ImageWriter {
     // MARK: - Writing Images
 
     static func writeSlices(_ images: [CGImage], with configuration: OutputConfiguration) throws {
-        try images.enumerated().forEach { value in
-            let outputPaths = configuration.makeOutputPaths(for: value.offset)
-            try writeImage(value.element, to: outputPaths, format: configuration.format)
+        DispatchQueue.concurrentPerform(iterations: images.count) { index in
+            ky_executeOrExit {
+                let image = images[index]
+                let outputPaths = configuration.makeOutputPaths(for: index)
+                try writeImage(image, to: outputPaths, format: configuration.format)
+            }
         }
     }
 
