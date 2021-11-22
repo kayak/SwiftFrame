@@ -74,10 +74,10 @@ public class ConfigProcessor: VerbosePrintable {
 
         DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
             ky_executeOrExit(verbose: verbose) { [weak self] in
-                guard let strongSelf = self else {
+                guard let `self` = self else {
                     throw NSError(description: "Could not reference weak self")
                 }
-                try strongSelf.process(deviceData: strongSelf.data.deviceData[index])
+                try self.process(deviceData: self.data.deviceData[index])
             }
         }
 
