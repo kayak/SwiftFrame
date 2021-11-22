@@ -74,7 +74,7 @@ if compile_process.returncode != 0:
 # Running benchmark
 benchmark_start = time.time()
 run_process = subprocess.run(
-    '.build/release/swiftframe Benchmark/example.config --verbose --skip-validation', shell=True)
+    '.build/release/swiftframe Benchmark/example.config --verbose --no-manual-validation', shell=True)
 benchmark_end = time.time()
 
 if run_process.returncode != 0:

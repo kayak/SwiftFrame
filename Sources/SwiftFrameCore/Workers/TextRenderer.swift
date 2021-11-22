@@ -9,7 +9,7 @@ final class TextRenderer {
     // MARK: - Frame Rendering
 
     func renderText(forKey key: String, locale: String, deviceIdentifier: String, alignment: TextAlignment, rect: NSRect, context: GraphicsContext) throws {
-        let attributedString = try AttributedStringCache.shared.getValue(titleIdentifer: key, locale: locale, deviceIdentifier: deviceIdentifier)
+        let attributedString = try AttributedStringCache.shared.attributedString(forTitleIdentifier: key, locale: locale, deviceIdentifier: deviceIdentifier)
 
         context.cg.saveGState()
 

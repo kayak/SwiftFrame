@@ -72,17 +72,14 @@ public class ConfigProcessor: VerbosePrintable {
 
         let imageRenderingStart = CFAbsoluteTimeGetCurrent()
 
-        let group = DispatchGroup()
-
-        data.deviceData.forEach { deviceData in
-            group.enter()
-            DispatchQueue.global(qos: .utility).ky_asyncOrExit(verbose: verbose) { [weak self] in
-                try self?.process(deviceData: deviceData)
-                group.leave()
+        DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
+            ky_executeOrExit(verbose: verbose) { [weak self] in
+                guard let strongSelf = self else {
+                    throw NSError(description: "Could not reference weak self")
+                }
+                try strongSelf.process(deviceData: strongSelf.data.deviceData[index])
             }
         }
-
-        group.wait()
 
         print("All done!".formattedGreen())
         printElapsedTime("Rendered and sliced all screenshots", startTime: imageRenderingStart)

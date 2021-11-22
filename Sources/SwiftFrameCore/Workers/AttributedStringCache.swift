@@ -14,13 +14,13 @@ final class AttributedStringCache: NSObject {
     // MARK: - Properties
 
     static let shared = AttributedStringCache()
-    private lazy var cache = NSCache<NSString, NSAttributedString>()
+    private var cache = [String: NSAttributedString]()
 
     // MARK: - Reading/Writing to cache
 
-    func getValue(titleIdentifer: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString {
-        let identifier = makeCacheIdentifier(titleIdentifer: titleIdentifer, locale: locale, deviceIdentifier: deviceIdentifier)
-        guard let value = cache.object(forKey: NSString(string: identifier)) else {
+    func attributedString(forTitleIdentifier titleIdentifier: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString {
+        let identifier = makeCacheIdentifier(titleIdentifer: titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
+        guard let value = cache[identifier] else {
             throw NSError(description: "Could not find value for key \"\(identifier)\" in attributed string cache")
         }
         return value
@@ -38,23 +38,24 @@ final class AttributedStringCache: NSObject {
         guard Thread.current.isMainThread else {
             throw NSError(description: "Attributed string processing has to be done on the main thread")
         }
-        try associatedStrings.forEach {
+        try associatedStrings.forEach { string, textData in
             let fontMode: FontMode
-            if let sharedSize = $0.data.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
+            if let sharedSize = textData.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
                 // Can use fixed font size since common maximum has already been calculated
                 fontMode = .fixed(pointSize: sharedSize)
             } else {
-                fontMode = .dynamic(maxSize: $0.data.maxFontSizeOverride ?? maxFontSize)
+                fontMode = .dynamic(maxSize: textData.maxFontSizeOverride ?? maxFontSize)
             }
 
             try add(
-                title: $0.string,
+                title: string,
                 locale: locale,
                 deviceIdentifier: deviceIdentifier,
-                font: $0.data.fontOverride?.font() ?? font,
-                color: $0.data.textColorOverride ?? color,
+                font: textData.fontOverride?.font() ?? font,
+                color: textData.textColorOverride ?? color,
                 fontMode: fontMode,
-                textData: $0.data)
+                textData: textData
+            )
         }
     }
 
@@ -67,7 +68,8 @@ final class AttributedStringCache: NSObject {
                 font: font,
                 alignment: textData.textAlignment,
                 maxSize: maxSize,
-                size: textData.rect.size)
+                size: textData.rect.size
+            )
         case let .fixed(pointSize: size):
             fontSize = size
         }
@@ -78,7 +80,10 @@ final class AttributedStringCache: NSObject {
         #if DEBUG
         print("Caching attributed string with key:", identifier, "point size:", fontSize)
         #endif
-        cache.setObject(attributedString, forKey: NSString(string: identifier))
+        if cache[identifier] != nil {
+            throw NSError(description: "Attempted to override cached attributed string for key \"\(identifier)\"")
+        }
+        cache[identifier] = attributedString
     }
 
     private func makeCacheIdentifier(titleIdentifer: String, locale: String, deviceIdentifier: String) -> String {
