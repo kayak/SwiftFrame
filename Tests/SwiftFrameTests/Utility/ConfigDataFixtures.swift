@@ -14,7 +14,8 @@ extension ConfigData {
         outputFormat: .png,
         clearDirectories: true,
         outputWholeImage: true,
-        deviceData: [.goodData])
+        deviceData: [.goodData]
+    )
 
     static let skippedLocaleData = ConfigData(
         textGroups: [],
@@ -27,7 +28,8 @@ extension ConfigData {
         clearDirectories: true,
         outputWholeImage: true,
         deviceData: [.goodData],
-        localesRegex: "^(?!en|fr$)\\w*$")
+        localesRegex: "^(?!en|fr$)\\w*$"
+    )
 
     static let englishOnlyData = ConfigData(
         textGroups: [],
@@ -40,7 +42,8 @@ extension ConfigData {
         clearDirectories: true,
         outputWholeImage: true,
         deviceData: [.goodData],
-        localesRegex: "en")
+        localesRegex: "en"
+    )
 
     static let invalidData = ConfigData(
         textGroups: [],
@@ -52,6 +55,7 @@ extension ConfigData {
         outputFormat: .png,
         clearDirectories: true,
         outputWholeImage: true,
-        deviceData: [.invalidData])
+        deviceData: [.invalidData]
+    )
 
 }

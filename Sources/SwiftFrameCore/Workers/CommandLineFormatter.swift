@@ -10,7 +10,7 @@ public final class CommandLineFormatter {
         case yellow = 33
         case `default` = 39
 
-        var escapeSquence: String {
+        var escapeSequence: String {
             "\u{001B}[0;\(rawValue)m"
         }
     }
@@ -38,7 +38,7 @@ public final class CommandLineFormatter {
         if ConfigProcessor.noColorOutput {
             return message
         } else {
-            return [color.escapeSquence, message, Color.default.escapeSquence].joined()
+            return [color.escapeSequence, message, Color.default.escapeSequence].joined()
         }
     }
 

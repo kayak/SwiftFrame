@@ -113,7 +113,8 @@ public class ConfigProcessor: VerbosePrintable {
                 outputWholeImage: data.outputWholeImage,
                 locale: locale,
                 suffixes: deviceData.outputSuffixes,
-                format: data.outputFormat)
+                format: data.outputFormat
+            )
 
             deviceData.outputSuffixes.forEach { suffix in
                 print("Finished \(locale)-\(suffix)")
