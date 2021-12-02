@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public struct DeviceData: Decodable, ConfigValidatable {
+public struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -94,7 +94,7 @@ public struct DeviceData: Decodable, ConfigValidatable {
             gapWidth: gapWidth)
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - ConfigValidateable
 
     func validate() throws {
         guard !screenshotsGroupedByLocale.isEmpty else {

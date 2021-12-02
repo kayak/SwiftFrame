@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
+public struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
 
     // MARK: - Properties
 
@@ -35,7 +35,7 @@ public struct ScreenshotData: Decodable, ConfigValidatable, Equatable {
             zIndex: zIndex)
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - ConfigValidateable
 
     func validate() throws {}
 

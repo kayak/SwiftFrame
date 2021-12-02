@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-protocol ConfigValidatable {
+protocol ConfigValidateable {
     func validate() throws
     func printSummary(insetByTabs tabs: Int)
 }
@@ -9,7 +9,7 @@ protocol ConfigValidatable {
 /// First key is locale, second is regular key in string file
 typealias LocalizedStringFiles = [String: [String: String]]
 
-struct ConfigData: Decodable, ConfigValidatable {
+struct ConfigData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -89,7 +89,7 @@ struct ConfigData: Decodable, ConfigValidatable {
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - ConfigValidateable
 
     public func validate() throws {
         guard !deviceData.isEmpty else {
