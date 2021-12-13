@@ -54,13 +54,13 @@ The format of the configuration file is specified as following (indent levels re
 
 -   `stringsPath`: a path to a folder with `.strings` files, prefixed with the corresponding locale (e.g. `en.strings`)
 -   `maxFontSize`: the maximum font point size to use. SwiftFrame will be always try to render the text at the largest point size that fits within the bounding rectangle. If the determined point size is larger than `maxFontSize`, the latter will be used
--   `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots. This is an array in case you want to render the files into multiple directories at the same time. (Note: screenshots will be placed into subfolders organised by locale within these paths)
+-   `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots. This is an array in case you want to render the files into multiple directories at the same time. (Note: screenshots will be placed into subfolders organized by locale within these paths)
 -   `fontFile`: a path to a font file
 -   `format`: the output format of the screenshots, can be `png`, `jpeg` or `jpg`
 -   `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
 -   `outputWholeImage`: **optional (default: false)** a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
 -   `clearDirectories`: **optional (default: true)** a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example
--   `locales`: **optional** a regular expression that can be used to exlude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
+-   `locales`: **optional** a regular expression that can be used to exclude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
 -   `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
     -   `outputSuffixes`: an array of suffixes to apply to the output files in addition to the locale identifier and index. Multiple suffixes can be used to render the same screenshots for different target devices (for example 2nd and 3rd 12.9 inch iPad Pro)
     -   `screenshots`: a folder path containing a subfolder for each locale, which in turn contains all the screenshots for that device
@@ -76,9 +76,9 @@ The format of the configuration file is specified as following (indent levels re
             -   `x`: The x coordinate of the corner point, relative to the left edge
             -   `y`: the y coordinate of the corner point, relative to the top or bottom edge
     -   `textData`: an array containing further information about text titles coordinates and its layout
-        -   `titleIdentifer`: the key that SwiftFrame should look for in the `.strings` file for a certain title
-        -   `textColorOverride`: **optional**, a color in Hex format to use specifically for this title
-        -   `textAlignment`: information about text alignment
+        -   `identifier`: the key that SwiftFrame should look for in the `.strings` file for a certain title
+        -   `colorOverride`: **optional**, a color in Hex format to use specifically for this title
+        -   `alignment`: information about text alignment
             -   `horizontal`: the horizontal text alignment in CSS style (`left`, `right`, `center`, `justify` or `natural`)
             -   `vertical`: the vertical text alignment in (`top`, `center`, `bottom`)
         -   `customFontPath`: **optional**, a path to a font file to use specifically for this title

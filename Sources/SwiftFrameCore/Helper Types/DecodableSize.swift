@@ -1,6 +1,6 @@
 import Foundation
 
-/// Wrapper struct used to work around weird decoding behaviour of `CGSize`
+/// Wrapper struct used to work around weird decoding behavior of `CGSize`
 struct DecodableSize: Codable {
 
     let width: CGFloat

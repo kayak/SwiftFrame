@@ -3,7 +3,7 @@ import Foundation
 
 private let kNumTitleLines = 3
 
-public struct TextGroup: Decodable, ConfigValidatable, Hashable {
+public struct TextGroup: Decodable, ConfigValidateable, Hashable {
 
     // MARK: - Properties
 
@@ -17,7 +17,7 @@ public struct TextGroup: Decodable, ConfigValidatable, Hashable {
         case maxFontSize
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - ConfigValidateable
 
     func validate() throws {}
 

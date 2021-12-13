@@ -3,7 +3,7 @@ import Foundation
 
 typealias AssociatedString = (string: String, data: TextData)
 
-struct TextData: Decodable, ConfigValidatable {
+struct TextData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -80,7 +80,7 @@ struct TextData: Decodable, ConfigValidatable {
             textColorOverride: colorOverride)
     }
 
-    // MARK: - ConfigValidatable
+    // MARK: - ConfigValidateable
 
     func validate() throws {
         guard (topLeft.x < bottomRight.x) && (topLeft.y > bottomRight.y) else {

@@ -9,6 +9,7 @@ extension ScreenshotData {
         bottomRight: Point(x: 40, y: 10),
         topLeft: Point(x: 10, y: 200),
         topRight: Point(x: 40, y: 200),
-        zIndex: 1)
+        zIndex: 1
+    )
 
 }

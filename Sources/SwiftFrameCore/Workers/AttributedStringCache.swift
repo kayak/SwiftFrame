@@ -19,7 +19,7 @@ final class AttributedStringCache: NSObject {
     // MARK: - Reading/Writing to cache
 
     func attributedString(forTitleIdentifier titleIdentifier: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString {
-        let identifier = makeCacheIdentifier(titleIdentifer: titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
+        let identifier = makeCacheIdentifier(titleIdentifier: titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
         guard let value = cache[identifier] else {
             throw NSError(description: "Could not find value for key \"\(identifier)\" in attributed string cache")
         }
@@ -76,7 +76,7 @@ final class AttributedStringCache: NSObject {
         let adaptedFont = font.ky_toFont(ofSize: fontSize)
         let attributedString = try TextRenderer.makeAttributedString(for: title, font: adaptedFont, color: color, alignment: textData.textAlignment)
 
-        let identifier = makeCacheIdentifier(titleIdentifer: textData.titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
+        let identifier = makeCacheIdentifier(titleIdentifier: textData.titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
         #if DEBUG
         print("Caching attributed string with key:", identifier, "point size:", fontSize)
         #endif
@@ -86,8 +86,8 @@ final class AttributedStringCache: NSObject {
         cache[identifier] = attributedString
     }
 
-    private func makeCacheIdentifier(titleIdentifer: String, locale: String, deviceIdentifier: String) -> String {
-        [locale, titleIdentifer, deviceIdentifier].joined(separator: "_")
+    private func makeCacheIdentifier(titleIdentifier: String, locale: String, deviceIdentifier: String) -> String {
+        [locale, titleIdentifier, deviceIdentifier].joined(separator: "_")
     }
 
 }
