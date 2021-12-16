@@ -66,7 +66,7 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
             }
 
             try Scaffold.defaultDevices.forEach { deviceName in
-                printVerbose("Creating screeenshot directory for locale \(locale) and device \(deviceName)")
+                printVerbose("Creating screenshot directory for locale \(locale) and device \(deviceName)")
                 numberOfCreatedDirectories += 1
                 
                 let localeScreenshotDirectoryURL = screenshotsDirectoryURL.appendingPathComponent(deviceName).appendingPathComponent(locale)
@@ -95,27 +95,6 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
             return URL(fileURLWithPath: path)
         } else {
             return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        }
-    }
-
-}
-
-extension FileManager {
-
-    func ky_writeToFile(_ contents: String, destination: URL) throws {
-        guard let data = contents.data(using: .utf8) else {
-            throw NSError(description: "Could not encode string using UTF-8")
-        }
-        try ky_createFile(atURL: destination, contents: data, attributes: nil)
-    }
-
-    func ky_createFile(atURL url: URL, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
-        try ky_createFile(atPath: url.path, contents: contents, attributes: attributes)
-    }
-
-    func ky_createFile(atPath path: String, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
-        if !createFile(atPath: path, contents: contents, attributes: attributes) {
-            throw NSError(description: "Could not create file at path \(path)")
         }
     }
 
