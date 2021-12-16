@@ -94,6 +94,30 @@ The format of the configuration file is specified as following (indent levels re
 
 To run the example, either install the CLI (see above) and run `swiftframe Example/example.config --verbose` or directly via `swift run swiftframe Example/example.config --verbose`
 
+## Scaffolding
+
+SwiftFrame also provides a subcommand to quickly setup the folder structure needed to get started with SwiftFrame. To scaffold, use the following command:
+
+```
+swiftframe scaffold "en" "de" --path path/of/your/desired/swiftframe/scaffold
+```
+
+After the subcommand `scaffold` you specify all the locales that you want to create folders/files for. After that you need to specify the path where you want the scaffold to be created.
+
+### Available Options
+
+#### --lowercased-directories
+
+This flag will create directories with lowercased names
+
+#### --no-helper-files
+
+With this flag SwiftFrame will not create sample files for each locale/device. Otherwise a sample `.strings` file and some `README.md` files will be written in the folders to help you get started
+
+#### --verbose
+
+Will print some additional information, for example how many folders and files were created
+
 ## Why not frameit?
 
 Fastlane's [frameit](https://github.com/fastlane/fastlane/tree/master/frameit) is an awesome tool but we have, unfortunately, found it to be too limitting for our own needs. At the time of writing this, the following reasons drove us towards implementing a stand-alone solution:

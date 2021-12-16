@@ -7,7 +7,7 @@ extension FileManager {
             .filter { pathExtension == nil ? true : $0.pathExtension == pathExtension }
     }
 
-    // Doesn't throw if the directory doesn't exist or another error occured
+    // Doesn't throw if the directory doesn't exist or another error occurred
     func ky_unsafeFilesAtPath(_ url: URL) -> [URL] {
         do {
             return try ky_filesAtPath(url)
@@ -32,6 +32,23 @@ extension FileManager {
             try mappedURLs.forEach {
                 try removeItem(at: $0)
             }
+        }
+    }
+
+    public func ky_writeToFile(_ contents: String, destination: URL) throws {
+        guard let data = contents.data(using: .utf8) else {
+            throw NSError(description: "Could not encode string using UTF-8")
+        }
+        try ky_createFile(atURL: destination, contents: data, attributes: nil)
+    }
+
+    public func ky_createFile(atURL url: URL, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
+        try ky_createFile(atPath: url.path, contents: contents, attributes: attributes)
+    }
+
+    public func ky_createFile(atPath path: String, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
+        if !createFile(atPath: path, contents: contents, attributes: attributes) {
+            throw NSError(description: "Could not create file at path \(path)")
         }
     }
 
