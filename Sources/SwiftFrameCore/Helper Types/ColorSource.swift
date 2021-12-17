@@ -3,18 +3,29 @@ import Foundation
 
 struct ColorSource: Decodable {
 
-    let hexString: String
+    let sourceString: String
     let color: NSColor
 
-    init(hexString: String) throws {
-        self.hexString = hexString
-        self.color = try NSColor(hexString: hexString)
+    init(sourceString: String) throws {
+        self.sourceString = sourceString
+
+        if isValidHexString(sourceString) {
+            self.color = try NSColor(hexString: sourceString)
+        } else if isValidRGBAString(sourceString) {
+            self.color = try NSColor(rgbaString: sourceString)
+        } else {
+            throw NSError(description: "Color source string \"\(sourceString)\" is not a valid color representation")
+        }
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let hexString = try container.decode(String.self)
-        try self.init(hexString: hexString)
+        let sourceString = try container.decode(String.self)
+        try self.init(sourceString: sourceString)
     }
 
+}
+
+func isValidRGBAString(_ string: String) -> Bool {
+    false
 }

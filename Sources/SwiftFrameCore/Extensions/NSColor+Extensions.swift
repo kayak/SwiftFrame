@@ -3,6 +3,10 @@ import Foundation
 
 extension NSColor {
 
+    convenience init(rgbaString: String) throws {
+        throw NSError(description: "Not implemented yet")
+    }
+
     convenience init(hexString: String) throws {
         let hex = try stringToHex(hexString)
 
@@ -40,7 +44,7 @@ private func stringToHex(_ string: String) throws -> Int {
 
 private func normalizeHexString(_ string: String) -> String? {
     let potentialHexString = string.hasPrefix("#") ? String(string[string.index(after: string.startIndex)...]) : string
-    guard CharacterSet(charactersIn: potentialHexString).isSubset(of: CharacterSet(charactersIn: "0123456789abcdefABCDEF")) else {
+    guard isValidHexString(potentialHexString) else {
         return nil
     }
     switch potentialHexString.count {
@@ -55,4 +59,8 @@ private func normalizeHexString(_ string: String) -> String? {
     default:
         return nil
     }
+}
+
+func isValidHexString(_ string: String) -> Bool {
+    CharacterSet(charactersIn: string).isSubset(of: CharacterSet(charactersIn: "#0123456789abcdefABCDEF"))
 }
