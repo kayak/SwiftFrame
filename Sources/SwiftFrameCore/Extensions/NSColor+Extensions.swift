@@ -4,7 +4,8 @@ import Foundation
 extension NSColor {
 
     convenience init(rgbaString: String) throws {
-        throw NSError(description: "Not implemented yet")
+        let values = try parseCSSColorString(rgbaString)
+        self.init(red: values.r, green: values.g, blue: values.b, alpha: values.a)
     }
 
     convenience init(hexString: String) throws {
@@ -63,4 +64,51 @@ private func normalizeHexString(_ string: String) -> String? {
 
 func isValidHexString(_ string: String) -> Bool {
     CharacterSet(charactersIn: string).isSubset(of: CharacterSet(charactersIn: "#0123456789abcdefABCDEF"))
+}
+
+func isValidRGBAString(_ string: String) -> Bool {
+    (try? NSRegularExpression.cssColorStringExpression().matches(string)) == true
+}
+
+func parseCSSColorString(_ string: String) throws -> (r: Double, g: Double, b: Double, a: Double) {
+    let regularExpression = try NSRegularExpression.cssColorStringExpression()
+    let stringRange = NSRange(location: 0, length: (string as NSString).length)
+    let matches = regularExpression.matches(in: string, options: [], range: stringRange)
+
+    guard matches.count == 1, let firstMatch = matches.first else {
+        throw NSError(description: "String matched more than once")
+    }
+
+    let values: [Double] = try (0..<firstMatch.numberOfRanges).compactMap {
+        let rangeBounds = firstMatch.range(at: $0)
+        guard let range = Range(rangeBounds, in: string) else {
+            throw NSError(description: "Could not make range in string")
+        }
+        let rangeString = String(string[range])
+        if rangeString == string {
+            return nil
+        } else if let number = Double(string[range]) {
+            return number
+        } else {
+            throw NSError(description: "Could not make number from \"\(rangeString)\"")
+        }
+    }
+
+    guard 3 <= values.count, values.count <= 4 else {
+        throw NSError(description: "Invalid number of RGB components")
+    }
+
+    return (
+        clampedToRGBRangeIfNecessary(values[0]),
+        clampedToRGBRangeIfNecessary(values[1]),
+        clampedToRGBRangeIfNecessary(values[2]),
+        clampedToRGBRangeIfNecessary(values[safe: 3] ?? 255)
+    )
+}
+
+private func clampedToRGBRangeIfNecessary(_ value: CGFloat) -> CGFloat {
+    let value = value.truncatingRemainder(dividingBy: 1) == 0
+        ? (value / 255)
+        : value
+    return Clamped(initialValue: value, lowerBound: 0, upperBound: 1).wrappedValue
 }

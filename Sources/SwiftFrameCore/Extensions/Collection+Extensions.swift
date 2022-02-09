@@ -14,11 +14,13 @@ extension Array where Element == URL {
 
 }
 
-extension NSRegularExpression {
+extension Collection {
 
-    func matches(_ string: String) -> Bool {
-        let range = NSRange(location: 0, length: (string as NSString).length)
-        return firstMatch(in: string, options: [], range: range) != nil
+    subscript(safe index: Index) -> Element? {
+        guard indices.contains(index) else {
+            return nil
+        }
+        return self[index]
     }
 
 }

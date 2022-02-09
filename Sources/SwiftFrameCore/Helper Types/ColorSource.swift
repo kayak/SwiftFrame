@@ -14,7 +14,11 @@ struct ColorSource: Decodable {
         } else if isValidRGBAString(sourceString) {
             self.color = try NSColor(rgbaString: sourceString)
         } else {
-            throw NSError(description: "Color source string \"\(sourceString)\" is not a valid color representation")
+            throw NSError(
+                description: "Color source string \"\(sourceString)\" is not a valid color representation",
+                expectation: "Colors should have the format #23F67A, rgb(1, 0.5, 0.3) or rgba(0.1, 0.67, 0.233, 1.0)",
+                actualValue: sourceString
+            )
         }
     }
 
@@ -24,8 +28,4 @@ struct ColorSource: Decodable {
         try self.init(sourceString: sourceString)
     }
 
-}
-
-func isValidRGBAString(_ string: String) -> Bool {
-    false
 }
