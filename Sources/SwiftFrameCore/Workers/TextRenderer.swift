@@ -117,14 +117,29 @@ final class TextRenderer {
     }
 
     // MARK: - Misc
+    
+    static func makeAttributedString(for string: String, font: NSFont, color: NSColor = .white, alignment: TextAlignment) throws -> NSAttributedString {
+        let attributedString: NSMutableAttributedString
+        // Currently the HTML tag support is limited, and the font information is only carried over if the font is provided using the .ttc format
+        // and the font is installed on the computer. Hence only using the HTML parsing if the string contains HTML tags
+        if string.ky_containsHTMLTags() {
+            attributedString = try makeHTMLAttributedString(for: string, font: font, color: color)
+        } else {
+            attributedString = NSMutableAttributedString(
+                string: string,
+                attributes: [.font: font, .foregroundColor: color]
+            )
+        }
+        attributedString.setAlignment(alignment.horizontal.nsAlignment, range: NSRange(location: 0, length: attributedString.length))
+        return attributedString
+    }
 
-    static func makeAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white, alignment: TextAlignment) throws -> NSAttributedString {
+    private static func makeHTMLAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white) throws -> NSMutableAttributedString {
         let htmlString = makeHTMLFormattedString(for: htmlString, font: font, color: color)
         guard let stringData = htmlString.data(using: .utf8) else {
             throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
         }
         let attributedString = try NSMutableAttributedString.ky_makeFromHTMLData(stringData)
-        attributedString.setAlignment(alignment.horizontal.nsAlignment, range: NSRange(location: 0, length: attributedString.length))
         return attributedString
     }
 
