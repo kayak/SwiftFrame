@@ -12,7 +12,7 @@ extension String {
     }
     
     func ky_containsHTMLTags() -> Bool {
-        let regex = try! NSRegularExpression(pattern: "<(.*)>.*?|<(.*) />")
+        let regex = try! NSRegularExpression(pattern: "<(.*)>.*?|<(.*)/>")
         let range = NSRange(location: 0, length: (self as NSString).length)
         return regex.firstMatch(in: self, options: [], range: range) != nil
     }
