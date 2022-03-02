@@ -118,6 +118,10 @@ With this flag SwiftFrame will not create sample files for each locale/device. O
 
 Will print some additional information, for example how many folders and files were created
 
+## Notes
+
+We offer rudimentary markup support for your strings with HTML tags such as <b>, <i> or <u>. In order to use this, please make sure the font file you pass in uses the .ttc format, is installed on your computer and has all the versions you need.
+
 ## Why not frameit?
 
 Fastlane's [frameit](https://github.com/fastlane/fastlane/tree/master/frameit) is an awesome tool but we have, unfortunately, found it to be too limitting for our own needs. At the time of writing this, the following reasons drove us towards implementing a stand-alone solution:

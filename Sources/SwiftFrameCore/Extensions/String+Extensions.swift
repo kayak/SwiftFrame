@@ -10,6 +10,12 @@ extension String {
     func formattedRed() -> String {
         CommandLineFormatter.formatWithColorIfNeeded(self, color: .red)
     }
+    
+    func ky_containsHTMLTags() -> Bool {
+        let regex = try! NSRegularExpression(pattern: "<(.*)>.*?|<(.*)/>")
+        let range = NSRange(location: 0, length: (self as NSString).length)
+        return regex.firstMatch(in: self, options: [], range: range) != nil
+    }
 
     public func ky_data(using encoding: String.Encoding = .utf8) throws -> Data {
         guard let data = self.data(using: encoding, allowLossyConversion: false) else {
