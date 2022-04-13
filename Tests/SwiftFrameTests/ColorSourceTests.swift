@@ -25,6 +25,13 @@ class ColorSourceTests: XCTestCase {
         XCTAssertNoThrow(try ColorSource(sourceString: "rgba(128, 123, 123, 0.3)"))
     }
 
+    func testInvalidRGBString() throws {
+        XCTAssertThrowsError(try ColorSource(sourceString: "rgba(-128, 123, 123, 0.3)"))
+        XCTAssertThrowsError(try ColorSource(sourceString: "rba(128, 123, 123, 0.3)"))
+        XCTAssertThrowsError(try ColorSource(sourceString: "rgba(128, 123, 123, 0.3"))
+        XCTAssertThrowsError(try ColorSource(sourceString: "rgba(128, 123)"))
+    }
+
     func testRGBStringColor() throws {
         let colorSource = try ColorSource(sourceString: "rgba(255, 0, 0, 0.3)")
         XCTAssertEqual(colorSource.color.redComponent, 1.0)
