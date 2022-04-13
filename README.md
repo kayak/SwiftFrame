@@ -57,7 +57,7 @@ The format of the configuration file is specified as following (indent levels re
 -   `outputPaths`: an array of paths to where SwiftFrame should output the finished screenshots. This is an array in case you want to render the files into multiple directories at the same time. (Note: screenshots will be placed into subfolders organized by locale within these paths)
 -   `fontFile`: a path to a font file
 -   `format`: the output format of the screenshots, can be `png`, `jpeg` or `jpg`
--   `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
+-   `textColor`: a RGB color in Hex or CSS format (e.g. `#FFF` or `rgba(0.5, 0.3, 0.1, 1.0`) to use for titles
 -   `outputWholeImage`: **optional (default: false)** a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots
 -   `clearDirectories`: **optional (default: true)** a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example
 -   `locales`: **optional** a regular expression that can be used to exclude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
@@ -77,7 +77,7 @@ The format of the configuration file is specified as following (indent levels re
             -   `y`: the y coordinate of the corner point, relative to the top or bottom edge
     -   `textData`: an array containing further information about text titles coordinates and its layout
         -   `identifier`: the key that SwiftFrame should look for in the `.strings` file for a certain title
-        -   `colorOverride`: **optional**, a color in Hex format to use specifically for this title
+        -   `colorOverride`: **optional**, a RGB color in Hex or CSS format (e.g. `#FFF` or `rgba(0.5, 0.3, 0.1, 1.0`) to use specifically for this title
         -   `alignment`: information about text alignment
             -   `horizontal`: the horizontal text alignment in CSS style (`left`, `right`, `center`, `justify` or `natural`)
             -   `vertical`: the vertical text alignment in (`top`, `center`, `bottom`)
