@@ -23,6 +23,7 @@ class ColorSourceTests: XCTestCase {
 
     func testRGBString() throws {
         XCTAssertNoThrow(try ColorSource(sourceString: "rgba(128, 123, 123, 0.3)"))
+        XCTAssertNoThrow(try ColorSource(sourceString: "rgba(10, 0, 0, 0)"))
     }
 
     func testInvalidRGBString() throws {

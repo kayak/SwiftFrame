@@ -44,26 +44,26 @@ private func stringToHex(_ string: String) throws -> Int {
 }
 
 private func normalizeHexString(_ string: String) -> String? {
-    let potentialHexString = string.hasPrefix("#") ? String(string[string.index(after: string.startIndex)...]) : string
-    guard isValidHexString(potentialHexString) else {
+    guard isValidHexString(string) else {
         return nil
     }
-    switch potentialHexString.count {
+    let hexString = string.hasPrefix("#") ? String(string[string.index(after: string.startIndex)...]) : string
+    switch hexString.count {
     case 3:
         var result = ""
-        for character in potentialHexString {
+        for character in hexString {
             result += "\(character)\(character)"
         }
         return result
     case 6:
-        return potentialHexString
+        return hexString
     default:
         return nil
     }
 }
 
 func isValidHexString(_ string: String) -> Bool {
-    CharacterSet(charactersIn: string).isSubset(of: CharacterSet(charactersIn: "#0123456789abcdefABCDEF"))
+    (try? NSRegularExpression.hexColorStringExpression().matches(string)) == true
 }
 
 func isValidRGBAString(_ string: String) -> Bool {
@@ -82,7 +82,7 @@ func parseCSSColorString(_ string: String) throws -> (r: Double, g: Double, b: D
     let values: [Double] = try (0..<firstMatch.numberOfRanges).compactMap {
         let rangeBounds = firstMatch.range(at: $0)
         guard let range = Range(rangeBounds, in: string) else {
-            throw NSError(description: "Could not make range in string")
+            throw NSError(description: "Could not make range in string \(rangeBounds)")
         }
         let rangeString = String(string[range])
         if rangeString == string {
