@@ -9,7 +9,8 @@ fontFile: "/System/Library/Fonts/HelveticaNeue.ttc"
 textColor: "#FFF"
 outputWholeImage: true
 deviceData:
-  - outputSuffix: iPhone X 5.8 inches
+  - outputSuffixes:
+        - iPhone X 5.8 inches
     screenshots: Example/Screenshots/iPhone X/
     templateFile: Example/Template Files/iPhone X TemplateFile.png
     screenshotData:
@@ -63,7 +64,8 @@ deviceData:
         alignment: 
           horizontal: right
           vertical: center
-  - outputSuffix: iPad Pro 12.9 inch
+  - outputSuffixes:
+      - iPad Pro 12.9 inch
     screenshots: Example/Screenshots/iPad Pro/
     templateFile: Example/Template Files/iPad Pro TemplateFile.png
     screenshotData:
