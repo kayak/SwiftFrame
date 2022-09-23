@@ -9,14 +9,26 @@ public class ConfigProcessor: VerbosePrintable {
 
     public let verbose: Bool
     private let noManualValidation: Bool
+    private let outputWholeImage: Bool
+    private let clearDirectories: Bool
+
     private var data: ConfigData
 
     // MARK: - Init
 
-    public init(configURL: URL, verbose: Bool, noManualValidation: Bool, noColorOutput: Bool) throws {
+    public init(
+        configURL: URL,
+        verbose: Bool,
+        noManualValidation: Bool,
+        outputWholeImage: Bool,
+        clearDirectories: Bool,
+        noColorOutput: Bool) throws
+    {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
         self.noManualValidation = noManualValidation
+        self.outputWholeImage = outputWholeImage
+        self.clearDirectories = clearDirectories
         ConfigProcessor.noColorOutput = noColorOutput
     }
 
@@ -25,6 +37,21 @@ public class ConfigProcessor: VerbosePrintable {
     public func validate() throws {
         try process()
         try data.validate()
+
+        if data.outputWholeImage != nil, outputWholeImage {
+            let warningMessage = """
+            ouputWholeImage was specified both in the config file and as a CLI argument.
+            The value from the config file will be prioritised until its removal
+            """
+            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        }
+        if data.clearDirectories != nil, clearDirectories {
+            let warningMessage = """
+            clearDirectories was specified both in the config file and as a CLI argument.
+            The value from the config file will be prioritised until its removal
+            """
+            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        }
     }
 
     private func process() throws {
@@ -40,7 +67,7 @@ public class ConfigProcessor: VerbosePrintable {
 
         print("Parsed and validated config file\n")
 
-        if data.clearDirectories {
+        if data.clearDirectories ?? clearDirectories {
             let clearingStart = CFAbsoluteTimeGetCurrent()
             try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
             printElapsedTime("Clear output directories", startTime: clearingStart)
@@ -110,7 +137,7 @@ public class ConfigProcessor: VerbosePrintable {
                 with: data.outputPaths,
                 sliceSize: sliceSize,
                 gapWidth: deviceData.gapWidth,
-                outputWholeImage: data.outputWholeImage,
+                outputWholeImage: data.outputWholeImage ?? outputWholeImage,
                 locale: locale,
                 suffixes: deviceData.outputSuffixes,
                 format: data.outputFormat
