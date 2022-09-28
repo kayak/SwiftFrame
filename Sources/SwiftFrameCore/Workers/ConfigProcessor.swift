@@ -5,12 +5,13 @@ public class ConfigProcessor: VerbosePrintable {
 
     // MARK: - Properties
 
-    static var noColorOutput = true
+    static var shouldColorOutput = true
 
     public let verbose: Bool
-    private let noManualValidation: Bool
-    private let outputWholeImage: Bool
-    private let clearDirectories: Bool
+
+    private let shouldValidateManually: Bool
+    private let shouldOutputWholeImage: Bool
+    private let shouldClearDirectories: Bool
 
     private var data: ConfigData
 
@@ -19,17 +20,17 @@ public class ConfigProcessor: VerbosePrintable {
     public init(
         configURL: URL,
         verbose: Bool,
-        noManualValidation: Bool,
-        outputWholeImage: Bool,
-        clearDirectories: Bool,
-        noColorOutput: Bool) throws
+        shouldValidateManually: Bool,
+        shouldOutputWholeImage: Bool,
+        shouldClearDirectories: Bool,
+        shouldColorOutput: Bool) throws
     {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
-        self.noManualValidation = noManualValidation
-        self.outputWholeImage = outputWholeImage
-        self.clearDirectories = clearDirectories
-        ConfigProcessor.noColorOutput = noColorOutput
+        self.shouldValidateManually = shouldValidateManually
+        self.shouldOutputWholeImage = shouldOutputWholeImage
+        self.shouldClearDirectories = shouldClearDirectories
+        ConfigProcessor.shouldColorOutput = shouldColorOutput
     }
 
     // MARK: - Methods
@@ -38,19 +39,11 @@ public class ConfigProcessor: VerbosePrintable {
         try process()
         try data.validate()
 
-        if data.outputWholeImage != nil, outputWholeImage {
-            let warningMessage = """
-            ouputWholeImage was specified both in the config file and as a CLI argument.
-            The value from the config file will be prioritised until its removal
-            """
-            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        if data.outputWholeImage != nil {
+            printDeprecationWarning(for: "ouputWholeImage")
         }
-        if data.clearDirectories != nil, clearDirectories {
-            let warningMessage = """
-            clearDirectories was specified both in the config file and as a CLI argument.
-            The value from the config file will be prioritised until its removal
-            """
-            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        if data.clearDirectories != nil {
+            printDeprecationWarning(for: "clearDirectories")
         }
     }
 
@@ -59,7 +52,7 @@ public class ConfigProcessor: VerbosePrintable {
     }
 
     public func run() throws {
-        if verbose && !noManualValidation {
+        if shouldValidateManually {
             data.printSummary(insetByTabs: 0)
             print("Press return key to continue")
             _ = readLine()
@@ -67,7 +60,7 @@ public class ConfigProcessor: VerbosePrintable {
 
         print("Parsed and validated config file\n")
 
-        if data.clearDirectories ?? clearDirectories {
+        if shouldClearDirectories {
             let clearingStart = CFAbsoluteTimeGetCurrent()
             try FileManager.default.ky_clearDirectories(data.outputPaths, localeFolders: Array(data.titles.keys))
             printElapsedTime("Clear output directories", startTime: clearingStart)
@@ -137,7 +130,7 @@ public class ConfigProcessor: VerbosePrintable {
                 with: data.outputPaths,
                 sliceSize: sliceSize,
                 gapWidth: deviceData.gapWidth,
-                outputWholeImage: data.outputWholeImage ?? outputWholeImage,
+                outputWholeImage: shouldOutputWholeImage,
                 locale: locale,
                 suffixes: deviceData.outputSuffixes,
                 format: data.outputFormat
@@ -151,6 +144,13 @@ public class ConfigProcessor: VerbosePrintable {
         }
 
         group.wait()
+    }
+
+    // MARK: - Helpers
+
+    private func printDeprecationWarning(for configProperty: String) {
+        let warningMessage = "\(configProperty) was specified in the config file, which is deprecated. The value will be ignored"
+        print(CommandLineFormatter.formatWarning(text: warningMessage))
     }
 
 }

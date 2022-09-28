@@ -35,7 +35,7 @@ public final class CommandLineFormatter {
     }
 
     class func formatWithColorIfNeeded(_ message: String, color: Color) -> String {
-        if ConfigProcessor.noColorOutput {
+        if ConfigProcessor.shouldColorOutput {
             return message
         } else {
             return [color.escapeSequence, message, Color.default.escapeSequence].joined()
