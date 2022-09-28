@@ -24,7 +24,7 @@ However, if you'd like you can also build SwiftFrame from source. To do this clo
 -   change into the directory: `cd SwiftFrame`
 -   run the install script: `sh install.sh`
 
-## Usage
+## Rendering Images
 
 To use SwiftFrame, you need to pass it a configuration file (which is a JSON or YAML file):
 
@@ -32,29 +32,31 @@ To use SwiftFrame, you need to pass it a configuration file (which is a JSON or 
 swiftframe path/to/your/config/file --verbose
 ```
 
-### Available Options
+### Opt-In Flags
+
+You can use the `--help` flag to print SwiftFrame's documentation out. The following flags are available
 
 #### --verbose
 
 Prints additional information during processing and rendering. This will also ask you to confirm the processed config file before SwiftFrame starts rendering
 
-#### --no-color-output
+#### --manual-validation
 
-Disables colored output. Useful for CI logs for example
-
-#### --no-manual-validation
-
-Disables the manual validation that requires you to confirm the parsed config file by pressing a key. Only useful in combination with `--verbose`
-
-#### --clear-directories
-
-Clears any output directory before writing images to prevent leftover images to remain in the directories
+Pauses after parsing the config file to let you verify the contents
 
 #### --output-whole-image
 
 Outputs the whole image canvas into the output directories before slicing it up into the correct screenshot sizes. Helpful for troubleshooting
 
-You can also use the `--help` flag to print SwiftFrame's documentation out
+### Opt-Out Flags
+
+#### --color-output/--no-color-output
+
+Controls whether logged output will be colored or now. Useful for CI logs for example. Default is **true**
+
+#### --clear-directories/--no-clear-directories
+
+Controls whether output directories will be cleared before writing images to them. Default is **true**
 
 ## Configuration File
 
@@ -66,8 +68,6 @@ The format of the configuration file is specified as following (indent levels re
 -   `fontFile`: a path to a font file
 -   `format`: the output format of the screenshots, can be `png`, `jpeg` or `jpg`
 -   `textColor`: a RGB color in Hex format (e.g. `#FFF`) to use for titles
--   `outputWholeImage`: **optional (default: false)** a boolean telling the application whether or not to also output the whole image instead of just the sliced up screenshots. **DEPRECATED: parsing will be removed in a future version**
--   `clearDirectories`: **optional (default: true)** a boolean telling the application whether or not to clear the specified output directories before writing new files to it. This prevents random screenshots from being used in case you update your template file to include one less screenshot for example. **DEPRECATED: parsing will be removed in a future version**
 -   `locales`: **optional** a regular expression that can be used to exclude (or include) certain locales during rendering. To only include `fr` and `de` locale for example, use `"fr|de"`. To exclude `ru` and `fr`, use something like `"^(?!ru|fr$)\\w*$"`
 -   `deviceData`: an array containing device specific data about screenshot and text coordinates (this way you can frame screenshots for more than one device per config file)
     -   `outputSuffixes`: an array of suffixes to apply to the output files in addition to the locale identifier and index. Multiple suffixes can be used to render the same screenshots for different target devices (for example 2nd and 3rd 12.9 inch iPad Pro)
