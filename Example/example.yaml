@@ -1,5 +1,4 @@
 ---
-clearDirectories: true
 format: png
 stringsPath: Example/Strings/
 maxFontSize: 140
@@ -7,7 +6,6 @@ outputPaths:
   - Example/Output/
 fontFile: "/System/Library/Fonts/HelveticaNeue.ttc"
 textColor: "#FFF"
-outputWholeImage: true
 deviceData:
   - outputSuffixes:
         - iPhone X 5.8 inches
