@@ -12,7 +12,7 @@ struct Render: ParsableCommand {
     )
     var configFilePath: String
 
-    // MARK: - Opt-In Features
+    // MARK: - Flags
 
     @Flag(
         name: .shortAndLong,
@@ -32,21 +32,17 @@ struct Render: ParsableCommand {
     )
     var outputWholeImage = false
 
-    // MARK: - Opt-Out Features
+    @Flag(
+        name: .long,
+        help: "Disables any colored output. Useful when running in CI"
+    )
+    var noColorOutput = false
 
     @Flag(
         name: .long,
-        inversion: .prefixedNo,
-        help: "Controls whether logged output will be colored or now"
+        help: "Disables clearing the output directories before writing images to them"
     )
-    var colorOutput = true
-
-    @Flag(
-        name: .long,
-        inversion: .prefixedNo,
-        help: "Controls whether output directories will be cleared before writing images to them"
-    )
-    var clearDirectories = true
+    var noClearDirectories = false
 
     // MARK: - Run
 
@@ -59,8 +55,8 @@ struct Render: ParsableCommand {
                 verbose: verbose,
                 shouldValidateManually: manualValidation,
                 shouldOutputWholeImage: outputWholeImage,
-                shouldClearDirectories: clearDirectories,
-                shouldColorOutput: colorOutput
+                shouldClearDirectories: !noClearDirectories,
+                shouldColorOutput: !noColorOutput
             )
             try processor.validate()
             try processor.run()

@@ -32,31 +32,27 @@ To use SwiftFrame, you need to pass it a configuration file (which is a JSON or 
 swiftframe path/to/your/config/file --verbose
 ```
 
-### Opt-In Flags
-
 You can use the `--help` flag to print SwiftFrame's documentation out. The following flags are available
 
-#### --verbose
+### --verbose
 
 Prints additional information during processing and rendering. This will also ask you to confirm the processed config file before SwiftFrame starts rendering
 
-#### --manual-validation
+### --manual-validation
 
 Pauses after parsing the config file to let you verify the contents
 
-#### --output-whole-image
+### --output-whole-image
 
 Outputs the whole image canvas into the output directories before slicing it up into the correct screenshot sizes. Helpful for troubleshooting
 
-### Opt-Out Flags
+### --no-color-output
 
-#### --color-output/--no-color-output
+Disables any colored output. Useful when running in CI
 
-Controls whether logged output will be colored or now. Useful for CI logs for example. Default is **true**
+### --no-clear-directories
 
-#### --clear-directories/--no-clear-directories
-
-Controls whether output directories will be cleared before writing images to them. Default is **true**
+Disables clearing the output directories before writing images to them
 
 ## Configuration File
 
