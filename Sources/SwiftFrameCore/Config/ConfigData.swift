@@ -20,9 +20,9 @@ struct ConfigData: Decodable, ConfigValidateable {
     let textColorSource: ColorSource
     let outputFormat: FileFormat
     let localesRegex: String?
+    let clearDirectories: Bool?
+    let outputWholeImage: Bool?
 
-    @DecodableDefault.True var clearDirectories: Bool
-    @DecodableDefault.False var outputWholeImage: Bool
     @DecodableDefault.EmptyList var textGroups: [TextGroup]
 
     internal private(set) var deviceData: [DeviceData]
@@ -54,8 +54,8 @@ struct ConfigData: Decodable, ConfigValidateable {
         fontSource: FontSource,
         textColorSource: ColorSource,
         outputFormat: FileFormat,
-        clearDirectories: Bool,
-        outputWholeImage: Bool,
+        clearDirectories: Bool?,
+        outputWholeImage: Bool?,
         deviceData: [DeviceData],
         localesRegex: String? = nil)
     {
@@ -92,6 +92,22 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - ConfigValidateable
 
     public func validate() throws {
+        if clearDirectories != nil {
+            let warningMessage = """
+            Specifying clearDirectories in the config file is deprecated and will be ignored in a future version.
+            Please use the CLI argument --clear-directories instead.
+            """
+            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        }
+
+        if outputWholeImage != nil {
+            let warningMessage = """
+            Specifying outputWholeImage in the config file is deprecated and will be ignored in a future version.
+            Please use the CLI argument --output-whole-image instead.
+            """
+            print(CommandLineFormatter.formatWarning(text: warningMessage))
+        }
+
         guard !deviceData.isEmpty else {
             throw NSError(
                 description: "No screenshot data was supplied",
