@@ -8,7 +8,7 @@ struct SwiftFrame: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "swiftframe",
         abstract: "CLI application for speedy screenshot framing",
-        version: "5.0.0",
+        version: "5.0.1",
         subcommands: [Render.self, Scaffold.self],
         defaultSubcommand: Render.self,
         helpNames: .shortAndLong
