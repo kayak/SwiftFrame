@@ -67,10 +67,11 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Processing
 
     mutating func process() throws {
-        let regex: Regex<AnyRegexOutput>? = if let localesRegex, !localesRegex.isEmpty {
-            try Regex(localesRegex)
+        let regex: Regex<AnyRegexOutput>?
+        if let localesRegex, !localesRegex.isEmpty {
+            regex = try Regex(localesRegex)
         } else {
-            nil
+            regex = nil
         }
 
         deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
