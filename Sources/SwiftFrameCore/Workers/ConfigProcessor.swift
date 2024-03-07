@@ -47,7 +47,7 @@ public class ConfigProcessor: VerbosePrintable {
     public func run() throws {
         if shouldValidateManually {
             data.printSummary(insetByTabs: 0)
-            print("Press return key to continue")
+            print("Press any key to continue")
             _ = readLine()
         }
 
@@ -87,7 +87,7 @@ public class ConfigProcessor: VerbosePrintable {
 
         DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
             ky_executeOrExit(verbose: verbose) { [weak self] in
-                guard let `self` = self else {
+                guard let `self` else {
                     throw NSError(description: "Could not reference weak self")
                 }
                 try self.process(deviceData: self.data.deviceData[index])

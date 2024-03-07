@@ -13,7 +13,7 @@ extension NSMutableAttributedString {
             options: [.characterEncoding: String.Encoding.utf8.rawValue],
             documentAttributes: nil
         )
-        if let string = string {
+        if let string {
             return string
         } else {
             throw NSError(description: "Could not parse HTML string")

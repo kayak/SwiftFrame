@@ -10,7 +10,7 @@ extension DeviceData {
             screenshotsPath: FileURL(path: "testing/screenshots/"),
             numberOfSlices: 4,
             screenshotData: [.goodData],
-            textData: [.goodData],
+            textData: [.validData],
             gapWidth: gapWidth
         )
     }
@@ -21,7 +21,7 @@ extension DeviceData {
         screenshotsPath: FileURL(path: "testing/screenshots/"),
         numberOfSlices: 4,
         screenshotData: [.goodData],
-        textData: [.invalidData]
+        textData: [.invalidTextBounds]
     )
 
     static let invalidNumberOfSlices = DeviceData(
@@ -30,7 +30,7 @@ extension DeviceData {
         screenshotsPath: FileURL(path: "testing/screenshots/"),
         numberOfSlices: 0,
         screenshotData: [.goodData],
-        textData: [.goodData]
+        textData: [.validData]
     )
 
     static let invalidGapWidth = DeviceData(
@@ -39,7 +39,7 @@ extension DeviceData {
         screenshotsPath: FileURL(path: "testing/screenshots/"),
         numberOfSlices: 5,
         screenshotData: [.goodData],
-        textData: [.goodData],
+        textData: [.validData],
         gapWidth: -10
     )
 

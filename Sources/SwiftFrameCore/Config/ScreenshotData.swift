@@ -45,6 +45,6 @@ struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
         CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Top Right", value: topRight, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Z Index", value: zIndex, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Z-Index", value: zIndex, insetBy: tabs + 1)
     }
 }

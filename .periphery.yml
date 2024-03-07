@@ -1,0 +1,4 @@
+targets:
+- SwiftFrame
+- SwiftFrameCore
+- SwiftFrameTests

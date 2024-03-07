@@ -87,7 +87,7 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
     }
 
     private func makeScaffoldRootURL() -> URL {
-        if let path = path {
+        if let path {
             return URL(fileURLWithPath: path)
         } else {
             return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)

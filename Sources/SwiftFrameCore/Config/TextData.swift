@@ -87,7 +87,8 @@ struct TextData: Decodable, ConfigValidateable {
             throw NSError(
                 description: "Bad text bounds for identifier \"\(titleIdentifier)\"",
                 expectation: "Top Left coordinates should have smaller x coordinates and smaller y coordinates than bottom right",
-                actualValue: "Top Left: \(topLeft), Bottom Right: \(bottomRight)")
+                actualValue: "Top Left: \(topLeft), Bottom Right: \(bottomRight)"
+            )
         }
     }
 
@@ -104,8 +105,8 @@ struct TextData: Decodable, ConfigValidateable {
             CommandLineFormatter.printKeyValue("Max Point Size", value: ptSize, insetBy: tabs + 1)
         }
 
-        if let textColorOverride = textColorOverride {
-            CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.ky_hexString, insetBy: tabs + 1)
+        if let textColorOverride {
+            CommandLineFormatter.printKeyValue("Custom color", value: textColorOverride.ky_hexString.uppercased(), insetBy: tabs + 1)
         }
     }
 }

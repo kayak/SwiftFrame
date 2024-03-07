@@ -57,7 +57,7 @@ struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Methods
 
-    func makeProcessedData(localesRegex: NSRegularExpression?) throws -> DeviceData {
+    func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
         guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
@@ -132,11 +132,22 @@ struct DeviceData: Decodable, ConfigValidateable {
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Number of slices", value: numberOfSlices, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
+
+        if let templateImage {
+            let sliceSize = SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: numberOfSlices,
+                gapWidth: gapWidth
+            )
+            CommandLineFormatter.printKeyValue("Output slice size", value: sliceSize.configValidationRepresentation, insetBy: tabs)
+        }
+
         CommandLineFormatter.printKeyValue(
             "Screenshot folders",
             value: screenshotsGroupedByLocale.isEmpty ? "none" : screenshotsGroupedByLocale.keys.joined(separator: ", "),
             insetBy: tabs
         )
+
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }

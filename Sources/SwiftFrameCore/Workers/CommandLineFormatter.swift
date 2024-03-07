@@ -45,7 +45,7 @@ final class CommandLineFormatter {
     // MARK: - Key-Value Formatting
 
     class func printKeyValue(_ key: String, value: Any?, insetBy tabs: Int = 0) {
-        guard let value = value else {
+        guard let value else {
             return
         }
         print(CommandLineFormatter.formatKeyValue(key, value: value, insetBy: tabs))

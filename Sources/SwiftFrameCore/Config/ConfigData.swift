@@ -67,11 +67,10 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Processing
 
     mutating func process() throws {
-        let regex: NSRegularExpression?
-        if let pattern = localesRegex {
-            regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let regex: Regex<AnyRegexOutput>? = if let localesRegex, !localesRegex.isEmpty {
+            try Regex(localesRegex)
         } else {
-            regex = nil
+            nil
         }
 
         deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
@@ -101,7 +100,7 @@ struct ConfigData: Decodable, ConfigValidateable {
 
     func printSummary(insetByTabs tabs: Int) {
         ky_print("### Config Summary Start", insetByTabs: tabs)
-        CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString.uppercased(), insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)
         CommandLineFormatter.printKeyValue(

@@ -2,13 +2,13 @@ import Foundation
 
 extension Array where Element == URL {
 
-    func filterByFileOrFoldername(regex: NSRegularExpression?) throws -> Self {
-        guard let regex = regex else {
+    func filterByFileOrFoldername(regex: Regex<AnyRegexOutput>?) throws -> Self {
+        guard let regex else {
             return self
         }
         return self.filter { url in
             let lastComponent = url.deletingPathExtension().lastPathComponent
-            return regex.matches(lastComponent)
+            return !lastComponent.matches(of: regex).isEmpty
         }
     }
 
