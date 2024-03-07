@@ -67,9 +67,9 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Processing
 
     mutating func process() throws {
-        let regex: Regex<AnyRegexOutput>?
+        let regex: NSRegularExpression?
         if let localesRegex, !localesRegex.isEmpty {
-            regex = try Regex(localesRegex)
+            regex = try NSRegularExpression(pattern: localesRegex)
         } else {
             regex = nil
         }

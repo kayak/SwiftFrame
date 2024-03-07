@@ -19,7 +19,7 @@ class RegexMatchTests: XCTestCase {
     }
 
     func testFranceFilteredOut() throws {
-        let regex = try Regex("^(?!fr$)\\w*$")
+        let regex = try NSRegularExpression(pattern: "^(?!fr$)\\w*$", options: .caseInsensitive)
         let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 3) else {
@@ -31,7 +31,7 @@ class RegexMatchTests: XCTestCase {
     }
 
     func testFranceAndRussiaFilteredOut() throws {
-        let regex = try Regex("^(?!fr|ru$)\\w*$")
+        let regex = try NSRegularExpression(pattern: "^(?!fr|ru$)\\w*$", options: .caseInsensitive)
         let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 2) else {
@@ -42,7 +42,7 @@ class RegexMatchTests: XCTestCase {
     }
 
     func testOnlyRussiaAndFrance() throws {
-        let regex = try Regex("ru|fr")
+        let regex = try NSRegularExpression(pattern: "ru|fr", options: .caseInsensitive)
         let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
 
         guard ky_assertEqual(urls.count, 2) else {
