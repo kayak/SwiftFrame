@@ -20,8 +20,6 @@ struct ConfigData: Decodable, ConfigValidateable {
     let textColorSource: ColorSource
     let outputFormat: FileFormat
     let localesRegex: String?
-    let clearDirectories: Bool?
-    let outputWholeImage: Bool?
 
     @DecodableDefault.EmptyList var textGroups: [TextGroup]
 
@@ -31,8 +29,6 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
-        case clearDirectories
-        case outputWholeImage
         case deviceData
         case textGroups
         case stringsPath
@@ -54,8 +50,6 @@ struct ConfigData: Decodable, ConfigValidateable {
         fontSource: FontSource,
         textColorSource: ColorSource,
         outputFormat: FileFormat,
-        clearDirectories: Bool?,
-        outputWholeImage: Bool?,
         deviceData: [DeviceData],
         localesRegex: String? = nil)
     {
@@ -66,8 +60,6 @@ struct ConfigData: Decodable, ConfigValidateable {
         self.fontSource = fontSource
         self.textColorSource = textColorSource
         self.outputFormat = outputFormat
-        self.clearDirectories = clearDirectories
-        self.outputWholeImage = outputWholeImage
         self.deviceData = deviceData
         self.localesRegex = localesRegex
     }
@@ -92,22 +84,6 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - ConfigValidateable
 
     public func validate() throws {
-        if clearDirectories != nil {
-            let warningMessage = """
-            Specifying clearDirectories in the config file is deprecated and will be ignored in a future version.
-            Please use the CLI argument --clear-directories instead.
-            """
-            print(CommandLineFormatter.formatWarning(text: warningMessage))
-        }
-
-        if outputWholeImage != nil {
-            let warningMessage = """
-            Specifying outputWholeImage in the config file is deprecated and will be ignored in a future version.
-            Please use the CLI argument --output-whole-image instead.
-            """
-            print(CommandLineFormatter.formatWarning(text: warningMessage))
-        }
-
         guard !deviceData.isEmpty else {
             throw NSError(
                 description: "No screenshot data was supplied",
@@ -125,7 +101,6 @@ struct ConfigData: Decodable, ConfigValidateable {
 
     public func printSummary(insetByTabs tabs: Int) {
         ky_print("### Config Summary Start", insetByTabs: tabs)
-        CommandLineFormatter.printKeyValue("Outputs whole image as well in addition to slices", value: outputWholeImage)
         CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Max Font Size", value: maxFontSize, insetBy: tabs)

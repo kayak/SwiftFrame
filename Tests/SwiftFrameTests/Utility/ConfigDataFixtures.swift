@@ -12,8 +12,6 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        clearDirectories: true,
-        outputWholeImage: true,
         deviceData: [.goodData]
     )
 
@@ -25,8 +23,6 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        clearDirectories: true,
-        outputWholeImage: true,
         deviceData: [.goodData],
         localesRegex: "^(?!en|fr$)\\w*$"
     )
@@ -39,8 +35,6 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        clearDirectories: true,
-        outputWholeImage: true,
         deviceData: [.goodData],
         localesRegex: "en"
     )
@@ -53,8 +47,6 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        clearDirectories: true,
-        outputWholeImage: true,
         deviceData: [.invalidData]
     )
 

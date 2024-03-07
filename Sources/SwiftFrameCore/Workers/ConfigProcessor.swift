@@ -38,13 +38,6 @@ public class ConfigProcessor: VerbosePrintable {
     public func validate() throws {
         try process()
         try data.validate()
-
-        if data.outputWholeImage != nil {
-            printDeprecationWarning(for: "ouputWholeImage")
-        }
-        if data.clearDirectories != nil {
-            printDeprecationWarning(for: "clearDirectories")
-        }
     }
 
     private func process() throws {
@@ -144,13 +137,6 @@ public class ConfigProcessor: VerbosePrintable {
         }
 
         group.wait()
-    }
-
-    // MARK: - Helpers
-
-    private func printDeprecationWarning(for configProperty: String) {
-        let warningMessage = "\(configProperty) was specified in the config file, which is deprecated. The value will be ignored"
-        print(CommandLineFormatter.formatWarning(text: warningMessage))
     }
 
 }
