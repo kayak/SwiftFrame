@@ -1,7 +1,7 @@
 import XCTest
 @testable import SwiftFrameCore
 
-final class SliceSizeCalculatorTests: BaseTest {
+final class SliceSizeCalculatorTests: BaseTestCase {
 
     func testSliceSizeCalculator_ProducesFiveSlices_WhenNotUsingGapWidth() {
         let templateSize = CGSize(width: 100, height: 50)

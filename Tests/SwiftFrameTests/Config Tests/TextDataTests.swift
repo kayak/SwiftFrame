@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class TextDataTests: BaseTest {
+class TextDataTests: BaseTestCase {
 
     func testValidData() throws {
         let size = CGSize(width: 200, height: 200)

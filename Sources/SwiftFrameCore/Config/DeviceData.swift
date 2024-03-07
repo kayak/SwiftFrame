@@ -110,6 +110,14 @@ public struct DeviceData: Decodable, ConfigValidateable {
             )
         }
 
+        guard gapWidth >= 0 else {
+            throw NSError(
+                description: "Invalid gapWidth value",
+                expectation: "gapWidth value should be >= 0 or ommitted from config",
+                actualValue: "gapWdith value is \(gapWidth)"
+            )
+        }
+
         try screenshotData.forEach { try $0.validate() }
         try textData.forEach { try $0.validate() }
 

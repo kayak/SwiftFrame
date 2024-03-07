@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class ImageLoaderTests: BaseTest {
+class ImageLoaderTests: BaseTestCase {
 
     func testLoadImage() throws {
         let context = try GraphicsContext(size: .square100Pixels)

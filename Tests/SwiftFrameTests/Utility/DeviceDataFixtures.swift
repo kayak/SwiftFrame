@@ -3,26 +3,19 @@ import Foundation
 
 extension DeviceData {
 
-    static let goodData = DeviceData(
-        outputSuffixes: ["iPhone X"],
-        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
-        screenshotsPath: FileURL(path: "testing/screenshots/"),
-        numberOfSlices: 4,
-        screenshotData: [.goodData],
-        textData: [.goodData]
-    )
+    static func validData(gapWidth: Int = 0) -> DeviceData {
+        DeviceData(
+            outputSuffixes: ["iPhone X"],
+            templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+            screenshotsPath: FileURL(path: "testing/screenshots/"),
+            numberOfSlices: 4,
+            screenshotData: [.goodData],
+            textData: [.goodData],
+            gapWidth: gapWidth
+        )
+    }
 
-    static let gapData = DeviceData(
-        outputSuffixes: ["iPhone X"],
-        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
-        screenshotsPath: FileURL(path: "testing/screenshots/"),
-        numberOfSlices: 4,
-        screenshotData: [.goodData],
-        textData: [.goodData],
-        gapWidth: 16
-    )
-
-    static let invalidData = DeviceData(
+    static let invalidTextData = DeviceData(
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
@@ -31,13 +24,23 @@ extension DeviceData {
         textData: [.invalidData]
     )
 
-    static let mismatchingDeviceSizeData = DeviceData(
+    static let invalidNumberOfSlices = DeviceData(
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
-        numberOfSlices: 4,
+        numberOfSlices: 0,
         screenshotData: [.goodData],
         textData: [.goodData]
+    )
+
+    static let invalidGapWidth = DeviceData(
+        outputSuffixes: ["iPhone X"],
+        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+        screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 5,
+        screenshotData: [.goodData],
+        textData: [.goodData],
+        gapWidth: -10
     )
 
 }

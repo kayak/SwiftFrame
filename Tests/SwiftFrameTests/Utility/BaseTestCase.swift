@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 
-class BaseTest: XCTestCase {
+class BaseTestCase: XCTestCase {
 
     override func setUpWithError() throws {
         try TestingUtility.setupMockDirectoryWithScreenshots()

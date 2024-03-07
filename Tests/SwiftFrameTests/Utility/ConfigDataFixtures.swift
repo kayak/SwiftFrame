@@ -12,7 +12,7 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        deviceData: [.goodData]
+        deviceData: [.validData()]
     )
 
     static let skippedLocaleData = ConfigData(
@@ -23,7 +23,7 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        deviceData: [.goodData],
+        deviceData: [.validData()],
         localesRegex: "^(?!en|fr$)\\w*$"
     )
 
@@ -35,7 +35,7 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        deviceData: [.goodData],
+        deviceData: [.validData()],
         localesRegex: "en"
     )
 
@@ -47,7 +47,7 @@ extension ConfigData {
         fontSource: .nsFont(.systemFont(ofSize: 20)),
         textColorSource: try! ColorSource(hexString: "#ff00ff"),
         outputFormat: .png,
-        deviceData: [.invalidData]
+        deviceData: [.invalidTextData]
     )
 
 }
