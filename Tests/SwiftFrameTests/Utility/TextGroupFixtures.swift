@@ -4,6 +4,6 @@ import Foundation
 
 extension TextGroup {
 
-    static let goodData = TextGroup(identifier: "SomeID", maxFontSize: 200.00)
+    static let goodData = TextGroup(identifier: "someID", maxFontSize: 200.00)
 
 }

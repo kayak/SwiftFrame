@@ -5,7 +5,7 @@ import Foundation
 extension TextData {
 
     static let goodData = TextData(
-        titleIdentifier: "someId",
+        titleIdentifier: "someID",
         textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
@@ -17,7 +17,7 @@ extension TextData {
     )
 
     static let invalidData = TextData(
-        titleIdentifier: "someId",
+        titleIdentifier: "someID",
         textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
@@ -29,7 +29,7 @@ extension TextData {
     )
 
     static let invertedData = TextData(
-        titleIdentifier: "someId",
+        titleIdentifier: "someID",
         textAlignment: TextAlignment(horizontal: .center, vertical: .top),
         maxFontSizeOverride: nil,
         fontOverride: nil,
