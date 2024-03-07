@@ -34,15 +34,17 @@ struct Render: ParsableCommand {
 
     @Flag(
         name: .long,
+        inversion: .prefixedNo,
         help: "Disables any colored output. Useful when running in CI"
     )
-    var noColorOutput = false
+    var colorOutput = true
 
     @Flag(
         name: .long,
+        inversion: .prefixedNo,
         help: "Disables clearing the output directories before writing images to them"
     )
-    var noClearDirectories = false
+    var clearDirectories = true
 
     // MARK: - Run
 
@@ -55,8 +57,8 @@ struct Render: ParsableCommand {
                 verbose: verbose,
                 shouldValidateManually: manualValidation,
                 shouldOutputWholeImage: outputWholeImage,
-                shouldClearDirectories: !noClearDirectories,
-                shouldColorOutput: !noColorOutput
+                shouldClearDirectories: clearDirectories,
+                shouldColorOutput: colorOutput
             )
             try processor.validate()
             try processor.run()

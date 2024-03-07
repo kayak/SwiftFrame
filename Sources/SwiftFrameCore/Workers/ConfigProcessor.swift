@@ -23,8 +23,8 @@ public class ConfigProcessor: VerbosePrintable {
         shouldValidateManually: Bool,
         shouldOutputWholeImage: Bool,
         shouldClearDirectories: Bool,
-        shouldColorOutput: Bool) throws
-    {
+        shouldColorOutput: Bool
+    ) throws {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
         self.shouldValidateManually = shouldValidateManually
@@ -103,14 +103,17 @@ public class ConfigProcessor: VerbosePrintable {
 
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
             group.enter()
+            defer { group.leave() }
 
             guard let templateImage = deviceData.templateImage else {
                 throw NSError(description: "No template image found")
             }
 
-            guard let sliceSize = deviceData.sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
-                throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
-            }
+            let sliceSize = SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: deviceData.numberOfSlices,
+                gapWidth: deviceData.gapWidth
+            )
 
             let composer = try ImageComposer(canvasSize: templateImage.ky_nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
@@ -132,8 +135,6 @@ public class ConfigProcessor: VerbosePrintable {
             deviceData.outputSuffixes.forEach { suffix in
                 print("Finished \(locale)-\(suffix)")
             }
-
-            group.leave()
         }
 
         group.wait()

@@ -7,6 +7,7 @@ extension DeviceData {
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 4,
         screenshotData: [.goodData],
         textData: [.goodData]
     )
@@ -15,6 +16,7 @@ extension DeviceData {
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 4,
         screenshotData: [.goodData],
         textData: [.goodData],
         gapWidth: 16
@@ -24,6 +26,7 @@ extension DeviceData {
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 4,
         screenshotData: [.goodData],
         textData: [.invalidData]
     )
@@ -32,19 +35,9 @@ extension DeviceData {
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
-        sliceSizeOverride: DecodableSize(width: 50, height: 100),
+        numberOfSlices: 4,
         screenshotData: [.goodData],
         textData: [.goodData]
-    )
-
-    static let faultyMismatchingDeviceSizeData = DeviceData(
-        outputSuffixes: ["iPhone X"],
-        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
-        screenshotsPath: FileURL(path: "testing/screenshots/"),
-        sliceSizeOverride: DecodableSize(width: 50, height: 100),
-        screenshotData: [.goodData],
-        textData: [.goodData],
-        gapWidth: 2
     )
 
 }
