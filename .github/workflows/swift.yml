@@ -12,7 +12,7 @@ jobs:
       - name: Configure Swift version
         uses: swift-actions/setup-swift@v1
         with:
-          swift-version: "5.8"
+          swift-version: "5.9"
       - name: Build
         run: swift build -v
       - name: Run tests
