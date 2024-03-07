@@ -42,7 +42,7 @@ struct ConfigData: Decodable, ConfigValidateable {
 
     // MARK: - Init
 
-    public init(
+    init(
         textGroups: [TextGroup] = [],
         stringsPath: FileURL,
         maxFontSize: CGFloat,
@@ -66,7 +66,7 @@ struct ConfigData: Decodable, ConfigValidateable {
 
     // MARK: - Processing
 
-    mutating public func process() throws {
+    mutating func process() throws {
         let regex: NSRegularExpression?
         if let pattern = localesRegex {
             regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
@@ -83,7 +83,7 @@ struct ConfigData: Decodable, ConfigValidateable {
 
     // MARK: - ConfigValidateable
 
-    public func validate() throws {
+    func validate() throws {
         guard !deviceData.isEmpty else {
             throw NSError(
                 description: "No screenshot data was supplied",
@@ -99,7 +99,7 @@ struct ConfigData: Decodable, ConfigValidateable {
         try deviceData.forEach { try $0.validate() }
     }
 
-    public func printSummary(insetByTabs tabs: Int) {
+    func printSummary(insetByTabs tabs: Int) {
         ky_print("### Config Summary Start", insetByTabs: tabs)
         CommandLineFormatter.printKeyValue("Title Color", value: textColorSource.hexString, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Title Font", value: try? fontSource.font().fontName, insetBy: tabs)

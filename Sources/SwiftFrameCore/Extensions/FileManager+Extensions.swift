@@ -7,15 +7,6 @@ extension FileManager {
             .filter { pathExtension == nil ? true : $0.pathExtension == pathExtension }
     }
 
-    // Doesn't throw if the directory doesn't exist or another error occurred
-    func ky_unsafeFilesAtPath(_ url: URL) -> [URL] {
-        do {
-            return try ky_filesAtPath(url)
-        } catch {
-            return []
-        }
-    }
-
     func ky_subDirectoriesAtPath(_ url: URL) -> [URL] {
         guard let urls = try? contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
             return []

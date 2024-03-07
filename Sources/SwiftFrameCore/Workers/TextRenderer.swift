@@ -158,10 +158,6 @@ final class TextRenderer {
 
 }
 
-private func >=(lhs: CGSize, rhs: CGSize) -> Bool {
-    lhs.width >= rhs.width && lhs.height >= rhs.height
-}
-
 private func <=(lhs: CGSize, rhs: CGSize) -> Bool {
     lhs.width <= rhs.width && lhs.height <= rhs.height
 }

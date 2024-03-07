@@ -1,7 +1,7 @@
 import Foundation
 @testable import SwiftFrameCore
 
-public typealias JSONDictionary = [String: Encodable]
+typealias JSONDictionary = [String: Encodable]
 
 struct TestingUtility {
 

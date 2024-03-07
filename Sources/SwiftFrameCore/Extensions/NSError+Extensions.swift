@@ -26,7 +26,7 @@ public extension NSError {
 
 }
 
-public func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
+func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
     do {
         return try work()
     } catch let error as NSError {

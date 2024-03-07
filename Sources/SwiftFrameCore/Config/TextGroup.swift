@@ -1,9 +1,7 @@
 import AppKit
 import Foundation
 
-private let kNumTitleLines = 3
-
-public struct TextGroup: Decodable, ConfigValidateable, Hashable {
+struct TextGroup: Decodable, ConfigValidateable, Hashable {
 
     // MARK: - Properties
 

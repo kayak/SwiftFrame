@@ -1,6 +1,6 @@
 import Foundation
 
-public final class CommandLineFormatter {
+final class CommandLineFormatter {
 
     // MARK: - Nested Types
 
@@ -19,17 +19,17 @@ public final class CommandLineFormatter {
 
     // MARK: - Message Formatting
 
-    public class func formatWarning(title: String = "WARNING", text: String) -> String {
+    class func formatWarning(title: String = "WARNING", text: String) -> String {
         let message = "[\(title)] \(text)"
         return formatWithColorIfNeeded(message, color: .yellow)
     }
 
-    public class func formatError(_ text: String) -> String {
+    class func formatError(_ text: String) -> String {
         let message = "[ERROR] \(text)"
         return formatWithColorIfNeeded(message, color: .red)
     }
 
-    public class func formatTimeMeasurement(_ text: String) -> String {
+    class func formatTimeMeasurement(_ text: String) -> String {
         let message = "[TIME] \(text)"
         return formatWithColorIfNeeded(message, color: .green)
     }
@@ -44,7 +44,7 @@ public final class CommandLineFormatter {
 
     // MARK: - Key-Value Formatting
 
-    public class func printKeyValue(_ key: String, value: Any?, insetBy tabs: Int = 0) {
+    class func printKeyValue(_ key: String, value: Any?, insetBy tabs: Int = 0) {
         guard let value = value else {
             return
         }
@@ -59,7 +59,7 @@ public final class CommandLineFormatter {
 
 }
 
-public func ky_print(_ objects: Any..., insetByTabs tabs: Int) {
+func ky_print(_ objects: Any..., insetByTabs tabs: Int) {
     let tabsString = String(repeating: CommandLineFormatter.tabsString, count: tabs)
     let arguments = objects.count == 1
         ? String(describing: objects[0])

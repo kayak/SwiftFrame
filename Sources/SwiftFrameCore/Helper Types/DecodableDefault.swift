@@ -10,7 +10,7 @@ protocol DecodableDefaultSource {
 
 }
 
-public enum DecodableDefault {}
+enum DecodableDefault {}
 
 extension DecodableDefault {
 
@@ -98,12 +98,3 @@ extension DecodableDefault {
 
 extension DecodableDefault.Wrapper: Equatable where Value: Equatable {}
 extension DecodableDefault.Wrapper: Hashable where Value: Hashable {}
-
-extension DecodableDefault.Wrapper: Encodable where Value: Encodable {
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(wrappedValue)
-    }
-
-}

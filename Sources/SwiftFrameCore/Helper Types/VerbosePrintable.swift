@@ -25,11 +25,4 @@ public extension VerbosePrintable {
         printVerbose(CommandLineFormatter.formatTimeMeasurement(messageString))
     }
 
-    @inlinable func performAndPrintElapsedTime<T>(_ name: @autoclosure () -> String, work: () throws -> T) rethrows -> T {
-        let startTime = CFAbsoluteTimeGetCurrent()
-        let result = try work()
-        printElapsedTime(name(), startTime: startTime)
-        return result
-    }
-
 }

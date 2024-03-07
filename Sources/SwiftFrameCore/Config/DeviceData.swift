@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public struct DeviceData: Decodable, ConfigValidateable {
+struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -18,10 +18,6 @@ public struct DeviceData: Decodable, ConfigValidateable {
     private(set) var templateImage: NSBitmapImageRep?
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
-
-    private var suffixesStringRepresentation: String {
-        outputSuffixes.map { "\"\($0)\"" }.joined(separator: ", ")
-    }
 
     // MARK: - Coding Keys
 

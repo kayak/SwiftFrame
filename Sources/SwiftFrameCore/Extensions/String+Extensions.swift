@@ -6,10 +6,6 @@ extension String {
     public func formattedGreen() -> String {
         CommandLineFormatter.formatWithColorIfNeeded(self, color: .green)
     }
-
-    func formattedRed() -> String {
-        CommandLineFormatter.formatWithColorIfNeeded(self, color: .red)
-    }
     
     func ky_containsHTMLTags() -> Bool {
         let regex = try! NSRegularExpression(pattern: "<(.*)>.*?|<(.*)/>")
