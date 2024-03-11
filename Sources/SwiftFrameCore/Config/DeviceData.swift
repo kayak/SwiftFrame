@@ -57,7 +57,7 @@ struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Methods
 
-    func makeProcessedData(localesRegex: NSRegularExpression?) throws -> DeviceData {
+    func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
         guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
