@@ -13,7 +13,8 @@ public extension NSError {
                 NSLocalizedDescriptionKey: description,
                 NSError.kExpectationKey: expectation as Any,
                 NSError.kActualValueKey: actualValue as Any
-            ])
+            ]
+        )
     }
 
     var expectation: String? {

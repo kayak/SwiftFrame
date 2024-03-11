@@ -36,12 +36,8 @@ public class ConfigProcessor: VerbosePrintable {
     // MARK: - Methods
 
     public func validate() throws {
-        try process()
-        try data.validate()
-    }
-
-    private func process() throws {
         try data.process()
+        try data.validate()
     }
 
     public func run() throws {
@@ -109,7 +105,7 @@ public class ConfigProcessor: VerbosePrintable {
                 throw NSError(description: "No template image found")
             }
 
-            let sliceSize = SliceSizeCalculator.calculateSliceSize(
+            let sliceSize = try SliceSizeCalculator.calculateSliceSize(
                 templateImageSize: templateImage.ky_nativeSize,
                 numberOfSlices: deviceData.numberOfSlices,
                 gapWidth: deviceData.gapWidth

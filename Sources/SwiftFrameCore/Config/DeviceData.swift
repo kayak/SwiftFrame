@@ -114,6 +114,14 @@ struct DeviceData: Decodable, ConfigValidateable {
             )
         }
 
+        if let templateImage {
+            _ = try SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: numberOfSlices,
+                gapWidth: gapWidth
+            )
+        }
+
         try screenshotData.forEach { try $0.validate() }
         try textData.forEach { try $0.validate() }
 
@@ -134,12 +142,12 @@ struct DeviceData: Decodable, ConfigValidateable {
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
 
         if let templateImage {
-            let sliceSize = SliceSizeCalculator.calculateSliceSize(
+            let sliceSize = try? SliceSizeCalculator.calculateSliceSize(
                 templateImageSize: templateImage.ky_nativeSize,
                 numberOfSlices: numberOfSlices,
                 gapWidth: gapWidth
             )
-            CommandLineFormatter.printKeyValue("Output slice size", value: sliceSize.configValidationRepresentation, insetBy: tabs)
+            CommandLineFormatter.printKeyValue("Output slice size", value: sliceSize?.configValidationRepresentation, insetBy: tabs)
         }
 
         CommandLineFormatter.printKeyValue(
