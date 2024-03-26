@@ -2,37 +2,30 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class DeviceDataTests: BaseTest {
+class DeviceDataTests: BaseTestCase {
 
-    func testValidData() throws {
-        let data = try DeviceData.goodData.makeProcessedData(localesRegex: nil)
+    func testDeviceData_IsValid_WhenAllDataIsValid() throws {
+        let data = try DeviceData.validData().makeProcessedData(localesRegex: nil)
         XCTAssertNoThrow(try data.validate())
     }
 
-    func testGapDataValid() throws {
-        try TestingUtility.setupMockDirectoryWithScreenshots(gapWidth: 16)
-
-        let data = try DeviceData.gapData.makeProcessedData(localesRegex: nil)
+    func testDeviceData_IsValid_WhenGapWidthIsPositive() throws {
+        let data = try DeviceData.validData(gapWidth: 16).makeProcessedData(localesRegex: nil)
         XCTAssertNoThrow(try data.validate())
     }
 
-    func testGapDataInvalid() throws {
-        let data = try DeviceData.gapData.makeProcessedData(localesRegex: nil)
+    func testDeviceData_IsInvalid_WhenTextDataIsInvalid() throws {
+        let data = try DeviceData.invalidTextData.makeProcessedData(localesRegex: nil)
         XCTAssertThrowsError(try data.validate())
     }
 
-    func testInvalidData() throws {
-        let data = try DeviceData.invalidData.makeProcessedData(localesRegex: nil)
+    func testDeviceData_IsInvalid_WhenNumberOfSlicesIsZero() throws {
+        let data = try DeviceData.invalidNumberOfSlices.makeProcessedData(localesRegex: nil)
         XCTAssertThrowsError(try data.validate())
     }
 
-    func testMismatchingDeviceSizeData() throws {
-        let data = try DeviceData.mismatchingDeviceSizeData.makeProcessedData(localesRegex: nil)
-        XCTAssertNoThrow(try data.validate())
-    }
-
-    func testFaultyMismatchingDeviceSizeData() throws {
-        let data = try DeviceData.faultyMismatchingDeviceSizeData.makeProcessedData(localesRegex: nil)
+    func testDeviceData_IsInvalid_WhenGapWidthNegative() throws {
+        let data = try DeviceData.invalidGapWidth.makeProcessedData(localesRegex: nil)
         XCTAssertThrowsError(try data.validate())
     }
 

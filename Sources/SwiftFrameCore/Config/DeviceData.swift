@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public struct DeviceData: Decodable, ConfigValidateable {
+struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -9,8 +9,8 @@ public struct DeviceData: Decodable, ConfigValidateable {
 
     let outputSuffixes: [String]
     let templateImagePath: FileURL
-    private let screenshotsPath: FileURL
-    let sliceSizeOverride: DecodableSize?
+    let screenshotsPath: FileURL
+    let numberOfSlices: Int
 
     @DecodableDefault.IntZero var gapWidth: Int
 
@@ -19,29 +19,25 @@ public struct DeviceData: Decodable, ConfigValidateable {
     private(set) var screenshotData = [ScreenshotData]()
     private(set) var textData = [TextData]()
 
-    private var suffixesStringRepresentation: String {
-        outputSuffixes.map { "\"\($0)\"" }.joined(separator: ", ")
-    }
-
     // MARK: - Coding Keys
 
     enum CodingKeys: String, CodingKey {
         case outputSuffixes
         case screenshotsPath = "screenshots"
         case templateImagePath = "templateFile"
-        case sliceSizeOverride
         case screenshotData
         case textData
         case gapWidth
+        case numberOfSlices
     }
 
     // MARK: - Init
 
-    internal init(
+    init(
         outputSuffixes: [String],
         templateImagePath: FileURL,
         screenshotsPath: FileURL,
-        sliceSizeOverride: DecodableSize? = nil,
+        numberOfSlices: Int,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [ScreenshotData](),
@@ -51,7 +47,7 @@ public struct DeviceData: Decodable, ConfigValidateable {
         self.outputSuffixes = outputSuffixes
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
-        self.sliceSizeOverride = sliceSizeOverride
+        self.numberOfSlices = numberOfSlices
         self.screenshotsGroupedByLocale = screenshotsGroupedByLocale
         self.templateImage = templateImage
         self.screenshotData = screenshotData
@@ -61,8 +57,8 @@ public struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Methods
 
-    func makeProcessedData(localesRegex: NSRegularExpression?) throws -> DeviceData {
-        guard let rep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
+    func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
+        guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
@@ -77,21 +73,22 @@ public struct DeviceData: Decodable, ConfigValidateable {
             parsedScreenshots[folder.lastPathComponent] = dictionary
         }
 
-        let processedTextData = try textData.map { try $0.makeProcessedData(size: rep.size) }
+        let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImage.size) }
         let processedScreenshotData = screenshotData
-            .map { $0.makeProcessedData(size: rep.size) }
+            .map { $0.makeProcessedData(size: templateImage.size) }
             .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
             outputSuffixes: outputSuffixes,
             templateImagePath: templateImagePath,
             screenshotsPath: screenshotsPath,
-            sliceSizeOverride: sliceSizeOverride,
+            numberOfSlices: numberOfSlices,
             screenshotsGroupedByLocale: parsedScreenshots,
-            templateImage: rep,
+            templateImage: templateImage,
             screenshotData: processedScreenshotData,
             textData: processedTextData,
-            gapWidth: gapWidth)
+            gapWidth: gapWidth
+        )
     }
 
     // MARK: - ConfigValidateable
@@ -101,27 +98,28 @@ public struct DeviceData: Decodable, ConfigValidateable {
             throw NSError(description: "No screenshots were loaded, most likely caused by a faulty regular expression")
         }
 
-        try screenshotsGroupedByLocale.forEach { localeDict in
-            guard let first = localeDict.value.first?.value else {
-                return
-            }
-            try localeDict.value.forEach {
-                if let size = NSBitmapImageRep.ky_loadFromURL($0.value)?.ky_nativeSize, size != NSBitmapImageRep.ky_loadFromURL(first)?.ky_nativeSize {
-                    throw NSError(
-                        description: "Image file with mismatching resolution found in folder \"\(localeDict.key)\"",
-                        expectation: "All screenshots should have the same resolution",
-                        actualValue: "Screenshot with dimensions \(size)")
-                }
-            }
+        guard numberOfSlices > 0 else {
+            throw NSError(
+                description: "Invalid numberOfSlices value",
+                expectation: "numberOfSlices value should be >= 1",
+                actualValue: "numberOfSlices value is \(numberOfSlices)"
+            )
         }
 
-        // Now that we know all screenshots have the same resolution, we can validate that template image is multiple in width
-        // plus specified gap width in between
-        if let screenshotSize = sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(screenshotsGroupedByLocale.first?.value.first?.value)?.ky_nativeSize {
-            guard let templateImageSize = templateImage?.ky_nativeSize else {
-                throw NSError(description: "Template image for output suffixes \(suffixesStringRepresentation) could not be loaded for validation")
-            }
-            try validateSize(templateImageSize, screenshotSize: screenshotSize)
+        guard gapWidth >= 0 else {
+            throw NSError(
+                description: "Invalid gapWidth value",
+                expectation: "gapWidth value should be >= 0 or ommitted from config",
+                actualValue: "gapWdith value is \(gapWidth)"
+            )
+        }
+
+        if let templateImage {
+            _ = try SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: numberOfSlices,
+                gapWidth: gapWidth
+            )
         }
 
         try screenshotData.forEach { try $0.validate() }
@@ -137,34 +135,27 @@ public struct DeviceData: Decodable, ConfigValidateable {
         }
     }
 
-    private func validateSize(_ templateSize: CGSize, screenshotSize: CGSize) throws {
-        let remainingPixels = templateSize.width.truncatingRemainder(dividingBy: screenshotSize.width)
-        if gapWidth == 0 {
-            guard remainingPixels == 0 else {
-                throw NSError(
-                    description: "Template image for output suffixes \(suffixesStringRepresentation) is not a multiple in width as associated screenshot width",
-                    expectation: "Width should be multiple of \(Int(screenshotSize.width))px",
-                    actualValue: "\(Int(screenshotSize.width))px")
-            }
-        } else {
-            // Make sure there's at least one gap
-            guard remainingPixels.truncatingRemainder(dividingBy: CGFloat(gapWidth)) == 0 && remainingPixels != 0 else {
-                throw NSError(
-                    description: "Template image for output suffixes \(suffixesStringRepresentation) is not a multiple in width as associated screenshot width",
-                    expectation: "Template image width should be = (x * screenshot width) + (x - 1) * gap width",
-                    actualValue: "Template image width: \(templateSize.width)px, screenshot width: \(screenshotSize.width), gap width: \(gapWidth)")
-            }
-        }
-    }
-
     func printSummary(insetByTabs tabs: Int) {
         CommandLineFormatter.printKeyValue("Ouput suffixes", value: outputSuffixes.joined(separator: ", "), insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Number of slices", value: numberOfSlices, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)
+
+        if let templateImage {
+            let sliceSize = try? SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: numberOfSlices,
+                gapWidth: gapWidth
+            )
+            CommandLineFormatter.printKeyValue("Output slice size", value: sliceSize?.configValidationRepresentation, insetBy: tabs)
+        }
+
         CommandLineFormatter.printKeyValue(
             "Screenshot folders",
             value: screenshotsGroupedByLocale.isEmpty ? "none" : screenshotsGroupedByLocale.keys.joined(separator: ", "),
-            insetBy: tabs)
+            insetBy: tabs
+        )
+
         screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
         textData.forEach { $0.printSummary(insetByTabs: tabs) }
     }

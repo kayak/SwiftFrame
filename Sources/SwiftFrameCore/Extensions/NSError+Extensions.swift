@@ -13,7 +13,8 @@ public extension NSError {
                 NSLocalizedDescriptionKey: description,
                 NSError.kExpectationKey: expectation as Any,
                 NSError.kActualValueKey: actualValue as Any
-            ])
+            ]
+        )
     }
 
     var expectation: String? {
@@ -26,7 +27,7 @@ public extension NSError {
 
 }
 
-public func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
+func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
     do {
         return try work()
     } catch let error as NSError {
@@ -36,10 +37,7 @@ public func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -
 
 public func ky_exitWithError(_ error: Error, verbose: Bool = false) -> Never {
     let error = error as NSError
-    let errorMessage = verbose
-        ? CommandLineFormatter.formatError(error.description)
-        : CommandLineFormatter.formatError(error.localizedDescription)
-    print(errorMessage)
+    print(CommandLineFormatter.formatError(verbose ? error.description : error.localizedDescription))
 
     error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "EXPECTATION", text: $0)) }
     error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "ACTUAL", text: $0)) }

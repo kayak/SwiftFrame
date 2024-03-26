@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class ConfigDataTests: BaseTest {
+class ConfigDataTests: BaseTestCase {
 
     func testValidData() throws {
         var data = ConfigData.goodData

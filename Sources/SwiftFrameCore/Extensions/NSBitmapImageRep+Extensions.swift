@@ -13,7 +13,7 @@ extension NSBitmapImageRep {
     }
 
     static func ky_loadFromURL(_ url: URL?) -> NSBitmapImageRep? {
-        guard let url = url else {
+        guard let url else {
             return nil
         }
         return ImageLoader.loadRepresentation(at: url)

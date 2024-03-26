@@ -4,7 +4,7 @@ import atexit
 import subprocess
 import sys
 import time
-from distutils.dir_util import copy_tree
+from shutil import copytree
 from os import path
 from pathlib import Path
 from shutil import copy2, rmtree
@@ -34,7 +34,7 @@ with open("Example/example.config", "rt", encoding="utf-8") as fin:
 
 # Copy template files
 TEMPLATE_FILES_FOLDER = "Example/Template Files/"
-copy_tree(TEMPLATE_FILES_FOLDER, "Benchmark/Template Files/")
+copytree(TEMPLATE_FILES_FOLDER, "Benchmark/Template Files/")
 
 # Copying over screenshots and titles
 for locale in LOCALES:
@@ -42,7 +42,7 @@ for locale in LOCALES:
     for device in ["iPhone X", "iPad Pro"]:
         screenshot_source_folder = f"Example/Screenshots/{device}/en"
         screenshot_target_folder = f"Benchmark/Screenshots/{device}/{locale}"
-        copy_tree(screenshot_source_folder, screenshot_target_folder)
+        copytree(screenshot_source_folder, screenshot_target_folder)
 
     STRING_SOURCE_FILE = "Example/Strings/en.strings"
     STRING_DESTINATION_FILE = f"Benchmark/Strings/{locale}.strings"
@@ -56,7 +56,7 @@ if path.exists(".build"):
 compile_process = subprocess.run("swift build -c release", shell=True, check=True)
 
 if compile_process.returncode != 0:
-    exit(compile_process.returncode)
+    sys.exit(compile_process.returncode)
 
 # Running benchmark
 benchmark_start = time.time()

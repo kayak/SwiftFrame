@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
+struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
 
     // MARK: - Properties
 
@@ -14,7 +14,7 @@ public struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
 
     // MARK: - Init
 
-    internal init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int?) {
+    init(screenshotName: String, bottomLeft: Point, bottomRight: Point, topLeft: Point, topRight: Point, zIndex: Int?) {
         self.screenshotName = screenshotName
         self.bottomLeft = bottomLeft
         self.bottomRight = bottomRight
@@ -45,6 +45,6 @@ public struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
         CommandLineFormatter.printKeyValue("Bottom Right", value: bottomRight, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Top Left", value: topLeft, insetBy: tabs + 1)
         CommandLineFormatter.printKeyValue("Top Right", value: topRight, insetBy: tabs + 1)
-        CommandLineFormatter.printKeyValue("Z Index", value: zIndex, insetBy: tabs + 1)
+        CommandLineFormatter.printKeyValue("Z-Index", value: zIndex, insetBy: tabs + 1)
     }
 }

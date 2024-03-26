@@ -40,12 +40,3 @@ extension CGContext {
     }
 
 }
-
-/// Since `XCTUnwrap` is currently unavailable when calling `swift test` from the command line, we use a custom wrapper
-/// See https://bugs.swift.org/browse/SR-11501
-func ky_unwrap<T>(_ value: T?) throws -> T {
-    guard let value = value else {
-        throw NSError(description: "Value of type \(T.self) was nil")
-    }
-    return value
-}

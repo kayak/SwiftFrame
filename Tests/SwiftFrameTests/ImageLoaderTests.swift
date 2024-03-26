@@ -2,12 +2,12 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class ImageLoaderTests: BaseTest {
+class ImageLoaderTests: BaseTestCase {
 
     func testLoadImage() throws {
         let context = try GraphicsContext(size: .square100Pixels)
         let rep = context.cg.makePlainWhiteImageRep()
-        let cgImage = try ky_unwrap(rep.cgImage)
+        let cgImage = try XCTUnwrap(rep.cgImage)
 
         let url = URL(fileURLWithPath: "testing/en/en-testing_device.png")
 

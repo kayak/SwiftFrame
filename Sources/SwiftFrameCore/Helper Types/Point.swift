@@ -12,13 +12,9 @@ struct Point: Codable, Equatable {
         CIVector(x: CGFloat(x), y: CGFloat(y))
     }
 
-    var cgPoint: CGPoint {
-        CGPoint(x: x, y: y)
-    }
-
     // MARK: - Coordinate space conversion
 
-    public func convertingToBottomLeftOrigin(withSize size: CGSize) -> Point {
+    func convertingToBottomLeftOrigin(withSize size: CGSize) -> Point {
         let newY = Int(size.height) - y
         return Point(x: x, y: newY)
     }

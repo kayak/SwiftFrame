@@ -23,8 +23,8 @@ public class ConfigProcessor: VerbosePrintable {
         shouldValidateManually: Bool,
         shouldOutputWholeImage: Bool,
         shouldClearDirectories: Bool,
-        shouldColorOutput: Bool) throws
-    {
+        shouldColorOutput: Bool
+    ) throws {
         data = try DecodableParser.parseData(fromURL: configURL)
         self.verbose = verbose
         self.shouldValidateManually = shouldValidateManually
@@ -36,25 +36,14 @@ public class ConfigProcessor: VerbosePrintable {
     // MARK: - Methods
 
     public func validate() throws {
-        try process()
-        try data.validate()
-
-        if data.outputWholeImage != nil {
-            printDeprecationWarning(for: "ouputWholeImage")
-        }
-        if data.clearDirectories != nil {
-            printDeprecationWarning(for: "clearDirectories")
-        }
-    }
-
-    private func process() throws {
         try data.process()
+        try data.validate()
     }
 
     public func run() throws {
         if shouldValidateManually {
             data.printSummary(insetByTabs: 0)
-            print("Press return key to continue")
+            print("Press any key to continue")
             _ = readLine()
         }
 
@@ -94,7 +83,7 @@ public class ConfigProcessor: VerbosePrintable {
 
         DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
             ky_executeOrExit(verbose: verbose) { [weak self] in
-                guard let `self` = self else {
+                guard let `self` else {
                     throw NSError(description: "Could not reference weak self")
                 }
                 try self.process(deviceData: self.data.deviceData[index])
@@ -110,14 +99,17 @@ public class ConfigProcessor: VerbosePrintable {
 
         try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
             group.enter()
+            defer { group.leave() }
 
             guard let templateImage = deviceData.templateImage else {
                 throw NSError(description: "No template image found")
             }
 
-            guard let sliceSize = deviceData.sliceSizeOverride?.cgSize ?? NSBitmapImageRep.ky_loadFromURL(imageDict.first?.value)?.ky_nativeSize else {
-                throw NSError(description: "No screenshots supplied, so it's impossible to slice into the correct size")
-            }
+            let sliceSize = try SliceSizeCalculator.calculateSliceSize(
+                templateImageSize: templateImage.ky_nativeSize,
+                numberOfSlices: deviceData.numberOfSlices,
+                gapWidth: deviceData.gapWidth
+            )
 
             let composer = try ImageComposer(canvasSize: templateImage.ky_nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
@@ -139,18 +131,9 @@ public class ConfigProcessor: VerbosePrintable {
             deviceData.outputSuffixes.forEach { suffix in
                 print("Finished \(locale)-\(suffix)")
             }
-
-            group.leave()
         }
 
         group.wait()
-    }
-
-    // MARK: - Helpers
-
-    private func printDeprecationWarning(for configProperty: String) {
-        let warningMessage = "\(configProperty) was specified in the config file, which is deprecated. The value will be ignored"
-        print(CommandLineFormatter.formatWarning(text: warningMessage))
     }
 
 }

@@ -3,48 +3,44 @@ import Foundation
 
 extension DeviceData {
 
-    static let goodData = DeviceData(
+    static func validData(gapWidth: Int = 0) -> DeviceData {
+        DeviceData(
+            outputSuffixes: ["iPhone X"],
+            templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
+            screenshotsPath: FileURL(path: "testing/screenshots/"),
+            numberOfSlices: 4,
+            screenshotData: [.goodData],
+            textData: [.validData],
+            gapWidth: gapWidth
+        )
+    }
+
+    static let invalidTextData = DeviceData(
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 4,
         screenshotData: [.goodData],
-        textData: [.goodData]
+        textData: [.invalidTextBounds]
     )
 
-    static let gapData = DeviceData(
+    static let invalidNumberOfSlices = DeviceData(
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 0,
         screenshotData: [.goodData],
-        textData: [.goodData],
-        gapWidth: 16
+        textData: [.validData]
     )
 
-    static let invalidData = DeviceData(
+    static let invalidGapWidth = DeviceData(
         outputSuffixes: ["iPhone X"],
         templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
         screenshotsPath: FileURL(path: "testing/screenshots/"),
+        numberOfSlices: 5,
         screenshotData: [.goodData],
-        textData: [.invalidData]
-    )
-
-    static let mismatchingDeviceSizeData = DeviceData(
-        outputSuffixes: ["iPhone X"],
-        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
-        screenshotsPath: FileURL(path: "testing/screenshots/"),
-        sliceSizeOverride: DecodableSize(width: 50, height: 100),
-        screenshotData: [.goodData],
-        textData: [.goodData]
-    )
-
-    static let faultyMismatchingDeviceSizeData = DeviceData(
-        outputSuffixes: ["iPhone X"],
-        templateImagePath: FileURL(path: "testing/templatefile-debug_device1.png"),
-        screenshotsPath: FileURL(path: "testing/screenshots/"),
-        sliceSizeOverride: DecodableSize(width: 50, height: 100),
-        screenshotData: [.goodData],
-        textData: [.goodData],
-        gapWidth: 2
+        textData: [.validData],
+        gapWidth: -10
     )
 
 }

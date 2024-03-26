@@ -2,17 +2,17 @@ import Foundation
 import XCTest
 @testable import SwiftFrameCore
 
-class TextDataTests: BaseTest {
+class TextDataTests: BaseTestCase {
 
-    func testValidData() throws {
+    func testTextData_IsValid() throws {
         let size = CGSize(width: 200, height: 200)
-        let data = try TextData.goodData.makeProcessedData(size: size)
+        let processedData = try TextData.validData.makeProcessedData(size: size)
 
-        XCTAssertNoThrow(try data.validate())
+        XCTAssertNoThrow(try processedData.validate())
     }
 
-    func testInvalidData() throws {
-        XCTAssertThrowsError(try TextData.invalidData.validate())
+    func testTextData_IsInvalid_WhenTextBoundsAreInvalid() throws {
+        XCTAssertThrowsError(try TextData.invalidTextBounds.validate())
     }
 
 }

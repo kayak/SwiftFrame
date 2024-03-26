@@ -86,12 +86,8 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
         print("Created \(numberOfCreatedFiles) files".formattedGreen())
     }
 
-    private func lowercasedDirectoryIfNeeded(_ string: String) -> String {
-        lowercasedDirectories ? string.lowercased() : string
-    }
-
     private func makeScaffoldRootURL() -> URL {
-        if let path = path {
+        if let path {
             return URL(fileURLWithPath: path)
         } else {
             return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)

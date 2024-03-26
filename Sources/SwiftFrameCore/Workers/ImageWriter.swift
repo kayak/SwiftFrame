@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-public final class ImageWriter {
+final class ImageWriter {
 
     // MARK: - Exporting
 

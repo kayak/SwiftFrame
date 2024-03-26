@@ -4,52 +4,50 @@ import XCTest
 
 class RegexMatchTests: XCTestCase {
 
-    static let urls: [URL] = {
-        [
-            URL(fileURLWithPath: "strings/en.strings"),
-            URL(fileURLWithPath: "strings/de.strings"),
-            URL(fileURLWithPath: "strings/fr.strings"),
-            URL(fileURLWithPath: "strings/ru.strings")
-        ]
-    }()
+    private let urls: [URL] = [
+        URL(fileURLWithPath: "strings/en.strings"),
+        URL(fileURLWithPath: "strings/de.strings"),
+        URL(fileURLWithPath: "strings/fr.strings"),
+        URL(fileURLWithPath: "strings/ru.strings")
+    ]
 
     func testAllURLs() throws {
-        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: nil)
-        XCTAssertEqual(urls, RegexMatchTests.urls)
+        let filteredURLs = try urls.filterByFileOrFoldername(regex: nil)
+        XCTAssertEqual(filteredURLs, urls)
     }
 
     func testFranceFilteredOut() throws {
-        let regex = try NSRegularExpression(pattern: "^(?!fr$)\\w*$", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
+        let regex = try Regex("^(?!fr$)\\w*$")
+        let filteredURLs = try urls.filterByFileOrFoldername(regex: regex)
 
-        guard ky_assertEqual(urls.count, 3) else {
+        guard ky_assertEqual(filteredURLs.count, 3) else {
             return
         }
-        XCTAssertTrue(urls[0].absoluteString.hasSuffix("en.strings"))
-        XCTAssertTrue(urls[1].absoluteString.hasSuffix("de.strings"))
-        XCTAssertTrue(urls[2].absoluteString.hasSuffix("ru.strings"))
+        XCTAssertTrue(filteredURLs[0].absoluteString.hasSuffix("en.strings"))
+        XCTAssertTrue(filteredURLs[1].absoluteString.hasSuffix("de.strings"))
+        XCTAssertTrue(filteredURLs[2].absoluteString.hasSuffix("ru.strings"))
     }
 
     func testFranceAndRussiaFilteredOut() throws {
-        let regex = try NSRegularExpression(pattern: "^(?!fr|ru$)\\w*$", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
+        let regex = try Regex("^(?!fr|ru$)\\w*$")
+        let filteredURLs = try urls.filterByFileOrFoldername(regex: regex)
 
-        guard ky_assertEqual(urls.count, 2) else {
+        guard ky_assertEqual(filteredURLs.count, 2) else {
             return
         }
-        XCTAssertTrue(urls[0].absoluteString.hasSuffix("en.strings"))
-        XCTAssertTrue(urls[1].absoluteString.hasSuffix("de.strings"))
+        XCTAssertTrue(filteredURLs[0].absoluteString.hasSuffix("en.strings"))
+        XCTAssertTrue(filteredURLs[1].absoluteString.hasSuffix("de.strings"))
     }
 
     func testOnlyRussiaAndFrance() throws {
-        let regex = try NSRegularExpression(pattern: "ru|fr", options: .caseInsensitive)
-        let urls = try RegexMatchTests.urls.filterByFileOrFoldername(regex: regex)
+        let regex = try Regex("ru|fr")
+        let filteredURLs = try urls.filterByFileOrFoldername(regex: regex)
 
-        guard ky_assertEqual(urls.count, 2) else {
+        guard ky_assertEqual(filteredURLs.count, 2) else {
             return
         }
-        XCTAssertEqual(urls[0].lastPathComponent, "fr.strings")
-        XCTAssertEqual(urls[1].lastPathComponent, "ru.strings")
+        XCTAssertEqual(filteredURLs[0].lastPathComponent, "fr.strings")
+        XCTAssertEqual(filteredURLs[1].lastPathComponent, "ru.strings")
     }
 
 }
