@@ -37,10 +37,7 @@ func ky_executeOrExit<T>(verbose: Bool = false, _ work: () throws -> T) -> T {
 
 public func ky_exitWithError(_ error: Error, verbose: Bool = false) -> Never {
     let error = error as NSError
-    let errorMessage = verbose
-        ? CommandLineFormatter.formatError(error.description)
-        : CommandLineFormatter.formatError(error.localizedDescription)
-    print(errorMessage)
+    print(CommandLineFormatter.formatError(verbose ? error.description : error.localizedDescription))
 
     error.expectation.flatMap { print(CommandLineFormatter.formatWarning(title: "EXPECTATION", text: $0)) }
     error.actualValue.flatMap { print(CommandLineFormatter.formatWarning(title: "ACTUAL", text: $0)) }
