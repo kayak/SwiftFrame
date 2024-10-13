@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+GIT_ROOT=$(git rev-parse --show-toplevel)
+
+swift-format lint \
+  --recursive \
+  --parallel \
+  --strict \
+  --configuration $GIT_ROOT/swift-format.json \
+  Sources/ \
+  Tests/ \
+  Package.swift
