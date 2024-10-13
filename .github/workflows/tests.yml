@@ -1,10 +1,16 @@
-name: Swift
+name: Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
@@ -12,7 +18,7 @@ jobs:
       - name: Configure Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "15.2"
+          xcode-version: "16.0"
       - name: Build
         run: swift build -v
       - name: Run tests
