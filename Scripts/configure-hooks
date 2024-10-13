@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+HOOKS=$(git rev-parse --git-path hooks)
+ROOT=$(git rev-parse --show-toplevel)
+
+# Symlink the hooks from scripts/hooks to the $HOOKS directory
+for hook in "${ROOT}"/scripts/hooks/*; do
+    HOOK_NAME=$(basename $hook)
+    echo "Symlinking $HOOK_NAME to $HOOKS/$HOOK_NAME"
+    ln -sf $hook $HOOKS/$HOOK_NAME
+done
