@@ -7,6 +7,6 @@ swift-format format \
   --parallel \
   --in-place \
   --configuration $GIT_ROOT/swift-format.json \
-  Sources/ \
-  Tests/ \
-  Package.swift
+  $GIT_ROOT/Sources/ \
+  $GIT_ROOT/Tests/ \
+  $GIT_ROOT/Package.swift

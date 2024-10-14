@@ -7,7 +7,7 @@ SWIFT_FORMAT_OUTPUT=$($GIT_ROOT/Scripts/lint-swift-code)
 RETURNED_ERROR=$?
 
 if [ $RETURNED_ERROR -ne 0 ]; then
-  echo "Error: Swift code is not formatted correctly. Please run 'swift-format format' to fix most errors."
+  echo "Error: Swift code is not formatted correctly. Please run 'Scripts/format-swift-code' to fix most errors."
   echo "$SWIFT_FORMAT_OUTPUT"
 fi
 
