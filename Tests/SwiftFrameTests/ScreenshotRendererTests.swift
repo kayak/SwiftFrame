@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import SwiftFrameCore
 
 class ScreenshotRendererTests: XCTestCase {
@@ -15,7 +16,8 @@ class ScreenshotRendererTests: XCTestCase {
         try renderer.render(
             screenshot: rep,
             with: mockScreenshotData,
-            in: context)
+            in: context
+        )
     }
 
 }

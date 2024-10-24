@@ -14,11 +14,12 @@ final class AttributedStringCache: NSObject {
     // MARK: - Properties
 
     static let shared = AttributedStringCache()
-    private var cache = [String: NSAttributedString]()
+    private var cache: [String: NSAttributedString] = [:]
 
     // MARK: - Reading/Writing to cache
 
-    func attributedString(forTitleIdentifier titleIdentifier: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString {
+    func attributedString(forTitleIdentifier titleIdentifier: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString
+    {
         let identifier = makeCacheIdentifier(titleIdentifier: titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
         guard let value = cache[identifier] else {
             throw NSError(description: "Could not find value for key \"\(identifier)\" in attributed string cache")
@@ -38,7 +39,7 @@ final class AttributedStringCache: NSObject {
         guard Thread.current.isMainThread else {
             throw NSError(description: "Attributed string processing has to be done on the main thread")
         }
-        try associatedStrings.forEach { string, textData in
+        for (string, textData) in associatedStrings {
             let fontMode: FontMode
             if let sharedSize = textData.groupIdentifier.flatMap({ maxFontSizeByGroup[$0] }) {
                 // Can use fixed font size since common maximum has already been calculated
@@ -59,10 +60,18 @@ final class AttributedStringCache: NSObject {
         }
     }
 
-    private func add(title: String, locale: String, deviceIdentifier: String, font: NSFont, color: NSColor, fontMode: FontMode, textData: TextData) throws {
+    private func add(
+        title: String,
+        locale: String,
+        deviceIdentifier: String,
+        font: NSFont,
+        color: NSColor,
+        fontMode: FontMode,
+        textData: TextData
+    ) throws {
         let fontSize: CGFloat
         switch fontMode {
-        case let .dynamic(maxSize: maxSize):
+        case .dynamic(let maxSize):
             fontSize = try TextRenderer.maximumFontSizeThatFits(
                 string: title,
                 font: font,
@@ -70,11 +79,16 @@ final class AttributedStringCache: NSObject {
                 maxSize: maxSize,
                 size: textData.rect.size
             )
-        case let .fixed(pointSize: size):
-            fontSize = size
+        case .fixed(let pointSize):
+            fontSize = pointSize
         }
         let adaptedFont = font.ky_toFont(ofSize: fontSize)
-        let attributedString = try TextRenderer.makeAttributedString(for: title, font: adaptedFont, color: color, alignment: textData.textAlignment)
+        let attributedString = try TextRenderer.makeAttributedString(
+            for: title,
+            font: adaptedFont,
+            color: color,
+            alignment: textData.textAlignment
+        )
 
         let identifier = makeCacheIdentifier(titleIdentifier: textData.titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
         #if DEBUG

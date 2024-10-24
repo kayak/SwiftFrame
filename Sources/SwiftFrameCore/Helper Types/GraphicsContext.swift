@@ -8,12 +8,14 @@ class GraphicsContext {
     private let colorSpace: CGColorSpace
 
     lazy var ci: CIContext = {
-        CIContext(cgContext: cg, options: [
-            CIContextOption.workingColorSpace: colorSpace,
-            CIContextOption.useSoftwareRenderer: false
-        ])
+        CIContext(
+            cgContext: cg,
+            options: [
+                CIContextOption.workingColorSpace: colorSpace,
+                CIContextOption.useSoftwareRenderer: false,
+            ]
+        )
     }()
-
 
     init(size: CGSize) throws {
         let colorSpace = CGColorSpaceCreateDeviceRGB()

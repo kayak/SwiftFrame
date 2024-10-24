@@ -28,7 +28,8 @@ struct Render: ParsableCommand {
 
     @Flag(
         name: .long,
-        help: "Outputs the whole image canvas into the output directories before slicing it up into the correct screenshot sizes. Helpful for troubleshooting"
+        help:
+            "Outputs the whole image canvas into the output directories before slicing it up into the correct screenshot sizes. Helpful for troubleshooting"
     )
     var outputWholeImage = false
 

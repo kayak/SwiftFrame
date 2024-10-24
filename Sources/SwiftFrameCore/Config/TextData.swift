@@ -48,8 +48,8 @@ struct TextData: Decodable, ConfigValidateable {
         groupIdentifier: String?,
         topLeft: Point,
         bottomRight: Point,
-        textColorOverride: NSColor? = nil)
-    {
+        textColorOverride: NSColor? = nil
+    ) {
         self.titleIdentifier = titleIdentifier
         self.textAlignment = textAlignment
         self.maxFontSizeOverride = maxFontSizeOverride
@@ -77,7 +77,8 @@ struct TextData: Decodable, ConfigValidateable {
             groupIdentifier: groupIdentifier,
             topLeft: processedTopLeft,
             bottomRight: processedBottomRight,
-            textColorOverride: colorOverride)
+            textColorOverride: colorOverride
+        )
     }
 
     // MARK: - ConfigValidateable

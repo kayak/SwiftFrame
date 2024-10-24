@@ -13,17 +13,17 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0"),
     ],
     targets: [
         .executableTarget(
             name: "SwiftFrame",
             dependencies: [
                 "SwiftFrameCore",
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(name: "SwiftFrameCore", dependencies: ["Yams"]),
-        .testTarget(name: "SwiftFrameTests", dependencies: ["SwiftFrameCore"])
+        .testTarget(name: "SwiftFrameTests", dependencies: ["SwiftFrameCore"]),
     ]
 )

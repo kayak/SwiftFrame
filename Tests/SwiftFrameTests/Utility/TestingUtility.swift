@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import SwiftFrameCore
 
 typealias JSONDictionary = [String: Encodable]
@@ -31,12 +32,12 @@ struct TestingUtility {
     static func setupMockDirectoryWithScreenshots(gapWidth: Int = 0) throws {
         let devices = ["debug_device1", "debug_device2"]
         let locales = ["en", "de", "fr"]
-        try devices.forEach { device in
+        for device in devices {
             try writeMockTemplateFile(deviceSuffix: device, gapWidth: gapWidth)
         }
 
-        try locales.forEach { locale in
-            try devices.forEach { deviceString in
+        for locale in locales {
+            for deviceString in devices {
                 try writeMockScreenshot(locale: locale, deviceSuffix: deviceString)
             }
         }
@@ -53,8 +54,8 @@ struct TestingUtility {
     static func writeStringFiles(for locales: [String]) throws {
         let fileContent = StringFilesContainer.goodData.makeStringFileContent()
 
-        try locales.forEach {
-            let filePath = URL(fileURLWithPath: "testing/strings/\($0).strings")
+        for locale in locales {
+            let filePath = URL(fileURLWithPath: "testing/strings/\(locale).strings")
             let data = try fileContent.ky_data(using: .utf8)
 
             try data.ky_write(to: filePath)

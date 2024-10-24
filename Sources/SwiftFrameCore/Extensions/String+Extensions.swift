@@ -6,9 +6,9 @@ extension String {
     public func formattedGreen() -> String {
         CommandLineFormatter.formatWithColorIfNeeded(self, color: .green)
     }
-    
-    func ky_containsHTMLTags() -> Bool {
-        let regex = try! NSRegularExpression(pattern: "<(.*)>.*?|<(.*)/>")
+
+    func ky_containsHTMLTags() throws -> Bool {
+        let regex = try NSRegularExpression(pattern: "<(.*)>.*?|<(.*)/>")
         let range = NSRange(location: 0, length: (self as NSString).length)
         return regex.firstMatch(in: self, options: [], range: range) != nil
     }
