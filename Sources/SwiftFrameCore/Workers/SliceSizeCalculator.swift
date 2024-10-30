@@ -13,7 +13,8 @@ struct SliceSizeCalculator {
         guard Int(templateWidthSubstractingGaps) >= numberOfSlices else {
             let minimumTemplateWidth = numberOfSlices + (totalGapWidthIfAny ?? 0)
             throw NSError(
-                description: "Template image is not wide enough to accommodate \(Pluralizer.pluralize(numberOfSlices, singular: "slice", plural: "slices"))",
+                description:
+                    "Template image is not wide enough to accommodate \(Pluralizer.pluralize(numberOfSlices, singular: "slice", plural: "slices"))",
                 expectation: "Template image should be at least \(minimumTemplateWidth) pixels wide",
                 actualValue: "Template image is \(templateImageSize.width) pixels wide"
             )

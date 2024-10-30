@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import SwiftFrameCore
 
 final class SliceSizeCalculatorTests: BaseTestCase {

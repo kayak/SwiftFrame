@@ -1,6 +1,6 @@
 import Foundation
 
-/// Wrapper struct to avoid some errors related to relative paths
+/// Wrapper struct to avoid some errors related to relative paths.
 struct FileURL: Decodable {
 
     // MARK: - Properties

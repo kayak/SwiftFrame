@@ -4,7 +4,7 @@ import Foundation
 extension URL {
 
     var fileName: String {
-        return deletingPathExtension().lastPathComponent
+        deletingPathExtension().lastPathComponent
     }
 
     var subDirectories: [URL] {

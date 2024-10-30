@@ -61,7 +61,8 @@ final class CommandLineFormatter {
 
 func ky_print(_ objects: Any..., insetByTabs tabs: Int) {
     let tabsString = String(repeating: CommandLineFormatter.tabsString, count: tabs)
-    let arguments = objects.count == 1
+    let arguments =
+        objects.count == 1
         ? String(describing: objects[0])
         : objects.map { String(describing: $0) }.joined(separator: " ")
     print(tabsString + arguments)

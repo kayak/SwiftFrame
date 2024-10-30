@@ -15,13 +15,13 @@ extension FileManager {
     }
 
     func ky_clearDirectories(_ urls: [FileURL], localeFolders: [String]) throws {
-        try urls.forEach { url in
+        for url in urls {
             let mappedURLs: [URL] = localeFolders.compactMap {
                 let mappedURL = url.absoluteURL.appendingPathComponent($0)
                 return fileExists(atPath: mappedURL.path) ? mappedURL : nil
             }
-            try mappedURLs.forEach {
-                try removeItem(at: $0)
+            for url in mappedURLs {
+                try removeItem(at: url)
             }
         }
     }
@@ -33,11 +33,11 @@ extension FileManager {
         try ky_createFile(atURL: destination, contents: data, attributes: nil)
     }
 
-    public func ky_createFile(atURL url: URL, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
+    public func ky_createFile(atURL url: URL, contents: Data?, attributes: [FileAttributeKey: Any]? = nil) throws {
         try ky_createFile(atPath: url.path, contents: contents, attributes: attributes)
     }
 
-    public func ky_createFile(atPath path: String, contents: Data?, attributes: [FileAttributeKey : Any]? = nil) throws {
+    public func ky_createFile(atPath path: String, contents: Data?, attributes: [FileAttributeKey: Any]? = nil) throws {
         if !createFile(atPath: path, contents: contents, attributes: attributes) {
             throw NSError(description: "Could not create file at path \(path)")
         }

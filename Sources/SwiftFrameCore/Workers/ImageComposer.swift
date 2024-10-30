@@ -1,7 +1,7 @@
 import AppKit
-import Foundation
 import CoreGraphics
 import CoreImage
+import Foundation
 
 final class ImageComposer {
 
@@ -33,13 +33,13 @@ final class ImageComposer {
     // MARK: - Titles Rendering
 
     func addStrings(_ textData: [TextData], locale: String, deviceIdentifier: String) throws {
-        try textData.forEach {
+        for text in textData {
             try textRenderer.renderText(
-                forKey: $0.titleIdentifier,
+                forKey: text.titleIdentifier,
                 locale: locale,
                 deviceIdentifier: deviceIdentifier,
-                alignment: $0.textAlignment,
-                rect: $0.rect,
+                alignment: text.textAlignment,
+                rect: text.rect,
                 context: context
             )
         }
@@ -48,7 +48,7 @@ final class ImageComposer {
     // MARK: - Screenshots Rendering
 
     func add(screenshots: [String: URL], with screenshotData: [ScreenshotData], for locale: String) throws {
-        try screenshotData.forEach { data in
+        for data in screenshotData {
             guard let image = NSBitmapImageRep.ky_loadFromURL(screenshots[data.screenshotName]) else {
                 throw NSError(description: "Screenshot named \(data.screenshotName) not found in folder \"\(locale)\"")
             }

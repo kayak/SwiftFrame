@@ -8,16 +8,16 @@ final class FontRegistry {
     static var shared = FontRegistry()
 
     // Key is path on file system, element is the corresponding font name
-    private var registeredFontPaths = [String: String]()
+    private var registeredFontPaths: [String: String] = [:]
 
     // MARK: - Font Handling
 
     /// Registers the font at the specified path if source is a file rather than `NSFont`
     @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
         switch source {
-        case let .nsFont(font):
+        case .nsFont(let font):
             return font
-        case let .filePath(path):
+        case .filePath(let path):
             return try registerFont(atPath: path)
         }
     }
@@ -37,7 +37,9 @@ final class FontRegistry {
             fontName = registeredFont
         } else {
             if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
-                throw NSError(description: error?.takeRetainedValue().localizedDescription ?? "Failed to load font file at \(url.absoluteString)")
+                throw NSError(
+                    description: error?.takeRetainedValue().localizedDescription ?? "Failed to load font file at \(url.absoluteString)"
+                )
             }
             let newFontName = try getFontName(from: url)
             registeredFontPaths[url.absoluteString] = newFontName
@@ -57,11 +59,15 @@ final class FontRegistry {
 
         // If we're dealing with a ttc file, it can contain multiple weights and font styles. If we arbitrarily choose the first descriptor in the file,
         // we could end up with the bold version of the font for example which would then kill off any <b> tags in the string files
-        let descriptor: CTFontDescriptor? = descriptors.count > 1
-            ? descriptors.first(where: { CTFontDescriptorCopyAttribute($0, kCTFontStyleNameAttribute) as? String == "Regular" }) ?? descriptors.first
+        let descriptor: CTFontDescriptor? =
+            descriptors.count > 1
+            ? descriptors.first(where: { CTFontDescriptorCopyAttribute($0, kCTFontStyleNameAttribute) as? String == "Regular" })
+                ?? descriptors.first
             : descriptors.first
 
-        guard let unwrappedDescriptor = descriptor, let name = CTFontDescriptorCopyAttribute(unwrappedDescriptor, kCTFontNameAttribute) as? String else {
+        guard let unwrappedDescriptor = descriptor,
+            let name = CTFontDescriptorCopyAttribute(unwrappedDescriptor, kCTFontNameAttribute) as? String
+        else {
             throw NSError(description: "Failed to load font descriptors from file at \(url.absoluteString)")
         }
         return name

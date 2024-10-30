@@ -29,14 +29,16 @@ struct TextGroup: Decodable, ConfigValidateable, Hashable {
 
     func sharedFontSize(with strings: [AssociatedString], globalFont: NSFont, globalMaxSize: CGFloat) throws -> CGFloat {
         let maxFontSizes: [CGFloat] = try strings.compactMap {
-            return try TextRenderer.maximumFontSizeThatFits(
+            try TextRenderer.maximumFontSizeThatFits(
                 string: $0.string,
                 font: $0.data.fontOverride?.font() ?? globalFont,
                 alignment: $0.data.textAlignment,
                 maxSize: $0.data.maxFontSizeOverride ?? globalMaxSize,
-                size: $0.data.rect.size)
+                size: $0.data.rect.size
+            )
         }
         // Can force-unwrap since array will never be empty
+        // swift-format-ignore: NeverForceUnwrap
         return ([globalMaxSize, maxFontSize] + maxFontSizes).min()!
     }
 }
