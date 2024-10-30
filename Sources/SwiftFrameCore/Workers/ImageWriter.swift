@@ -13,8 +13,8 @@ final class ImageWriter {
         outputWholeImage: Bool,
         locale: String,
         suffixes: [String],
-        format: FileFormat) throws
-    {
+        format: FileFormat
+    ) throws {
         guard let image = context.cg.makeImage() else {
             throw NSError(description: "Could not render output image")
         }
@@ -49,9 +49,9 @@ final class ImageWriter {
 
     static func sliceImage(_ image: CGImage, with size: CGSize, gapWidth: Int) throws -> [CGImage] {
         let numberOfSlices = image.width / Int(size.width)
-        var croppedImages = [CGImage]()
+        var croppedImages: [CGImage] = []
 
-        for i in 0..<numberOfSlices {
+        for i in 0 ..< numberOfSlices {
             let rect = CGRect(x: (size.width * CGFloat(i)) + (CGFloat(gapWidth) * CGFloat(i)), y: 0, width: size.width, height: size.height)
             image.cropping(to: rect).flatMap { croppedImages.append($0) }
         }
@@ -85,8 +85,8 @@ final class ImageWriter {
             throw NSError(description: "Failed to convert image to \(format.fileExtension.uppercased())")
         }
 
-        try urls.forEach {
-            try data.ky_write(to: $0, options: .atomicWrite)
+        for url in urls {
+            try data.ky_write(to: url, options: .atomicWrite)
         }
     }
 
@@ -108,9 +108,9 @@ extension ImageWriter {
         // MARK: - Methods
 
         func makeBigImageOutputPaths() -> [URL] {
-            var urls = [URL]()
-            makeBasePaths().forEach { basePath in
-                suffixes.forEach { suffix in
+            var urls: [URL] = []
+            for basePath in makeBasePaths() {
+                for suffix in suffixes {
                     let url = basePath.appendingPathComponent("\(locale)-\(suffix)-big").appendingPathExtension(format.fileExtension)
                     urls.append(url)
                 }
@@ -119,10 +119,12 @@ extension ImageWriter {
         }
 
         func makeOutputPaths(for sliceIndex: Int) -> [URL] {
-            var urls = [URL]()
-            makeBasePaths().forEach { basePath in
-                suffixes.forEach { suffix in
-                    let url = basePath.appendingPathComponent("\(locale)-\(suffix)-\(sliceIndex)").appendingPathExtension(format.fileExtension)
+            var urls: [URL] = []
+            for basePath in makeBasePaths() {
+                for suffix in suffixes {
+                    let url = basePath.appendingPathComponent("\(locale)-\(suffix)-\(sliceIndex)").appendingPathExtension(
+                        format.fileExtension
+                    )
                     urls.append(url)
                 }
             }

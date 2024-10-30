@@ -17,7 +17,7 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
 
     @Flag
     var noHelperFiles = false
-    
+
     @Flag
     var verbose = false
 
@@ -43,7 +43,7 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
             templatesDirectoryURL,
         ]
 
-        try directoriesToCreate.forEach { directory in
+        for directory in directoriesToCreate {
             printVerbose("Creating directory \(directory.path)")
             numberOfCreatedDirectories += 1
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
@@ -56,7 +56,7 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
             numberOfCreatedFiles += 1
         }
 
-        try locales.forEach { locale in
+        for locale in locales {
             if shouldCreateHelperFiles {
                 let localeStringsFileContents = "\"some string key\" = \"the corresponding translation\";"
                 let localeStringsFileURL = stringsDirectoryURL.appendingPathComponent("\(locale).strings")
@@ -65,17 +65,25 @@ struct Scaffold: ParsableCommand, VerbosePrintable {
                 numberOfCreatedFiles += 1
             }
 
-            try Scaffold.defaultDevices.forEach { deviceName in
+            for deviceName in Scaffold.defaultDevices {
                 printVerbose("Creating screenshot directory for locale \(locale) and device \(deviceName)")
                 numberOfCreatedDirectories += 1
-                
+
                 let localeScreenshotDirectoryURL = screenshotsDirectoryURL.appendingPathComponent(deviceName).appendingPathComponent(locale)
-                try FileManager.default.createDirectory(at: localeScreenshotDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-                
+                try FileManager.default.createDirectory(
+                    at: localeScreenshotDirectoryURL,
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+
                 if shouldCreateHelperFiles {
-                    let markdownContents = "# \(deviceName) - \(locale)\n\nPlace your screenshots for \(deviceName) (\(locale)) in this folder\n" +
-                    "Please make sure that all screenshots that represent the same screen have the same name for every locale."
-                    try FileManager.default.ky_writeToFile(markdownContents, destination: localeScreenshotDirectoryURL.appendingPathComponent("README.md"))
+                    let markdownContents =
+                        "# \(deviceName) - \(locale)\n\nPlace your screenshots for \(deviceName) (\(locale)) in this folder\n"
+                        + "Please make sure that all screenshots that represent the same screen have the same name for every locale."
+                    try FileManager.default.ky_writeToFile(
+                        markdownContents,
+                        destination: localeScreenshotDirectoryURL.appendingPathComponent("README.md")
+                    )
                     numberOfCreatedFiles += 1
                 }
             }

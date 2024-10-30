@@ -36,6 +36,7 @@ extension CGContext {
     func makePlainWhiteImageRep() -> NSBitmapImageRep {
         setFillColor(.white)
         fill(NSRect(x: 0, y: 0, width: width, height: height))
+        // swift-format-ignore: NeverForceUnwrap
         return NSBitmapImageRep(cgImage: makeImage()!)
     }
 

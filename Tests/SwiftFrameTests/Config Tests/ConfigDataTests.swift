@@ -1,18 +1,19 @@
 import Foundation
 import XCTest
+
 @testable import SwiftFrameCore
 
 class ConfigDataTests: BaseTestCase {
 
     func testValidData() throws {
-        var data = ConfigData.goodData
+        var data = try ConfigData.goodData()
         try data.process()
 
         XCTAssertNoThrow(try data.validate())
     }
 
     func testSkippedLocalesData() throws {
-        var data = ConfigData.skippedLocaleData
+        var data = try ConfigData.skippedLocaleData()
         try data.process()
 
         XCTAssertNoThrow(try data.validate())
@@ -24,7 +25,7 @@ class ConfigDataTests: BaseTestCase {
     }
 
     func testEnglishOnlyData() throws {
-        var data = ConfigData.englishOnlyData
+        var data = try ConfigData.englishOnlyData()
         try data.process()
 
         XCTAssertNoThrow(try data.validate())
@@ -36,7 +37,7 @@ class ConfigDataTests: BaseTestCase {
     }
 
     func testInvalidData() throws {
-        var data = ConfigData.invalidData
+        var data = try ConfigData.invalidData()
         try data.process()
 
         XCTAssertThrowsError(try data.validate())

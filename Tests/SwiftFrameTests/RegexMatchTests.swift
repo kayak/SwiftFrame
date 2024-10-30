@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+
 @testable import SwiftFrameCore
 
 class RegexMatchTests: XCTestCase {
@@ -8,7 +9,7 @@ class RegexMatchTests: XCTestCase {
         URL(fileURLWithPath: "strings/en.strings"),
         URL(fileURLWithPath: "strings/de.strings"),
         URL(fileURLWithPath: "strings/fr.strings"),
-        URL(fileURLWithPath: "strings/ru.strings")
+        URL(fileURLWithPath: "strings/ru.strings"),
     ]
 
     func testAllURLs() throws {

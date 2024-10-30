@@ -57,8 +57,8 @@ public class ConfigProcessor: VerbosePrintable {
 
         let stringProcessingStart = CFAbsoluteTimeGetCurrent()
 
-        try data.deviceData.forEach { deviceData in
-            try deviceData.screenshotsGroupedByLocale.forEach { locale, _ in
+        for deviceData in data.deviceData {
+            for (locale, _) in deviceData.screenshotsGroupedByLocale {
                 printVerbose("Processing strings for locale \(locale) (\(deviceData.outputSuffixes.first ?? "unknown device"))")
 
                 let associatedStrings = try data.makeAssociatedStrings(for: deviceData, locale: locale)
@@ -97,7 +97,7 @@ public class ConfigProcessor: VerbosePrintable {
     private func process(deviceData: DeviceData) throws {
         let group = DispatchGroup()
 
-        try deviceData.screenshotsGroupedByLocale.forEach { locale, imageDict in
+        for (locale, imageDict) in deviceData.screenshotsGroupedByLocale {
             group.enter()
             defer { group.leave() }
 
@@ -128,7 +128,7 @@ public class ConfigProcessor: VerbosePrintable {
                 format: data.outputFormat
             )
 
-            deviceData.outputSuffixes.forEach { suffix in
+            for suffix in deviceData.outputSuffixes {
                 print("Finished \(locale)-\(suffix)")
             }
         }

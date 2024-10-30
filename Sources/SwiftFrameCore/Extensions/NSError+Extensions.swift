@@ -1,27 +1,27 @@
 import Foundation
 
-public extension NSError {
+extension NSError {
 
     private static let kExpectationKey = "kExpectationKey"
     private static let kActualValueKey = "kActualValueKey"
 
-    convenience init(code: Int = 1, description: String, expectation: String? = nil, actualValue: String? = nil) {
+    public convenience init(code: Int = 1, description: String, expectation: String? = nil, actualValue: String? = nil) {
         self.init(
             domain: "com.kayak.SwiftFrame",
             code: code,
             userInfo: [
                 NSLocalizedDescriptionKey: description,
                 NSError.kExpectationKey: expectation as Any,
-                NSError.kActualValueKey: actualValue as Any
+                NSError.kActualValueKey: actualValue as Any,
             ]
         )
     }
 
-    var expectation: String? {
+    public var expectation: String? {
         userInfo[NSError.kExpectationKey] as? String
     }
 
-    var actualValue: String? {
+    public var actualValue: String? {
         userInfo[NSError.kActualValueKey] as? String
     }
 

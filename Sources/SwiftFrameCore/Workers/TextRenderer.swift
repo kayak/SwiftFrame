@@ -8,8 +8,19 @@ final class TextRenderer {
 
     // MARK: - Frame Rendering
 
-    func renderText(forKey key: String, locale: String, deviceIdentifier: String, alignment: TextAlignment, rect: NSRect, context: GraphicsContext) throws {
-        let attributedString = try AttributedStringCache.shared.attributedString(forTitleIdentifier: key, locale: locale, deviceIdentifier: deviceIdentifier)
+    func renderText(
+        forKey key: String,
+        locale: String,
+        deviceIdentifier: String,
+        alignment: TextAlignment,
+        rect: NSRect,
+        context: GraphicsContext
+    ) throws {
+        let attributedString = try AttributedStringCache.shared.attributedString(
+            forTitleIdentifier: key,
+            locale: locale,
+            deviceIdentifier: deviceIdentifier
+        )
 
         context.cg.saveGState()
 
@@ -52,7 +63,9 @@ final class TextRenderer {
 
     /// Determines the maximum point size of the specified font that allows to render the given text onto a
     /// particular number of lines
-    static func maximumFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
+    static func maximumFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, maxSize: CGFloat, size: CGSize) throws
+        -> CGFloat
+    {
         guard !string.isEmpty else {
             // Will be skipped during rendering anyways and won't affect text group's max size negatively, so it's okay to
             // return maxSize here
@@ -65,12 +78,20 @@ final class TextRenderer {
             alignment: alignment,
             minSize: TextRenderer.minFontSize,
             maxSize: maxSize,
-            size: size)
+            size: size
+        )
         // Subtract some small number to make absolutely sure text will be rendered completely
         return min(calculatedFontSize.rounded(.down), maxSize)
     }
 
-    private static func maxFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, minSize: CGFloat, maxSize: CGFloat, size: CGSize) throws -> CGFloat {
+    private static func maxFontSizeThatFits(
+        string: String,
+        font: NSFont,
+        alignment: TextAlignment,
+        minSize: CGFloat,
+        maxSize: CGFloat,
+        size: CGSize
+    ) throws -> CGFloat {
         let fontSize = (minSize + maxSize) / 2
         let adaptedFont = font.ky_toFont(ofSize: fontSize)
 
@@ -92,9 +113,23 @@ final class TextRenderer {
         }
 
         if formattedString(attributedString, fitsIntoRect: size) {
-            return try maxFontSizeThatFits(string: string, font: adaptedFont, alignment: alignment, minSize: fontSize, maxSize: maxSize, size: size)
+            return try maxFontSizeThatFits(
+                string: string,
+                font: adaptedFont,
+                alignment: alignment,
+                minSize: fontSize,
+                maxSize: maxSize,
+                size: size
+            )
         } else {
-            return try maxFontSizeThatFits(string: string, font: adaptedFont, alignment: alignment, minSize: minSize, maxSize: fontSize, size: size)
+            return try maxFontSizeThatFits(
+                string: string,
+                font: adaptedFont,
+                alignment: alignment,
+                minSize: minSize,
+                maxSize: fontSize,
+                size: size
+            )
         }
     }
 
@@ -117,12 +152,14 @@ final class TextRenderer {
     }
 
     // MARK: - Misc
-    
-    static func makeAttributedString(for string: String, font: NSFont, color: NSColor = .white, alignment: TextAlignment) throws -> NSAttributedString {
+
+    static func makeAttributedString(for string: String, font: NSFont, color: NSColor = .white, alignment: TextAlignment) throws
+        -> NSAttributedString
+    {
         let attributedString: NSMutableAttributedString
         // Currently the HTML tag support is limited, and the font information is only carried over if the font is provided using the .ttc format
         // and the font is installed on the computer. Hence only using the HTML parsing if the string contains HTML tags
-        if string.ky_containsHTMLTags() {
+        if try string.ky_containsHTMLTags() {
             attributedString = try makeHTMLAttributedString(for: string, font: font, color: color)
         } else {
             attributedString = NSMutableAttributedString(
@@ -134,7 +171,9 @@ final class TextRenderer {
         return attributedString
     }
 
-    private static func makeHTMLAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white) throws -> NSMutableAttributedString {
+    private static func makeHTMLAttributedString(for htmlString: String, font: NSFont, color: NSColor = .white) throws
+        -> NSMutableAttributedString
+    {
         let htmlString = makeHTMLFormattedString(for: htmlString, font: font, color: color)
         guard let stringData = htmlString.data(using: .utf8) else {
             throw NSError(description: "Could not make attributed string for string \"\(htmlString)\"")
@@ -149,7 +188,7 @@ final class TextRenderer {
         let attributes = [
             "font-family: \(font.fontName)",
             "font-size: \(Int(font.pointSize))",
-            "color: \(colorHexString)"
+            "color: \(colorHexString)",
         ]
 
         let constructedAttributes = attributes.joined(separator: "; ")
@@ -158,6 +197,6 @@ final class TextRenderer {
 
 }
 
-private func <=(lhs: CGSize, rhs: CGSize) -> Bool {
+private func <= (lhs: CGSize, rhs: CGSize) -> Bool {
     lhs.width <= rhs.width && lhs.height <= rhs.height
 }

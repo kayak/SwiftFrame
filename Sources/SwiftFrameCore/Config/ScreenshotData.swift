@@ -32,7 +32,8 @@ struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
             bottomRight: bottomRight.convertingToBottomLeftOrigin(withSize: size),
             topLeft: topLeft.convertingToBottomLeftOrigin(withSize: size),
             topRight: topRight.convertingToBottomLeftOrigin(withSize: size),
-            zIndex: zIndex)
+            zIndex: zIndex
+        )
     }
 
     // MARK: - ConfigValidateable

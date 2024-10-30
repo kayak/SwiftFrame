@@ -1,12 +1,12 @@
-import Foundation
 import AppKit
+import Foundation
 
 protocol ConfigValidateable {
     func validate() throws
     func printSummary(insetByTabs tabs: Int)
 }
 
-/// First key is locale, second is regular key in string file
+/// First key is locale, second is regular key in string file.
 typealias LocalizedStringFiles = [String: [String: String]]
 
 struct ConfigData: Decodable, ConfigValidateable {
@@ -51,8 +51,8 @@ struct ConfigData: Decodable, ConfigValidateable {
         textColorSource: ColorSource,
         outputFormat: FileFormat,
         deviceData: [DeviceData],
-        localesRegex: String? = nil)
-    {
+        localesRegex: String? = nil
+    ) {
         self.textGroups = textGroups
         self.stringsPath = stringsPath
         self.maxFontSize = maxFontSize
@@ -67,15 +67,18 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Processing
 
     mutating func process() throws {
-        let regex: Regex<AnyRegexOutput>? = if let localesRegex, !localesRegex.isEmpty {
-            try Regex(localesRegex)
-        } else {
-            nil
-        }
+        let regex: Regex<AnyRegexOutput>? =
+            if let localesRegex, !localesRegex.isEmpty {
+                try Regex(localesRegex)
+            } else {
+                nil
+            }
 
         deviceData = try deviceData.map { try $0.makeProcessedData(localesRegex: regex) }
 
-        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filterByFileOrFoldername(regex: regex)
+        let textFiles = try FileManager.default.ky_filesAtPath(stringsPath.absoluteURL, with: "strings").filterByFileOrFoldername(
+            regex: regex
+        )
         let strings = textFiles.compactMap { NSDictionary(contentsOf: $0) as? [String: String] }
         titles = Dictionary(uniqueKeysWithValues: zip(textFiles.map({ $0.fileName }), strings))
     }
@@ -86,16 +89,20 @@ struct ConfigData: Decodable, ConfigValidateable {
         guard !deviceData.isEmpty else {
             throw NSError(
                 description: "No screenshot data was supplied",
-                expectation: "Please supply at least one screenshot along with metadata")
+                expectation: "Please supply at least one screenshot along with metadata"
+            )
         }
 
         guard !outputPaths.isEmpty else {
             throw NSError(
                 description: "No output paths were specified",
-                expectation: "Please specify at least one output directory")
+                expectation: "Please specify at least one output directory"
+            )
         }
 
-        try deviceData.forEach { try $0.validate() }
+        for device in deviceData {
+            try device.validate()
+        }
     }
 
     func printSummary(insetByTabs tabs: Int) {
@@ -106,21 +113,24 @@ struct ConfigData: Decodable, ConfigValidateable {
         CommandLineFormatter.printKeyValue(
             "String Files",
             value: titles.isEmpty ? "none" : titles.keys.joined(separator: ", "),
-            insetBy: tabs)
+            insetBy: tabs
+        )
 
         ky_print("Output paths:", insetByTabs: tabs)
-        outputPaths.forEach { ky_print($0.path.formattedGreen(), insetByTabs: tabs + 1) }
+        for path in outputPaths {
+            ky_print(path.path.formattedGreen(), insetByTabs: tabs + 1)
+        }
 
         ky_print("Device data:", insetByTabs: tabs)
-        deviceData.forEach {
-            $0.printSummary(insetByTabs: tabs + 1)
+        for device in deviceData {
+            device.printSummary(insetByTabs: tabs + 1)
             print()
         }
 
         if !textGroups.isEmpty {
             print("Text groups:")
-            textGroups.forEach {
-                $0.printSummary(insetByTabs: tabs + 1)
+            for textGroup in textGroups {
+                textGroup.printSummary(insetByTabs: tabs + 1)
                 print()
             }
         } else {
@@ -133,7 +143,7 @@ struct ConfigData: Decodable, ConfigValidateable {
     // MARK: - Screenshot Factory
 
     func makeAssociatedStrings(for device: DeviceData, locale: String) throws -> [AssociatedString] {
-        return try device.textData.map {
+        try device.textData.map {
             guard let title = titles[locale]?[$0.titleIdentifier] else {
                 throw NSError(description: "Title with key \"\($0.titleIdentifier)\" not found in string file \"\(locale)\"")
             }
@@ -142,12 +152,13 @@ struct ConfigData: Decodable, ConfigValidateable {
     }
 
     func makeSharedFontSizes(for associatedStrings: [AssociatedString]) throws -> [String: CGFloat] {
-        return try textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
+        try textGroups.reduce(into: [String: CGFloat]()) { dictionary, group in
             let strings = associatedStrings.filter({ $0.data.groupIdentifier == group.identifier })
             dictionary[group.identifier] = try group.sharedFontSize(
                 with: strings,
                 globalFont: try fontSource.font(),
-                globalMaxSize: maxFontSize)
+                globalMaxSize: maxFontSize
+            )
         }
     }
 

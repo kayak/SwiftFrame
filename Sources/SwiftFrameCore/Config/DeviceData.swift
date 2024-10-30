@@ -16,8 +16,8 @@ struct DeviceData: Decodable, ConfigValidateable {
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
     private(set) var templateImage: NSBitmapImageRep?
-    private(set) var screenshotData = [ScreenshotData]()
-    private(set) var textData = [TextData]()
+    private(set) var screenshotData: [ScreenshotData] = []
+    private(set) var textData: [TextData] = []
 
     // MARK: - Coding Keys
 
@@ -40,10 +40,10 @@ struct DeviceData: Decodable, ConfigValidateable {
         numberOfSlices: Int,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
         templateImage: NSBitmapImageRep? = nil,
-        screenshotData: [ScreenshotData] = [ScreenshotData](),
-        textData: [TextData] = [TextData](),
-        gapWidth: Int = 0)
-    {
+        screenshotData: [ScreenshotData] = [],
+        textData: [TextData] = [],
+        gapWidth: Int = 0
+    ) {
         self.outputSuffixes = outputSuffixes
         self.templateImagePath = templateImagePath
         self.screenshotsPath = screenshotsPath
@@ -57,24 +57,27 @@ struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Methods
 
+    // swift-format:
     func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
         guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
-        var parsedScreenshots = [String: [String: URL]]()
-        try screenshotsPath.absoluteURL.subDirectories.filterByFileOrFoldername(regex: localesRegex).forEach { folder in
-            var dictionary = [String: URL]()
+        var parsedScreenshots: [String: [String: URL]] = [:]
+        for folder in try screenshotsPath.absoluteURL.subDirectories.filterByFileOrFoldername(regex: localesRegex) {
+            var dictionary: [String: URL] = [:]
+            // swift-format-ignore: ReplaceForEachWithForLoop
             try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                 .filter { url in
                     kScreenshotExtensions.contains(url.pathExtension.lowercased())
-                    && screenshotData.contains(where: { $0.screenshotName == url.lastPathComponent })
+                        && screenshotData.contains(where: { $0.screenshotName == url.lastPathComponent })
                 }.forEach { dictionary[$0.lastPathComponent] = $0 }
             parsedScreenshots[folder.lastPathComponent] = dictionary
         }
 
         let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImage.size) }
-        let processedScreenshotData = screenshotData
+        let processedScreenshotData =
+            screenshotData
             .map { $0.makeProcessedData(size: templateImage.size) }
             .sorted { $0.zIndex < $1.zIndex }
 
@@ -122,15 +125,13 @@ struct DeviceData: Decodable, ConfigValidateable {
             )
         }
 
-        try screenshotData.forEach { try $0.validate() }
-        try textData.forEach { try $0.validate() }
+        for screenshot in screenshotData { try screenshot.validate() }
+        for text in textData { try text.validate() }
 
         let screenshotNames = screenshotData.map { $0.screenshotName }
-        try screenshotsGroupedByLocale.forEach { localeDict in
-            try screenshotNames.forEach { name in
-                if localeDict.value[name] == nil {
-                    throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \"\(name)\"")
-                }
+        for localeDict in screenshotsGroupedByLocale {
+            for name in screenshotNames where localeDict.value[name] == nil {
+                throw NSError(description: "Screenshot folder \(localeDict.key) does not contain a screenshot named \"\(name)\"")
             }
         }
     }
@@ -156,8 +157,8 @@ struct DeviceData: Decodable, ConfigValidateable {
             insetBy: tabs
         )
 
-        screenshotData.forEach { $0.printSummary(insetByTabs: tabs) }
-        textData.forEach { $0.printSummary(insetByTabs: tabs) }
+        for screenshot in screenshotData { screenshot.printSummary(insetByTabs: tabs) }
+        for text in textData { text.printSummary(insetByTabs: tabs) }
     }
 
 }

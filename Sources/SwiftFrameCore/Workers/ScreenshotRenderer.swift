@@ -14,9 +14,14 @@ final class ScreenshotRenderer {
         context.cg.restoreGState()
     }
 
-    private func renderScreenshot(_ screenshot: NSBitmapImageRep, with data: ScreenshotData, in context: GraphicsContext) throws -> CGImage {
+    private func renderScreenshot(
+        _ screenshot: NSBitmapImageRep,
+        with data: ScreenshotData,
+        in context: GraphicsContext
+    ) throws -> CGImage {
         let ciImage = CIImage(bitmapImageRep: screenshot)
 
+        // swift-format-ignore: NeverForceUnwrap
         let perspectiveTransform = CIFilter(name: "CIPerspectiveTransform")!
         perspectiveTransform.setDefaults()
         perspectiveTransform.setValue(data.topLeft.ciVector, forKey: "inputTopLeft")
@@ -34,19 +39,20 @@ final class ScreenshotRenderer {
         return cgImage
     }
 
+    // swift-format-ignore: NeverForceUnwrap
     private func calculateRect(for screenshotData: ScreenshotData) -> NSRect {
         let xCoordinates = [
             screenshotData.bottomLeft.x,
             screenshotData.bottomRight.x,
             screenshotData.topLeft.x,
-            screenshotData.topRight.x
+            screenshotData.topRight.x,
         ]
 
         let yCoordinates = [
             screenshotData.bottomLeft.y,
             screenshotData.bottomRight.y,
             screenshotData.topLeft.y,
-            screenshotData.topRight.y
+            screenshotData.topRight.y,
         ]
 
         // Can force-unwrap since the are never empty
