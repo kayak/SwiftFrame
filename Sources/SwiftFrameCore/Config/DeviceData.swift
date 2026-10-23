@@ -112,8 +112,8 @@ struct DeviceData: Decodable, ConfigValidateable {
         guard gapWidth >= 0 else {
             throw NSError(
                 description: "Invalid gapWidth value",
-                expectation: "gapWidth value should be >= 0 or ommitted from config",
-                actualValue: "gapWdith value is \(gapWidth)"
+                expectation: "gapWidth value should be >= 0 or omitted from config",
+                actualValue: "gapWidth value is \(gapWidth)"
             )
         }
 
@@ -137,7 +137,7 @@ struct DeviceData: Decodable, ConfigValidateable {
     }
 
     func printSummary(insetByTabs tabs: Int) {
-        CommandLineFormatter.printKeyValue("Ouput suffixes", value: outputSuffixes.joined(separator: ", "), insetBy: tabs)
+        CommandLineFormatter.printKeyValue("Output suffixes", value: outputSuffixes.joined(separator: ", "), insetBy: tabs)
         CommandLineFormatter.printKeyValue("Template file path", value: templateImagePath.path, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Number of slices", value: numberOfSlices, insetBy: tabs)
         CommandLineFormatter.printKeyValue("Gap Width", value: gapWidth, insetBy: tabs)

@@ -29,7 +29,7 @@ final class ImageWriter {
         let workGroup = DispatchGroup()
 
         // Writing images asynchronously gave a big performance boost, what a surprise
-        // Also, since we checked beforehand if the directory is writable, we can safely put of the rendering work to a different queue
+        // Also, since we checked beforehand if the directory is writable, we can safely put off the rendering work to a different queue
         workGroup.enter()
         DispatchQueue.global(qos: .userInitiated).ky_asyncOrExit {
             try ImageWriter.writeSlices(slices, with: fileNameConfiguration)

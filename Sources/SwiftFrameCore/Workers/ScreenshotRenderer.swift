@@ -55,7 +55,7 @@ final class ScreenshotRenderer {
             screenshotData.topRight.y,
         ]
 
-        // Can force-unwrap since the are never empty
+        // Can force-unwrap since they are never empty
         let minX = xCoordinates.min()!
         let maxX = xCoordinates.max()!
         let minY = yCoordinates.min()!
