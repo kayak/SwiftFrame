@@ -1,6 +1,6 @@
 import AppKit
 import Foundation
-import os
+import Synchronization
 
 final class FontRegistry: Sendable {
 
@@ -9,15 +9,15 @@ final class FontRegistry: Sendable {
     static let shared = FontRegistry()
 
     // Key is path on file system, element is the corresponding font name
-    private let registeredFontPaths = OSAllocatedUnfairLock(initialState: [String: String]())
+    private let registeredFontPaths = Mutex<[String: String]>([:])
 
     // MARK: - Font Handling
 
     /// Registers the font at the specified path if source is a file rather than `NSFont`.
     @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
         switch source {
-        case .nsFont(let font):
-            return font
+        case .systemFont(let pointSize):
+            return NSFont.systemFont(ofSize: pointSize)
         case .filePath(let path):
             return try registerFont(atPath: path)
         }

@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct Point: Codable, Equatable {
+struct Point: Codable, Equatable, Sendable {
 
     // MARK: - Properties
 

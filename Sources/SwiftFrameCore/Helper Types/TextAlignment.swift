@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct TextAlignment: Codable, Equatable {
+struct TextAlignment: Codable, Equatable, Sendable {
 
     // MARK: - Nested Types
 

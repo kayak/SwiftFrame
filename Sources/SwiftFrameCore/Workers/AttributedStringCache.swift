@@ -1,11 +1,9 @@
 import AppKit
 import Foundation
+import Synchronization
 
 // Used for keeping attributed strings that were parsed on the main thread in memory for asynchronous processing
-//
-// This type is `@unchecked Sendable` because `NSAttributedString` is not `Sendable` on macOS. This is safe: only `process`
-// writes to `cache`, on the main thread, and it finishes before the concurrent rendering starts. After that, threads only read `cache`.
-final class AttributedStringCache: NSObject, @unchecked Sendable {
+final class AttributedStringCache: NSObject, Sendable {
 
     // MARK: - Nested Type
 
@@ -14,20 +12,34 @@ final class AttributedStringCache: NSObject, @unchecked Sendable {
         case fixed(pointSize: CGFloat)
     }
 
+    /// An attributed string that threads can share.
+    ///
+    /// This type is `@unchecked Sendable` because `NSAttributedString` is not `Sendable` on macOS. This is safe: the initializer
+    /// makes an immutable copy, nothing keeps a mutable reference to that copy, and immutable `NSAttributedString` objects are thread-safe.
+    private struct SharedAttributedString: @unchecked Sendable {
+
+        let value: NSAttributedString
+
+        init(copying string: NSAttributedString) {
+            value = NSAttributedString(attributedString: string)
+        }
+
+    }
+
     // MARK: - Properties
 
     static let shared = AttributedStringCache()
-    private var cache: [String: NSAttributedString] = [:]
+    private let cache = Mutex<[String: SharedAttributedString]>([:])
 
     // MARK: - Reading/Writing to cache
 
     func attributedString(forTitleIdentifier titleIdentifier: String, locale: String, deviceIdentifier: String) throws -> NSAttributedString
     {
         let identifier = makeCacheIdentifier(titleIdentifier: titleIdentifier, locale: locale, deviceIdentifier: deviceIdentifier)
-        guard let value = cache[identifier] else {
+        guard let sharedString = cache.withLock({ $0[identifier] }) else {
             throw NSError(description: "Could not find value for key \"\(identifier)\" in attributed string cache")
         }
-        return value
+        return sharedString.value
     }
 
     func process(
@@ -97,10 +109,13 @@ final class AttributedStringCache: NSObject, @unchecked Sendable {
         #if DEBUG
         print("Caching attributed string with key:", identifier, "point size:", fontSize)
         #endif
-        if cache[identifier] != nil {
-            throw NSError(description: "Attempted to override cached attributed string for key \"\(identifier)\"")
+        let sharedString = SharedAttributedString(copying: attributedString)
+        try cache.withLock { cache in
+            if cache[identifier] != nil {
+                throw NSError(description: "Attempted to override cached attributed string for key \"\(identifier)\"")
+            }
+            cache[identifier] = sharedString
         }
-        cache[identifier] = attributedString
     }
 
     private func makeCacheIdentifier(titleIdentifier: String, locale: String, deviceIdentifier: String) -> String {

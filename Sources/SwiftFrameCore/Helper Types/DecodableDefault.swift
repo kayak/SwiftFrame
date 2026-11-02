@@ -72,3 +72,4 @@ extension DecodableDefault {
 
 extension DecodableDefault.Wrapper: Equatable where Value: Equatable {}
 extension DecodableDefault.Wrapper: Hashable where Value: Hashable {}
+extension DecodableDefault.Wrapper: Sendable where Value: Sendable {}

@@ -1,10 +1,8 @@
 import AppKit
 import Foundation
-import os
+import Synchronization
 
-// This type is `@unchecked Sendable` because `data` holds non-`Sendable` images and fonts. This is safe: only `validate` writes
-// to `data`, and it finishes before `run` starts the concurrent rendering, which only reads `data`.
-public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
+public class ConfigProcessor: VerbosePrintable {
 
     // MARK: - Properties
 
@@ -17,7 +15,7 @@ public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
         }
     }
 
-    private static let colorOutputSetting = OSAllocatedUnfairLock(initialState: true)
+    private static let colorOutputSetting = Mutex(true)
 
     public let verbose: Bool
 
@@ -93,12 +91,18 @@ public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
 
         let imageRenderingStart = CFAbsoluteTimeGetCurrent()
 
-        DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
-            ky_executeOrExit(verbose: verbose) { [weak self] in
-                guard let `self` else {
-                    throw NSError(description: "Could not reference weak self")
-                }
-                try self.process(deviceData: self.data.deviceData[index])
+        let deviceData = data.deviceData
+        let outputPaths = data.outputPaths
+        let outputFormat = data.outputFormat
+
+        DispatchQueue.concurrentPerform(iterations: deviceData.count) { [verbose, shouldOutputWholeImage] index in
+            ky_executeOrExit(verbose: verbose) {
+                try ConfigProcessor.process(
+                    deviceData: deviceData[index],
+                    outputPaths: outputPaths,
+                    outputFormat: outputFormat,
+                    shouldOutputWholeImage: shouldOutputWholeImage
+                )
             }
         }
 
@@ -106,7 +110,12 @@ public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
         printElapsedTime("Rendered and sliced all screenshots", startTime: imageRenderingStart)
     }
 
-    private func process(deviceData: DeviceData) throws {
+    private static func process(
+        deviceData: DeviceData,
+        outputPaths: [FileURL],
+        outputFormat: FileFormat,
+        shouldOutputWholeImage: Bool
+    ) throws {
         let group = DispatchGroup()
 
         for (locale, imageDict) in deviceData.screenshotsGroupedByLocale {
@@ -125,19 +134,19 @@ public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
 
             let composer = try ImageComposer(canvasSize: templateImage.ky_nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
-            try composer.addTemplateImage(templateImage)
+            composer.addTemplateImage(templateImage)
 
             try composer.addStrings(deviceData.textData, locale: locale, deviceIdentifier: deviceData.outputSuffixes.joined())
 
             try ImageWriter.finish(
                 context: composer.context,
-                with: data.outputPaths,
+                with: outputPaths,
                 sliceSize: sliceSize,
                 gapWidth: deviceData.gapWidth,
                 outputWholeImage: shouldOutputWholeImage,
                 locale: locale,
                 suffixes: deviceData.outputSuffixes,
-                format: data.outputFormat
+                format: outputFormat
             )
 
             for suffix in deviceData.outputSuffixes {

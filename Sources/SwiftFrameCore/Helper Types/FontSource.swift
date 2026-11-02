@@ -1,10 +1,10 @@
 import AppKit
 import Foundation
 
-enum FontSource {
+enum FontSource: Sendable {
 
     case filePath(_ path: String)
-    case nsFont(_ font: NSFont)
+    case systemFont(ofSize: CGFloat)
 
     func font() throws -> NSFont {
         try FontRegistry.shared.registerFont(from: self)

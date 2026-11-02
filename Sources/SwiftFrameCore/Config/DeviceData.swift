@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct DeviceData: Decodable, ConfigValidateable {
+struct DeviceData: Decodable, ConfigValidateable, Sendable {
 
     // MARK: - Properties
 
@@ -15,7 +15,7 @@ struct DeviceData: Decodable, ConfigValidateable {
     @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
-    private(set) var templateImage: NSBitmapImageRep?
+    private(set) var templateImage: CGImage?
     private(set) var screenshotData: [ScreenshotData] = []
     private(set) var textData: [TextData] = []
 
@@ -39,7 +39,7 @@ struct DeviceData: Decodable, ConfigValidateable {
         screenshotsPath: FileURL,
         numberOfSlices: Int,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
-        templateImage: NSBitmapImageRep? = nil,
+        templateImage: CGImage? = nil,
         screenshotData: [ScreenshotData] = [],
         textData: [TextData] = [],
         gapWidth: Int = 0
@@ -59,7 +59,10 @@ struct DeviceData: Decodable, ConfigValidateable {
 
     // swift-format:
     func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
-        guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
+        guard
+            let templateImageRep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL),
+            let templateImage = templateImageRep.cgImage
+        else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
@@ -75,10 +78,10 @@ struct DeviceData: Decodable, ConfigValidateable {
             parsedScreenshots[folder.lastPathComponent] = dictionary
         }
 
-        let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImage.size) }
+        let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImageRep.size) }
         let processedScreenshotData =
             screenshotData
-            .map { $0.makeProcessedData(size: templateImage.size) }
+            .map { $0.makeProcessedData(size: templateImageRep.size) }
             .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(
