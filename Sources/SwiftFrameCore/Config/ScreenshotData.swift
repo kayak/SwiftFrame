@@ -1,6 +1,6 @@
 import Foundation
 
-struct ScreenshotData: Decodable, ConfigValidateable, Equatable, Sendable {
+struct ScreenshotData: Decodable, ConfigValidateable, Equatable {
 
     // MARK: - Properties
 

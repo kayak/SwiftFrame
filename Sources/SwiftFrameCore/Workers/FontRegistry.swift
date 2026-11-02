@@ -1,23 +1,22 @@
 import AppKit
 import Foundation
-import Synchronization
 
-final class FontRegistry: Sendable {
+final class FontRegistry {
 
     // MARK: - Properties
 
-    static let shared = FontRegistry()
+    static var shared = FontRegistry()
 
     // Key is path on file system, element is the corresponding font name
-    private let registeredFontPaths = Mutex<[String: String]>([:])
+    private var registeredFontPaths: [String: String] = [:]
 
     // MARK: - Font Handling
 
     /// Registers the font at the specified path if source is a file rather than `NSFont`.
     @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
         switch source {
-        case .systemFont(let pointSize):
-            return NSFont.systemFont(ofSize: pointSize)
+        case .nsFont(let font):
+            return font
         case .filePath(let path):
             return try registerFont(atPath: path)
         }
@@ -34,7 +33,7 @@ final class FontRegistry: Sendable {
         }
 
         let fontName: String
-        if let registeredFont = registeredFontPaths.withLock({ $0[url.absoluteString] }) {
+        if let registeredFont = registeredFontPaths[url.absoluteString] {
             fontName = registeredFont
         } else {
             if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
@@ -43,7 +42,7 @@ final class FontRegistry: Sendable {
                 )
             }
             let newFontName = try getFontName(from: url)
-            registeredFontPaths.withLock { $0[url.absoluteString] = newFontName }
+            registeredFontPaths[url.absoluteString] = newFontName
             fontName = newFontName
         }
 

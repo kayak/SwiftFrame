@@ -3,7 +3,7 @@ import Foundation
 
 typealias AssociatedString = (string: String, data: TextData)
 
-struct TextData: Decodable, ConfigValidateable, Sendable {
+struct TextData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 

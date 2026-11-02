@@ -1,21 +1,11 @@
 import AppKit
 import Foundation
-import Synchronization
 
 public class ConfigProcessor: VerbosePrintable {
 
     // MARK: - Properties
 
-    static var shouldColorOutput: Bool {
-        get {
-            colorOutputSetting.withLock { $0 }
-        }
-        set {
-            colorOutputSetting.withLock { $0 = newValue }
-        }
-    }
-
-    private static let colorOutputSetting = Mutex(true)
+    static var shouldColorOutput = true
 
     public let verbose: Bool
 
@@ -91,18 +81,12 @@ public class ConfigProcessor: VerbosePrintable {
 
         let imageRenderingStart = CFAbsoluteTimeGetCurrent()
 
-        let deviceData = data.deviceData
-        let outputPaths = data.outputPaths
-        let outputFormat = data.outputFormat
-
-        DispatchQueue.concurrentPerform(iterations: deviceData.count) { [verbose, shouldOutputWholeImage] index in
-            ky_executeOrExit(verbose: verbose) {
-                try ConfigProcessor.process(
-                    deviceData: deviceData[index],
-                    outputPaths: outputPaths,
-                    outputFormat: outputFormat,
-                    shouldOutputWholeImage: shouldOutputWholeImage
-                )
+        DispatchQueue.concurrentPerform(iterations: data.deviceData.count) { index in
+            ky_executeOrExit(verbose: verbose) { [weak self] in
+                guard let `self` else {
+                    throw NSError(description: "Could not reference weak self")
+                }
+                try self.process(deviceData: self.data.deviceData[index])
             }
         }
 
@@ -110,12 +94,7 @@ public class ConfigProcessor: VerbosePrintable {
         printElapsedTime("Rendered and sliced all screenshots", startTime: imageRenderingStart)
     }
 
-    private static func process(
-        deviceData: DeviceData,
-        outputPaths: [FileURL],
-        outputFormat: FileFormat,
-        shouldOutputWholeImage: Bool
-    ) throws {
+    private func process(deviceData: DeviceData) throws {
         let group = DispatchGroup()
 
         for (locale, imageDict) in deviceData.screenshotsGroupedByLocale {
@@ -134,19 +113,19 @@ public class ConfigProcessor: VerbosePrintable {
 
             let composer = try ImageComposer(canvasSize: templateImage.ky_nativeSize)
             try composer.add(screenshots: imageDict, with: deviceData.screenshotData, for: locale)
-            composer.addTemplateImage(templateImage)
+            try composer.addTemplateImage(templateImage)
 
             try composer.addStrings(deviceData.textData, locale: locale, deviceIdentifier: deviceData.outputSuffixes.joined())
 
             try ImageWriter.finish(
                 context: composer.context,
-                with: outputPaths,
+                with: data.outputPaths,
                 sliceSize: sliceSize,
                 gapWidth: deviceData.gapWidth,
                 outputWholeImage: shouldOutputWholeImage,
                 locale: locale,
                 suffixes: deviceData.outputSuffixes,
-                format: outputFormat
+                format: data.outputFormat
             )
 
             for suffix in deviceData.outputSuffixes {

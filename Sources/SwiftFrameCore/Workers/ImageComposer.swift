@@ -20,9 +20,13 @@ final class ImageComposer {
 
     // MARK: - Composition
 
-    func addTemplateImage(_ image: CGImage) {
+    func addTemplateImage(_ image: NSBitmapImageRep) throws {
+        guard let templateImage = image.cgImage else {
+            throw NSError(description: "Could not render template image")
+        }
+
         context.cg.saveGState()
-        context.cg.draw(image, in: image.ky_nativeRect)
+        context.cg.draw(templateImage, in: image.ky_nativeRect)
         context.cg.restoreGState()
     }
 

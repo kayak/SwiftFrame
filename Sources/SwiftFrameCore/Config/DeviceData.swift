@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-struct DeviceData: Decodable, ConfigValidateable, Sendable {
+struct DeviceData: Decodable, ConfigValidateable {
 
     // MARK: - Properties
 
@@ -15,7 +15,7 @@ struct DeviceData: Decodable, ConfigValidateable, Sendable {
     @DecodableDefault.IntZero var gapWidth: Int
 
     private(set) var screenshotsGroupedByLocale: [String: [String: URL]]!
-    private(set) var templateImage: CGImage?
+    private(set) var templateImage: NSBitmapImageRep?
     private(set) var screenshotData: [ScreenshotData] = []
     private(set) var textData: [TextData] = []
 
@@ -39,7 +39,7 @@ struct DeviceData: Decodable, ConfigValidateable, Sendable {
         screenshotsPath: FileURL,
         numberOfSlices: Int,
         screenshotsGroupedByLocale: [String: [String: URL]]? = nil,
-        templateImage: CGImage? = nil,
+        templateImage: NSBitmapImageRep? = nil,
         screenshotData: [ScreenshotData] = [],
         textData: [TextData] = [],
         gapWidth: Int = 0
@@ -59,10 +59,7 @@ struct DeviceData: Decodable, ConfigValidateable, Sendable {
 
     // swift-format:
     func makeProcessedData(localesRegex: Regex<AnyRegexOutput>?) throws -> DeviceData {
-        guard
-            let templateImageRep = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL),
-            let templateImage = templateImageRep.cgImage
-        else {
+        guard let templateImage = ImageLoader.loadRepresentation(at: templateImagePath.absoluteURL) else {
             throw NSError(description: "Error while loading template image at path \(templateImagePath.absoluteString)")
         }
 
@@ -78,10 +75,10 @@ struct DeviceData: Decodable, ConfigValidateable, Sendable {
             parsedScreenshots[folder.lastPathComponent] = dictionary
         }
 
-        let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImageRep.size) }
+        let processedTextData = try textData.map { try $0.makeProcessedData(size: templateImage.size) }
         let processedScreenshotData =
             screenshotData
-            .map { $0.makeProcessedData(size: templateImageRep.size) }
+            .map { $0.makeProcessedData(size: templateImage.size) }
             .sorted { $0.zIndex < $1.zIndex }
 
         return DeviceData(

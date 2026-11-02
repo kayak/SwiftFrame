@@ -1,4 +1,4 @@
-// swift-tools-version:6.3
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftFrame",
     platforms: [
-        .macOS(.v15)
+        .macOS(.v13)
     ],
     products: [
         .executable(name: "swiftframe", targets: ["SwiftFrame"])

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Wrapper struct to avoid some errors related to relative paths.
-struct FileURL: Decodable, Sendable {
+struct FileURL: Decodable {
 
     // MARK: - Properties
 
