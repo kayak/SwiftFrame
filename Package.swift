@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftFrame",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v15)
     ],
     products: [
         .executable(name: "swiftframe", targets: ["SwiftFrame"])
