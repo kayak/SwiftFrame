@@ -2,7 +2,10 @@ import AppKit
 import Foundation
 
 // Used for keeping attributed strings that were parsed on the main thread in memory for asynchronous processing
-final class AttributedStringCache: NSObject {
+//
+// This type is `@unchecked Sendable` because `NSAttributedString` is not `Sendable` on macOS. This is safe: only `process`
+// writes to `cache`, on the main thread, and it finishes before the concurrent rendering starts. After that, threads only read `cache`.
+final class AttributedStringCache: NSObject, @unchecked Sendable {
 
     // MARK: - Nested Type
 

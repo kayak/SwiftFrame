@@ -1,14 +1,15 @@
 import AppKit
 import Foundation
+import os
 
-final class FontRegistry {
+final class FontRegistry: Sendable {
 
     // MARK: - Properties
 
-    static var shared = FontRegistry()
+    static let shared = FontRegistry()
 
     // Key is path on file system, element is the corresponding font name
-    private var registeredFontPaths: [String: String] = [:]
+    private let registeredFontPaths = OSAllocatedUnfairLock(initialState: [String: String]())
 
     // MARK: - Font Handling
 
@@ -33,7 +34,7 @@ final class FontRegistry {
         }
 
         let fontName: String
-        if let registeredFont = registeredFontPaths[url.absoluteString] {
+        if let registeredFont = registeredFontPaths.withLock({ $0[url.absoluteString] }) {
             fontName = registeredFont
         } else {
             if !CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) {
@@ -42,7 +43,7 @@ final class FontRegistry {
                 )
             }
             let newFontName = try getFontName(from: url)
-            registeredFontPaths[url.absoluteString] = newFontName
+            registeredFontPaths.withLock { $0[url.absoluteString] = newFontName }
             fontName = newFontName
         }
 

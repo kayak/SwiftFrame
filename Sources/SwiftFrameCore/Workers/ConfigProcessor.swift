@@ -1,11 +1,23 @@
 import AppKit
 import Foundation
+import os
 
-public class ConfigProcessor: VerbosePrintable {
+// This type is `@unchecked Sendable` because `data` holds non-`Sendable` images and fonts. This is safe: only `validate` writes
+// to `data`, and it finishes before `run` starts the concurrent rendering, which only reads `data`.
+public class ConfigProcessor: VerbosePrintable, @unchecked Sendable {
 
     // MARK: - Properties
 
-    static var shouldColorOutput = true
+    static var shouldColorOutput: Bool {
+        get {
+            colorOutputSetting.withLock { $0 }
+        }
+        set {
+            colorOutputSetting.withLock { $0 = newValue }
+        }
+    }
+
+    private static let colorOutputSetting = OSAllocatedUnfairLock(initialState: true)
 
     public let verbose: Bool
 

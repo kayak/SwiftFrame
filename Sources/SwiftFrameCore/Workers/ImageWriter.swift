@@ -96,7 +96,7 @@ final class ImageWriter {
 
 extension ImageWriter {
 
-    struct OutputConfiguration {
+    struct OutputConfiguration: Sendable {
 
         // MARK: - Properties
 
