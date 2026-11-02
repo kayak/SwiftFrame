@@ -12,7 +12,7 @@ final class FontRegistry {
 
     // MARK: - Font Handling
 
-    /// Registers the font at the specified path if source is a file rather than `NSFont`
+    /// Registers the font at the specified path if source is a file rather than `NSFont`.
     @discardableResult func registerFont(from source: FontSource) throws -> NSFont {
         switch source {
         case .nsFont(let font):
