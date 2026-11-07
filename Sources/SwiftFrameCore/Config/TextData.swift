@@ -9,7 +9,7 @@ struct TextData: Decodable, ConfigValidateable {
 
     let titleIdentifier: String
     let textAlignment: TextAlignment
-    /// Text group will be prioritized over this, if specified
+    /// Text group will be prioritized over this, if specified.
     let maxFontSizeOverride: CGFloat?
     let fontOverride: FontSource?
     let textColorOverrideString: String?

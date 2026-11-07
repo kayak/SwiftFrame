@@ -62,7 +62,7 @@ final class TextRenderer {
     // MARK: - Fitting & Size Computations
 
     /// Determines the maximum point size of the specified font that allows to render the given text onto a
-    /// particular number of lines
+    /// particular number of lines.
     static func maximumFontSizeThatFits(string: String, font: NSFont, alignment: TextAlignment, maxSize: CGFloat, size: CGSize) throws
         -> CGFloat
     {
